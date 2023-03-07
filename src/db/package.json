@@ -1,0 +1,15 @@
+{
+  "name": "db",
+  "version": "1.0.0",
+  "description": "",
+  "main": "",
+  "scripts": {
+    "new": "node utils/create_migration.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "knex": "^2.4.2",
+    "pg": "^8.10.0"
+  }
+}
