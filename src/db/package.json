@@ -4,7 +4,11 @@
   "description": "",
   "main": "",
   "scripts": {
-    "new": "node utils/create_migration.js"
+    "new": "npx knex migrate:make",
+    "up": "npx knex migrate:up",
+    "down": "npx knex migrate:down",
+    "up:all": "npx knex migrate:latest",
+    "down:all": "npx knex migrate:rollback --all"
   },
   "author": "",
   "license": "MIT",

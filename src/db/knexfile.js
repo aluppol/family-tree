@@ -10,8 +10,9 @@ module.exports = {
     connection: {
       host: 'localhost',
       port: '5432',
-      user:     'postgres',
-      password: 'pg_password'
+      user: 'postgres',
+      password: 'pg_password',
+      database: 'family_tree'
     },
     pool: {
       min: 2,
