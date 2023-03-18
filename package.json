@@ -22,7 +22,7 @@
     "url": "git+https://gitlab.com/albert-l/family-tree.git"
   },
   "author": "Albert Luppol",
-  "license": "SEE LICENSE IN README.md",
+  "license": "MIT",
   "bugs": {
     "url": "https://gitlab.com/albert-l/family-tree/issues"
   },
