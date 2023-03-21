@@ -1,34 +1,32 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { PeopleService } from './people.service';
-import { CreatePersonDto } from '../transport_layer/dto/create-person.dto';
-import { UpdatePersonDto } from '../transport_layer/dto/update-person.dto';
 
 @Controller('people')
 export class PeopleController {
-  constructor(private readonly peopleService: PeopleService) {}
+  constructor(private readonly _peopleService: PeopleService) {}
 
   @Post()
   create(@Body() createPersonDto: CreatePersonDto) {
-    return this.peopleService.create(createPersonDto);
+    return this._peopleService.create(createPersonDto);
   }
 
   @Get()
   findAll() {
-    return this.peopleService.findAll();
+    return this._peopleService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.peopleService.findOne(+id);
+    return this._peopleService.findOne(+id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePersonDto: UpdatePersonDto) {
-    return this.peopleService.update(+id, updatePersonDto);
+    return this._peopleService.update(+id, updatePersonDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.peopleService.remove(+id);
+    return this._peopleService.remove(+id);
   }
 }

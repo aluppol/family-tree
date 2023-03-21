@@ -10,7 +10,6 @@ exports.up = function(knex) {
         CREATE TABLE auth."Users" (
             id BIGSERIAL PRIMARY KEY,
 
-            "cognitoId" VARCHAR(100) NOT NULL,
             "personId" BIGINT,
 
             "createdAt" TIMESTAMP NOT NULL DEFAULT now(),

@@ -1,30 +1,23 @@
-import { Neo4jModule } from 'nest-neo4j';
+import Joi from 'joi';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { PeopleService } from './services_layer';
-import { PeopleController } from './transport_layer/controllers';
+import { DatabaseModule } from './data_access/database.module';
+import { PeopleController } from './presentation/people/controller/people.controller';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
-    Neo4jModule.forRootAsync({
-      scheme: process.env.DB_NEO4J_SCHEME,
-      host: process.env.DB_NEO4J_HOST,
-      port: process.env.DB_NEO4J_PORT,
-      username: process.env.DB_NEO4J_USERNAME,
-      password: process.env.DB_NEO4J_PASSWORD,
+    ConfigModule.forRoot({
+      envFilePath: '../../.env',
+      validationSchema: Joi.object({
+        DB_POSTGRESQL_HOST: Joi.string().required(),
+        DB_POSTGRESQL_PORT: Joi.number().required(),
+        DB_POSTGRESQL_USER: Joi.string().required(),
+        DB_POSTGRESQL_PASSWORD: Joi.string().required(),
+        DB_POSTGRESQL_DB_NAME: Joi.string().required(),
+        PORT: Joi.number(),
+      }),
     }),
-    TypeOrmModule.forRoot({
-      type: 'neo4j',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'root',
-      database: 'test',
-      entities: [],
-      synchronize: true,
-    }),
+    DatabaseModule,
   ],
   controllers: [PeopleController],
   providers: [PeopleService],
