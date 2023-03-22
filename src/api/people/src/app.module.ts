@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './data_access/database.module';
 import { PeopleController } from './presentation/people/controller/people.controller';
+import { PeopleService } from './business_logic';
 
 @Module({
   imports: [
