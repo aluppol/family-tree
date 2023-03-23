@@ -13,13 +13,10 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
 } from 'typeorm';
-import { IContextModifier } from '../base';
 import { Base, IBase } from '../base/base.model';
-import { User } from '../users/user.model';
 
-@Entity()
+@Entity({ schema: 'src', name: 'People' })
 export class Person extends Base implements IPerson {
   @Column({ type: 'varchar' })
   @IsString()
@@ -43,17 +40,17 @@ export class Person extends Base implements IPerson {
   @IsInt()
   motherId?: number;
 
-  @Column({ type: 'bigint' })
-  @IsInt()
-  createdBy: number;
+  // @Column({ type: 'bigint' })
+  // @IsInt()
+  // createdBy: number;
 
-  @Column({ type: 'bigint' })
-  @IsInt()
-  updatedBy?: number;
+  // @Column({ type: 'bigint' })
+  // @IsInt()
+  // updatedBy?: number;
 
-  @Column({ type: 'bigint' })
-  @IsInt()
-  deletedBy?: number;
+  // @Column({ type: 'bigint' })
+  // @IsInt()
+  // deletedBy?: number;
 
   @BeforeInsert()
   @BeforeUpdate()
@@ -73,9 +70,9 @@ export class Person extends Base implements IPerson {
   @JoinColumn()
   children?: Person[];
 
-  @OneToOne(() => User, (user) => user.person)
-  @JoinColumn()
-  user?: User;
+  // @OneToOne(() => User, (user) => user.person)
+  // @JoinColumn()
+  // user?: User;
 
   constructor(entity: IPersonPayload & Partial<IBase>) {
     super(entity);
@@ -93,7 +90,7 @@ export class Person extends Base implements IPerson {
 
 export interface IPerson extends IPersonPayload, IBase {}
 
-export interface IPersonPayload extends IContextModifier {
+export interface IPersonPayload {
   name: string;
   familyName: string;
   birthday: Date;
@@ -103,5 +100,5 @@ export interface IPersonPayload extends IContextModifier {
   father?: Person;
   mother?: Person;
   children?: Person[];
-  user?: User;
+  // user?: User;
 }

@@ -8,7 +8,8 @@
     "up": "npx knex migrate:up",
     "down": "npx knex migrate:down",
     "up:all": "npx knex migrate:latest",
-    "down:all": "npx knex migrate:rollback --all"
+    "down:all": "npx knex migrate:rollback --all",
+    "seed": "npx knex seed:run"
   },
   "author": "",
   "license": "MIT",

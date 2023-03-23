@@ -1,5 +1,10 @@
-import { IUser } from 'src/data_access';
+// import { IUser } from 'src/data_access';
 
+interface IUser {
+  id: number;
+  personId: number;
+  createdAt: Date;
+}
 interface IRequestContext {
   user: IUser;
 }

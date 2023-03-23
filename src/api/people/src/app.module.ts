@@ -1,9 +1,12 @@
-import Joi from 'joi';
+import * as Joi from 'joi';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './data_access/database.module';
 import { PeopleController } from './presentation/people/controller/people.controller';
 import { PeopleService } from './business_logic';
+import { ParseDatePipe } from './utils';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Person } from './data_access';
 
 @Module({
   imports: [
@@ -19,8 +22,9 @@ import { PeopleService } from './business_logic';
       }),
     }),
     DatabaseModule,
+    TypeOrmModule.forFeature([Person]),
   ],
   controllers: [PeopleController],
-  providers: [PeopleService],
+  providers: [PeopleService, ParseDatePipe],
 })
 export class AppModule {}

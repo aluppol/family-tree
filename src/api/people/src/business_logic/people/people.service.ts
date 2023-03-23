@@ -14,10 +14,8 @@ export class PeopleService extends ContextService {
   }
 
   public async create(createPersonDto: IPersonCreateDto): Promise<IPerson> {
-    const { user } = this.context;
     const personPayload = new Person({
       ...createPersonDto,
-      createdBy: user.id,
     });
     return this._peopleRepository.create(personPayload);
   }
@@ -31,8 +29,7 @@ export class PeopleService extends ContextService {
     limit = 10,
     offset = 0,
   ): Promise<IPerson[]> {
-    const { ids, name, familyName, birthday, fatherIds, motherIds, createdBy } =
-      options;
+    const { ids, name, familyName, birthday, fatherIds, motherIds } = options;
     return this._peopleRepository.find({
       where: {
         id: In(ids),
@@ -41,7 +38,6 @@ export class PeopleService extends ContextService {
         birthday,
         fatherId: In(fatherIds),
         motherId: In(motherIds),
-        createdBy: In(createdBy),
       },
       take: limit,
       skip: offset,
@@ -75,5 +71,4 @@ export interface IPeopleReadManyOptions {
   birthday?: Date;
   fatherIds?: number[];
   motherIds?: number[];
-  createdBy?: number[];
 }
