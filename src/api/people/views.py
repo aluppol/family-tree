@@ -13,7 +13,7 @@ class PeopleList(generics.ListCreateAPIView):
         if name is not None:
             queryset = queryset.filter(name=name)
 
-        familyName = self.request.query_params.get('familyName')
+        familyName = self.request.query_params.get('family_ame')
         if familyName is not None:
             queryset = queryset.filter(familyName=familyName)
 
@@ -21,15 +21,16 @@ class PeopleList(generics.ListCreateAPIView):
         if birthday is not None:
             queryset = queryset.filter(birthday=birthday)
 
-        motherId = self.request.query_params.get('motherId')
+        motherId = self.request.query_params.get('mother_d')
         if motherId is not None:
             queryset = queryset.filter(motherId=motherId)
 
-        fatherId = self.request.query_params.get('fatherId')
+        fatherId = self.request.query_params.get('father_id')
         if fatherId is not None:
             queryset = queryset.filter(fatherId=fatherId)
 
         return queryset
+
 
 class PersonDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PersonSerializer
