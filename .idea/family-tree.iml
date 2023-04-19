@@ -23,6 +23,7 @@
       <excludeFolder url="file://$MODULE_DIR$/db/postgres/data/pg_twophase" />
       <excludeFolder url="file://$MODULE_DIR$/db/postgres/data/pg_wal" />
       <excludeFolder url="file://$MODULE_DIR$/db/postgres/data/pg_xact" />
+      <excludeFolder url="file://$MODULE_DIR$/src/api/venv" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+*.log
+*.sql
+*.sqlite3
+*.swp
+.dockerignore
+.git
+.gitignore

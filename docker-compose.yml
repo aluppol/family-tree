@@ -25,8 +25,6 @@ services:
       - "6379:6379"
     volumes:
       - ./db/redis:/data
-#    networks:
-#      - app_net
     restart: always
 
   mongo:
@@ -52,18 +50,19 @@ services:
       - redis
       - mongo
 
-  people:
-    build: ./src/api/people
-    command: python manage.py runserver 0.0.0.0:3001
+  django:
+    build: ./src/api
     volumes:
-      - ./src/api/people:/app
+      - ./src/api:/app
     env_file:
       - .env
+    restart: always
     ports:
       - "3001:3001"
     depends_on:
       - postgres
-      - auth
+    networks:
+      - src
 
   nginx:
     image: nginx:1.21.0-alpine
@@ -75,7 +74,7 @@ services:
       - "443:443"
     depends_on:
       - auth
-      - people
+      - django
 
 networks:
   auth:
