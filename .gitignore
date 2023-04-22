@@ -56,9 +56,9 @@ build/
 /people/*/migrations/
 /people/static/assets/
 
-db/postgres/data/*
-db/mongo/data/*
-db/redis/data/*
+db/postgres/data/
+db/mongo/data/
+db/redis/data/
 
 # Other project specific files
 *.env
@@ -74,3 +74,6 @@ build/
 *.swp
 *.swo
 *.sqlite3
+
+node_modules
+package-lock.json

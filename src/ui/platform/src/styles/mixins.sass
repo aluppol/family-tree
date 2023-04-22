@@ -1,0 +1,55 @@
+// Media Query Mixin
+@mixin respond-to($media)
+  @if $media == 'phone'
+    @media (max-width: 480px)
+      @content
+  @else if $media == 'tablet-portrait'
+    @media (max-width: 768px)
+      @content
+  @else if $media == 'tablet-landscape'
+    @media (max-width: 1024px)
+      @content
+  @else if $media == 'desktop'
+    @media (max-width: 1200px)
+      @content
+  @else if $media == 'desktop-large'
+    @media (min-width: 1201px)
+      @content
+
+// Flexbox Mixin
+@mixin flexbox($direction: row, $wrap: nowrap, $justify: flex-start, $align: stretch)
+  display: flex
+  flex-direction: $direction
+  flex-wrap: $wrap
+  justify-content: $justify
+  align-items: $align
+
+// Center Content Mixin
+@mixin center-content
+  display: flex
+  justify-content: center
+  align-items: center
+
+// Border Mixin
+@mixin border($width: 1px, $style: solid, $color: #000)
+  border: $width $style $color
+
+// Border Radius Mixin
+@mixin border-radius($radius: 4px)
+  border-radius: $radius
+
+// Box Shadow Mixin
+@mixin box-shadow($h-offset: 0, $v-offset: 2px, $blur: 4px, $spread: 0, $color: rgba(0, 0, 0, 0.1))
+  box-shadow: $h-offset $v-offset $blur $spread $color
+
+// Transition Mixin
+@mixin transition($property: all, $duration: 0.3s, $timing-function: ease, $delay: 0s)
+  transition: $property $duration $timing-function $delay
+
+// Example usage of mixins:
+.example
+  @include border-radius(5px)
+  @include box-shadow
+  @include transition
+  @include respond-to('phone')
+    font-size: 14px
