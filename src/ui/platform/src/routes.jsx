@@ -1,29 +1,22 @@
 // src/routes.js
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import SearchPage from './pages/SearchPage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import PersonPage from './pages/PersonPage';
-import SettingsPage from './pages/SettingsPage';
-import AuthGuard from './components/AuthGuard';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import HomePage from './pages/Home/Home';
+import LoginPage from './pages/Login/Login';
+import RegisterPage from './pages/Register/Register';
+import ProtectedRoute from './components/ProtectedRoute';
 
-const Routes = () => {
+const Urls = () => {
   return (
-    <Router>
-      <Switch>
-      <Route path="/login" component={LoginPage} />
-      <AuthGuard>
-            <Route exact path="/" component={HomePage} />
-            <Route path="/search" component={SearchPage} />
-            <Route path="/register" component={RegisterPage} />
-            <Route path="/person" component={PersonPage} />
-            <Route path="/settings" component={SettingsPage} />
-        </AuthGuard>
-      </Switch>
-    </Router>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/" element={<ProtectedRoute />}>
+        <Route index element={<HomePage />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
-};
+}
 
-export default Routes;
+export default Urls;

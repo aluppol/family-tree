@@ -1,20 +1,29 @@
 // src/pages/LoginPage.js
 import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../components/AuthContext';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { setAuthToken, setRefreshToken } = useAuth();
+
+  const [login, setLogin] = useState('');
+  const [pass, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleLogin = (e) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { from } = location.state || { from: { pathname: '/' }}
+
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     // Replace this with your actual authentication logic
-    const isAuthenticated = email === 'test@example.com' && password === 'password';
+    const { auth, refresh } = (await authUser(login, pass)) || {};
 
-    if (isAuthenticated) {
-      // Redirect to the home page or any other protected route
-      console.log('Login successful');
+    if (auth && refresh) {
+      setAuthToken(auth);
+      setRefreshToken(refresh);
+      navigate(from);
     } else {
       setError('Invalid email or password');
     }
@@ -22,14 +31,14 @@ const LoginPage = () => {
 
   return (
     <div className="login-page">
-      <h1>Login</h1>
+      <h1>Login Page</h1>
       <form onSubmit={handleLogin}>
         <div>
-          <label>Email:</label>
+          <label>Login:</label>
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="login"
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
             required
           />
         </div>
@@ -37,7 +46,7 @@ const LoginPage = () => {
           <label>Password:</label>
           <input
             type="password"
-            value={password}
+            value={pass}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
@@ -50,3 +59,15 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
+
+const authUser = async (login, pass) => {
+  return new Promise((res) => {
+    setTimeout(() => {
+        if (login === 'test' && pass === 'pass') {
+          return res({ auth: 'auth_token', refresh: 'refresh_token' });
+        }
+        res(null);
+    }, 1000);
+  });
+}
