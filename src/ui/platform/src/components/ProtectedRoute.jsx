@@ -53,7 +53,7 @@ const validateTokenWithServer = async (token) => {
           return res(true);
         }
         res(false);
-    }, 1000);
+    }, 4000);
   });
 };
 
