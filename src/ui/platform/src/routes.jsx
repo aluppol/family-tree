@@ -16,6 +16,7 @@ const Urls = () => {
       <Route path='/' element={<ProtectedRoute />}>
         <Route path='/' element={<PlatformLayoutPage />}>
           <Route index element={<HomePage />} />
+          <Route path='/people' element={<PersonPage />} />
           <Route path='/person/:id' element={<PersonPage />} />
         </Route>
       </Route>

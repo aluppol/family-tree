@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Person.sass';
 import { useParams, useNavigate, useLocation, Routes, Route } from 'react-router-dom';
-import { PersonService } from './PersonService';
+import { personService } from './PersonService';
 import PersonOverview from './PersonOverview/PersonOverview';
 import PersonEdit from './PersonEdit/PersonEdit';
 
@@ -15,7 +15,7 @@ const PersonPage = () => {
   const showEditButton = location.pathname.endsWith('/overview');
 
   const fetchData = async (id) => {
-    const person = await PersonService.getPerson(personId);
+    const person = await personService.getPerson(personId);
     setPerson(person);
   }
 
@@ -34,7 +34,7 @@ const PersonPage = () => {
   const handleSave = async (payload) => {
     const isCreation = !person?.id;
     try {
-      const res = await (isCreation ? PersonService.createPerson(payload) : PersonService.updatePerson(person.id, payload));
+      const res = await (isCreation ? personService.createPerson(payload) : personService.updatePerson(person.id, payload));
       setPerson(res.data);
       navigate(`/person/${res.data?.id}/overview`, { replace: isCreation ? true : false });
     } catch (e) {

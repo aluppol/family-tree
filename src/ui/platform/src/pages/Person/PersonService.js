@@ -1,21 +1,21 @@
 import axios from 'axios'; 
 
-export class PersonService {
-    baseUrl = 'http://localhost:3000';
+class PersonService {
+    baseUrl = 'http://0.0.0.0:3001';
     url = '/people';
 
-    static async getPerson(id) {
+    async getPerson(id) {
         if (!id) return null;
         return axios.get(`${this.baseUrl}${this.url}/${id}`);
         
     }
 
-    static async getPeople() {
+    async getPeople() {
         return axios.get(`${this.baseUrl}${this.url}`);
         
     }
 
-    static async updatePerson(id, payload = {}) {
+    async updatePerson(id, payload = {}) {
         if (!id) throw new Error('You have to provide id in order to update person.');
         const {
            name,
@@ -34,7 +34,7 @@ export class PersonService {
         
     }
 
-    static async createPerson(payload = {}) {
+    async createPerson(payload = {}) {
         const {
            name,
            family_name,
@@ -52,9 +52,11 @@ export class PersonService {
         
     }
 
-    static async deletePerson(id) {
+    async deletePerson(id) {
         if (!id) throw new Error('You have to provide id in order to delete person.')
         return axios.delete(`${this.baseUrl}${this.url}/${id}`);
         
     }
 }
+
+export const personService = new PersonService();

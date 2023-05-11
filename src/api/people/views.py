@@ -13,7 +13,7 @@ class PeopleList(generics.ListCreateAPIView):
         if name is not None:
             queryset = queryset.filter(name=name)
 
-        familyName = self.request.query_params.get('family_ame')
+        familyName = self.request.query_params.get('family_name')
         if familyName is not None:
             queryset = queryset.filter(familyName=familyName)
 
@@ -21,7 +21,7 @@ class PeopleList(generics.ListCreateAPIView):
         if birthday is not None:
             queryset = queryset.filter(birthday=birthday)
 
-        motherId = self.request.query_params.get('mother_d')
+        motherId = self.request.query_params.get('mother_id')
         if motherId is not None:
             queryset = queryset.filter(motherId=motherId)
 
