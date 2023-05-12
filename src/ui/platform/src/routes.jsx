@@ -7,6 +7,7 @@ import RegisterPage from './pages/Register/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 import PersonPage from './pages/Person/Person';
 import PlatformLayoutPage from './pages/PlatformLayout/PlatformLayout';
+import PeoplePage from './pages/People/People.tsx';
 
 const Urls = () => {
   return (
@@ -16,8 +17,8 @@ const Urls = () => {
       <Route path='/' element={<ProtectedRoute />}>
         <Route path='/' element={<PlatformLayoutPage />}>
           <Route index element={<HomePage />} />
-          <Route path='/people' element={<PersonPage />} />
-          <Route path='/person/:id' element={<PersonPage />} />
+          <Route path='/people' element={<PeoplePage />} />
+          <Route path='/person/:id/*' element={<PersonPage />} />
         </Route>
       </Route>
       <Route path='*' element={<Navigate to='/' replace />} />

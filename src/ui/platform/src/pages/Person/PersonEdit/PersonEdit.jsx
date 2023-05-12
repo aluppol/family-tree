@@ -1,7 +1,7 @@
 import React, { Component, useEffect, useState } from 'react';
 import './PersonEdit.sass';
 import { useParams } from 'react-router-dom';
-import { PersonService } from '../PersonService';
+import { PersonService } from '../PersonService.ts';
 
 const PersonEdit = ({ person, errors, onSave }) => {
   return (

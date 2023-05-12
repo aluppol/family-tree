@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import './Person.sass';
 import { useParams, useNavigate, useLocation, Routes, Route } from 'react-router-dom';
-import { personService } from './PersonService';
+import { personService } from './PersonService.ts';
 import PersonOverview from './PersonOverview/PersonOverview';
 import PersonEdit from './PersonEdit/PersonEdit';
 
