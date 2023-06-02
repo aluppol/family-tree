@@ -24,12 +24,12 @@ const NavComponent = ({ showMobileMenu, setShowMobileMenu }) => {
       {/* Desktop Nav */}
       <nav className="nav desktop-nav">
         <Link to="/" className={`nav__link ${location.pathname === '/' ? 'nav__link--active' : ''}`}>Home</Link>
-        <Link to="/people" className={`nav__link ${location.pathname === '/people' ? 'nav__link--active' : ''}`}>People</Link>
+        <Link to="/people" className={`nav__link ${location.pathname.includes('/people') ? 'nav__link--active' : ''}`}>People</Link>
         <div className="nav__link nav__settings">
-          <span>Settings</span>
+          <span className={`${location.pathname.includes('/settings') ? 'nav__settings-dropdown__link--active' : ''}`}>Settings</span>
           <ul className="nav__settings-dropdown">
             <li>
-              <Link to="/profile" className={`nav__settings-dropdown__link ${location.pathname === '/profile' ? 'nav__settings-dropdown__link--active' : ''}`}>Profile</Link>
+              <Link to="/profile" className={`nav__settings-dropdown__link ${location.pathname.includes('/profile') ? 'nav__settings-dropdown__link--active' : ''}`}>Profile</Link>
             </li>
             <li>
               <button onClick={logout} className="nav__settings-dropdown__link nav__settings-dropdown__link--logout">Logout</button>
@@ -45,10 +45,10 @@ const NavComponent = ({ showMobileMenu, setShowMobileMenu }) => {
             <Link to="/" className={`nav__link ${location.pathname === '/' ? 'nav__link--active' : ''}`}>Home</Link>
             {/* <Link to="/people" className={`nav__link ${location.pathname === '/people' ? 'nav__link--active' : ''}`}>People</Link> */}
             <div className="nav__link nav__settings">
-              <span>Settings</span>
+              <span className={`${location.pathname.includes('/settings') ? 'nav__settings-dropdown__link--active' : ''}`}>Settings</span>
               <ul className="nav__settings-dropdown">
                 <li>
-                  <Link to="/profile" className={`nav__link nav__settings-dropdown__link ${location.pathname === '/profile' ? 'nav__settings-dropdown__link--active' : ''}`}>Profile</Link>
+                  <Link to="/profile" className={`nav__link nav__settings-dropdown__link ${location.pathname.includes('/profile') ? 'nav__settings-dropdown__link--active' : ''}`}>Profile</Link>
                 </li>
                 <li>
                   <button onClick={logout} className="nav__settings-dropdown__link nav__settings-dropdown__link--logout">Logout</button>

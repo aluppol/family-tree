@@ -18,7 +18,7 @@ const Urls = () => {
         <Route path='/' element={<PlatformLayoutPage />}>
           <Route index element={<HomePage />} />
           <Route path='/people' element={<PeoplePage />} />
-          <Route path='/person/:id/*' element={<PersonPage />} />
+          <Route path='/people/person/:id/*' element={<PersonPage />} />
         </Route>
       </Route>
       <Route path='*' element={<Navigate to='/' replace />} />

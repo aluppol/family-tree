@@ -1,0 +1,29 @@
+@import '../../styles/theme'
+@import '../../styles/mixins'
+
+$base-font-size: 16px
+$phone-font-size: 14px
+
+.btn-component
+  padding: 2rem
+
+  background-color: $primary-color
+  color: $light-text-color
+  border: none
+  cursor: pointer
+
+  @include border-radius(5px)
+  @include box-shadow
+  @include transition
+
+  &:hover
+    background-color: $secondary-color
+
+  &:focus
+    outline: none
+    box-shadow: 0 0 0 3px $accent-color
+
+  font-size: $base-font-size
+
+  @include respond-to('phone')
+    font-size: $phone-font-size

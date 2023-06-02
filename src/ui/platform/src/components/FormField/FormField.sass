@@ -1,0 +1,58 @@
+@import '../../styles/theme'
+@import '../../styles/mixins'
+
+// Variables
+$form-field-margin-bottom: 30px
+$form-field-label-font-size: $base-font-size
+$form-field-label-transition-duration: 0.3s
+$form-field-label-transition-properties: top, font-size
+$form-field-label-small-top: -30px
+$form-field-label-small-font-size: 12px
+$form-field-input-padding: 10px
+$form-field-input-border: 1px solid $dark-text-color
+$form-field-input-transition-duration: 0.3s
+$form-field-input-focus-border-color: $secondary-color
+$form-field-error-input-border-color: $danger-color
+$form-field-error-message-color: $danger-color
+$form-field-error-message-font-size: 12px
+$form-field-error-message-margin-top: 5px
+
+.form-field-select
+  background-color: white
+
+.form-field
+  position: relative
+  margin-bottom: $form-field-margin-bottom
+
+  label
+    position: absolute
+    top: 0
+    left: 0
+    font-size: $form-field-label-font-size
+    transition: $form-field-label-transition-properties $form-field-label-transition-duration
+    transform-origin: top left
+    @include transition(all, 0.3s)
+
+    &.small
+      top: $form-field-label-small-top
+      font-size: $form-field-label-small-font-size
+
+  input,
+  select.form-field-select
+    width: 100%
+    padding: $form-field-input-padding
+    border: $form-field-input-border
+    transition: border-color $form-field-input-transition-duration
+
+    &:focus
+      border-color: $form-field-input-focus-border-color
+
+  &.error
+    input,
+    select.form-field-select
+      border-color: $form-field-error-input-border-color
+
+    .error-message
+      color: $form-field-error-message-color
+      font-size: $form-field-error-message-font-size
+      margin-top: $form-field-error-message-margin-top

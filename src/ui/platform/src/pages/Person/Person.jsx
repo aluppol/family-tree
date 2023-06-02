@@ -15,7 +15,7 @@ const PersonPage = () => {
   const showEditButton = location.pathname.endsWith('/overview');
 
   const fetchData = async (id) => {
-    const person = await personService.getPerson(personId);
+    const person = await personService.getPerson(id);
     setPerson(person);
   }
 
@@ -34,6 +34,7 @@ const PersonPage = () => {
   const handleSave = async (payload) => {
     const isCreation = !person?.id;
     try {
+      console.log(payload);
       const res = await (isCreation ? personService.createPerson(payload) : personService.updatePerson(person.id, payload));
       setPerson(res.data);
       navigate(`/person/${res.data?.id}/overview`, { replace: isCreation ? true : false });
