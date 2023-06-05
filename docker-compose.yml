@@ -50,7 +50,7 @@ services:
       - redis
       - mongo
 
-  django:
+  api:
     build: ./src/api
     volumes:
       - ./src/api:/app
@@ -74,8 +74,7 @@ services:
       - "443:443"
     depends_on:
       - auth
-      - django
-
+      - api
 networks:
   auth:
   src:

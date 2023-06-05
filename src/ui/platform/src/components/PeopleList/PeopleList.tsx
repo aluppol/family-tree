@@ -9,7 +9,7 @@ const PeopleListComponent = ({ people }: { people: IPerson[] }) => {
         {
           people?.length ? people.map((person) => (
             <li key={person.id}>
-              <Link to={`/person/${person.id}`}>{person.name} {person.family_name}</Link>
+              <Link to={`/people/person/${person.id}/overview`}>{person.name} {person.family_name}</Link>
             </li>
           )) : (
             <h3>There is no people in the system.</h3>

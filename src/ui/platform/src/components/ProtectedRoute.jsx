@@ -1,6 +1,7 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import { useEffect, useState } from "react";
+import { URLS } from "../urls";
 
 const ProtectedRoute = () => {
   const { authToken, setAuthToken, clearTokens, refreshToken } = useAuth();
@@ -25,7 +26,7 @@ const ProtectedRoute = () => {
             setIsLoading(false);
           } else {
             clearTokens();
-            navigate('/login', { state: { from: location }, replace: true });
+            navigate(URLS.login, { state: { from: location }, replace: true });
           }
         }
       } catch (error) {

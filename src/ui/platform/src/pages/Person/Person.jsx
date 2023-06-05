@@ -4,6 +4,7 @@ import { useParams, useNavigate, useLocation, Routes, Route } from 'react-router
 import { personService } from './PersonService.ts';
 import PersonOverview from './PersonOverview/PersonOverview';
 import PersonEdit from './PersonEdit/PersonEdit';
+import { URLS } from '../../urls.js';
 
 const PersonPage = () => {
   const { id: personId } = useParams();
@@ -21,7 +22,7 @@ const PersonPage = () => {
 
   useEffect(() => {
     if (personId === 'new') {
-      navigate('edit');
+      navigate(URLS.person_edit('new'));
     } else if (person?.id !== personId) {
       fetchData(personId);
     }
@@ -34,10 +35,9 @@ const PersonPage = () => {
   const handleSave = async (payload) => {
     const isCreation = !person?.id;
     try {
-      console.log(payload);
       const res = await (isCreation ? personService.createPerson(payload) : personService.updatePerson(person.id, payload));
       setPerson(res.data);
-      navigate(`/person/${res.data?.id}/overview`, { replace: isCreation ? true : false });
+      navigate(URLS.person_overview(res.data?.id), { replace: isCreation ? true : false });
     } catch (e) {
       setErrors(e);
     }

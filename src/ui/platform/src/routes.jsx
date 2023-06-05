@@ -1,13 +1,13 @@
 // src/routes.js
-import React from 'react';
+import { lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import HomePage from './pages/Home/Home';
-import LoginPage from './pages/Login/Login';
-import RegisterPage from './pages/Register/Register';
-import ProtectedRoute from './components/ProtectedRoute';
-import PersonPage from './pages/Person/Person';
-import PlatformLayoutPage from './pages/PlatformLayout/PlatformLayout';
-import PeoplePage from './pages/People/People.tsx';
+const HomePage = lazy(() => import('./pages/Home/Home'));
+const LoginPage = lazy(() => import('./pages/Login/Login'));
+const RegisterPage = lazy(() => import('./pages/Register/Register'));
+const ProtectedRoute = lazy(() => import('./components/ProtectedRoute'));
+const PersonPage = lazy(() => import('./pages/Person/Person'));
+const PlatformLayoutPage = lazy(() => import('./pages/PlatformLayout/PlatformLayout'));
+const PeoplePage = lazy(() => import('./pages/People/People.tsx'));
 
 const Urls = () => {
   return (
