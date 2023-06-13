@@ -12,3 +12,5 @@ export const URLS = {
 
     wildcard: '*',
 }
+
+function joinStrings(a, b)
