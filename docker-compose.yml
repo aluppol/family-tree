@@ -1,0 +1,80 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./db/postgres/data:/var/lib/postgresql/data
+      - ./db/postgres/init_template.sql:/docker-entrypoint-initdb.d/init_template.sql
+      - ./db/postgres/inject-env-vars.sh:/docker-entrypoint-initdb.d/inject-env-vars.sh
+    networks:
+      - src
+    command: >
+      bash -c '
+        docker-entrypoint-initdb.d/inject-env-vars.sh &&
+        docker-entrypoint.sh postgres'
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./db/redis:/data
+    restart: always
+
+  mongo:
+    image: mongo
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./mongo/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    ports:
+      - "27017:27017"
+
+  auth:
+    build: ./src/api/auth
+    command: python manage.py runserver 0.0.0.0:3000
+    volumes:
+      - ./src/api/auth:/app
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - redis
+      - mongo
+
+  api:
+    build: ./src/api
+    volumes:
+      - ./src/api:/app
+    env_file:
+      - .env
+    restart: always
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+    networks:
+      - src
+
+  nginx:
+    image: nginx:1.21.0-alpine
+    restart: always
+    volumes:
+      - ./src/nginx/conf.d:/etc/nginx/conf.d
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - auth
+      - api
+networks:
+  auth:
+  src:

@@ -1,0 +1,130 @@
+@import '../../styles/theme.sass'
+@import '../../styles/mixins.sass'
+
+.nav
+  @include flexbox(row, nowrap, space-between, center)
+  @include transition
+  list-style-type: none
+  margin: 0
+  padding: 0
+
+  &--open
+    position: absolute
+    top: 100%
+    left: 0
+    width: 100%
+    background-color: $primary-color
+    padding: 1rem 0
+    z-index: 20
+
+    .nav__link,
+    .nav__settings
+      display: block
+      width: 100%
+
+.nav__link
+  color: $light-text-color
+  margin: 0 1rem
+  text-decoration: none
+  position: relative
+
+.nav__link
+  &--active
+    color: $secondary-color
+
+.nav__settings
+  cursor: pointer
+
+  &:hover, &:active, &:focus
+    & .nav__settings-dropdown
+      display: block
+
+.nav__settings-dropdown
+  display: none
+  list-style-type: none
+  margin: 0
+  padding: 0
+  position: absolute
+  top: 100%
+  right: 0
+  background-color: $primary-color
+  z-index: 10
+
+  @include respond-to('phone')
+    left: 2rem
+    right: auto
+    background-color: $background-color
+
+  &__link
+    display: block
+    padding: 0.5rem 1rem
+    color: $light-text-color
+    text-decoration: none
+
+    &--active
+      color: $secondary-color
+
+    &--logout
+      background-color: $danger-color
+      border: none
+      color: $light-text-color
+      cursor: pointer
+      display: block
+      font-family: inherit
+      font-size: inherit
+      font-weight: inherit
+      margin: 0
+
+.desktop-nav
+  display: flex
+  @include respond-to('phone')
+    display: none
+
+.mobile-nav
+  display: none
+  @include respond-to('phone')
+    display: block
+    flex-direction: column
+    gap: 10px
+    padding: 20px
+    background-color: $background-color
+    position: fixed
+    top: 0
+    right: 0
+    bottom: 0
+    width: 80%
+    max-width: 300px
+    z-index: 1
+    transition: transform 0.3s ease-in-out
+    transform: translateX(100%)
+
+    &--open
+      transform: translateX(20%)
+
+  .nav__link, .nav__settings
+    color: $text-color
+    padding: 8px 16px
+    border: none
+    background-color: transparent
+    font-size: 18px
+    font-weight: bold
+    text-align: left
+
+.burger-menu
+  display: none
+  background-color: transparent
+  border: none
+  color: $light-text-color
+  cursor: pointer
+
+  @include respond-to('phone')
+    display: block
+
+.mobile-menu-backdrop
+  background-color: rgba(0, 0, 0, 0.5)
+  position: fixed
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+  z-index: 10

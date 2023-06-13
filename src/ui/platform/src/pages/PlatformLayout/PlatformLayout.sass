@@ -1,0 +1,25 @@
+@import '../../styles/theme.sass'
+@import '../../styles/mixins.sass'
+
+.platform-layout-page
+  display: flex
+  flex-direction: column
+  min-height: 100vh
+  position: relative
+
+.header
+  @include flexbox(row, nowrap, space-between, center)
+  background-color: $primary-color
+  padding: 0.5rem 1rem
+
+  @include respond-to('phone')
+    flex-direction: row-reverse
+
+.app-title
+  color: $light-text-color
+  font-family: $heading-font-family
+  margin: 0
+
+.main
+  flex: 1
+  padding: 1rem

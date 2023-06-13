@@ -1,0 +1,61 @@
+@import '../../../styles/theme';
+@import '../../../styles/mixins';
+
+$form-width: 300px
+
+
+.person-edit
+  display: flex
+  justify-content: center
+
+.person-form
+  background-color: $background-color
+  color: $text-color
+  font-size: $base-font-size
+  font-family: $base-font-family
+  line-height: 1.5
+  width: $form-width
+  
+
+  label
+    display: block
+    padding: 10px
+    color: $accent-color
+    text-decoration: none
+    position: relative
+
+    &:hover
+      text-decoration: underline
+
+  input
+    border: 1px solid $primary-color
+    border-radius: 4px
+    padding: 0.5rem
+    font-size: $base-font-size
+
+    &::placeholder
+      color: $primary-color
+
+  select
+    border: 1px solid $primary-color
+    border-radius: 4px
+    padding: 0.5rem
+    font-size: $base-font-size
+
+  button
+    background-color: $secondary-color
+    color: $light-text-color
+    border: none
+    border-radius: 4px
+    padding: 0.5rem 1rem
+    cursor: pointer
+
+    &:hover
+      background-color: darken($secondary-color, 10%)
+
+    &:focus
+      outline: none
+      box-shadow: 0 0 3px $accent-color
+
+  .error-message
+    color: $danger-color
