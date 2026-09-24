@@ -12,18 +12,20 @@ export interface ShellViewProps {
   menu: MenuState;
   menuButtonRef: RefObject<HTMLButtonElement | null>;
   mainRef: RefObject<HTMLElement | null>;
+  isNavigating: boolean;
   children: ReactNode;
 }
 
-export function ShellView({ viewerName, isSandbox, menu, menuButtonRef, mainRef, children }: ShellViewProps): ReactElement {
+export function ShellView({ viewerName, isSandbox, menu, menuButtonRef, mainRef, isNavigating, children }: ShellViewProps): ReactElement {
   return (
     <div className={styles.shell}>
+      {isNavigating && <div className={styles.progress} role="progressbar" aria-label="Loading the page" />}
       <a href={`#${MAIN_CONTENT_ID}`} className={styles.skipLink}>
         Skip to main content
       </a>
       <SiteHeader viewerName={viewerName} menu={menu} menuButtonRef={menuButtonRef} />
       {isSandbox && <SandboxBanner />}
-      <main ref={mainRef} id={MAIN_CONTENT_ID} tabIndex={-1} className={styles.main}>
+      <main ref={mainRef} id={MAIN_CONTENT_ID} tabIndex={-1} className={styles.main} aria-busy={isNavigating}>
         {children}
       </main>
       <SiteFooter />

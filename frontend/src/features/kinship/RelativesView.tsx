@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import { type ReactElement, type RefObject, useEffect, useRef } from 'react';
 import { Link } from 'react-router';
 import type { PersonSummary } from '../../api/types';
 import { Avatar, Badge, Button, CardSection, Icon } from '../../design/components';
@@ -26,8 +26,10 @@ export interface RelativesViewProps {
 }
 
 export function RelativesView({ title, addLabel, emptyText, editLabel, entries, onAdd }: RelativesViewProps): ReactElement {
+  const addButtonRef = useRef<HTMLButtonElement>(null);
+  useFocusRescueAfterRemoval(entries.length, addButtonRef);
   const addButton = (
-    <Button size="small" onClick={onAdd}>
+    <Button ref={addButtonRef} size="small" onClick={onAdd}>
       <Icon name="plus" />
       {addLabel}
     </Button>
@@ -81,4 +83,15 @@ function RelativeActions({ name, editLabel, entry }: { name: string; editLabel: 
       </Button>
     </div>
   );
+}
+
+function useFocusRescueAfterRemoval(entryCount: number, target: RefObject<HTMLElement | null>): void {
+  const previousCount = useRef(entryCount);
+  useEffect(() => {
+    const hasLostAnEntry = entryCount < previousCount.current;
+    previousCount.current = entryCount;
+    if (hasLostAnEntry && document.activeElement === document.body) {
+      target.current?.focus();
+    }
+  }, [entryCount, target]);
 }

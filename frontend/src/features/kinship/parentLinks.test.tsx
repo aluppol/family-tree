@@ -71,6 +71,9 @@ test('removing a parent link asks for confirmation and keeps both people', async
     expect(within(parents).queryByRole('link', { name: 'Susannah Wedgwood' })).not.toBeInTheDocument();
   });
   expect(fakeBackend.person(DARWIN_IDS.susannah)).toBeDefined();
+  await waitFor(() => {
+    expect(within(parents).getByRole('button', { name: 'Add parent' })).toHaveFocus();
+  });
 });
 
 test('adding a child links the chosen person as a child', async () => {

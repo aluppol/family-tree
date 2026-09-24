@@ -1,5 +1,5 @@
 import { type ReactElement, useRef } from 'react';
-import { Outlet, ScrollRestoration, useLocation } from 'react-router';
+import { Outlet, ScrollRestoration, useLocation, useNavigation } from 'react-router';
 import { useViewer, useWorkspace } from '../workspace/workspaceQueries';
 import { ShellView } from './ShellView';
 import { useFocusOnNavigation } from './useFocusOnNavigation';
@@ -11,6 +11,7 @@ export function AppLayout(): ReactElement {
   const { pathname } = useLocation();
   const { menu, menuButtonRef } = useMobileMenu(pathname);
   const mainRef = useRef<HTMLElement>(null);
+  const isNavigating = useNavigation().state !== 'idle';
   useFocusOnNavigation(pathname, mainRef);
   return (
     <ShellView
@@ -19,6 +20,7 @@ export function AppLayout(): ReactElement {
       menu={menu}
       menuButtonRef={menuButtonRef}
       mainRef={mainRef}
+      isNavigating={isNavigating}
     >
       <ScrollRestoration />
       <Outlet />
