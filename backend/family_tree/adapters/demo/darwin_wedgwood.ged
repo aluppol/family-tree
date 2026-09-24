@@ -1,0 +1,874 @@
+0 HEAD
+1 SOUR FAMILY_TREE_DEMO
+2 NAME Family Tree demo data
+1 GEDC
+2 VERS 5.5.1
+2 FORM LINEAGE-LINKED
+1 CHAR UTF-8
+1 LANG English
+0 @I1@ INDI
+1 NAME Charles Robert /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 12 FEB 1809
+2 PLAC The Mount, Shrewsbury, Shropshire, England
+1 DEAT
+2 DATE 19 APR 1882
+2 PLAC Down House, Downe, Kent, England
+1 NOTE Naturalist whose theory of evolution by natural selection was published in On the Origin of Species (1859).
+1 FAMC @F2@
+1 FAMS @F1@
+0 @I2@ INDI
+1 NAME Emma /Wedgwood/
+1 SEX F
+1 BIRT
+2 DATE 2 MAY 1808
+2 PLAC Maer Hall, Maer, Staffordshire, England
+1 DEAT
+2 DATE 2 OCT 1896
+2 PLAC Down House, Downe, Kent, England
+1 NOTE Youngest child of Josiah Wedgwood II and Elizabeth Allen. She married her first cousin Charles Darwin in 1839 and they had ten children.
+1 FAMC @F3@
+1 FAMS @F1@
+0 @I3@ INDI
+1 NAME Erasmus /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 12 DEC 1731
+2 PLAC Elston Hall, Elston, Nottinghamshire, England
+1 DEAT
+2 DATE 18 APR 1802
+2 PLAC Breadsall Priory, Breadsall, Derbyshire, England
+1 NOTE Physician, natural philosopher and poet of Lichfield and Derby. He was the grandfather of both Charles Darwin and Francis Galton.
+1 FAMS @F4@
+1 FAMS @F5@
+0 @I4@ INDI
+1 NAME Mary /Howard/
+1 SEX F
+1 BIRT
+2 DATE 12 FEB 1740
+1 DEAT
+2 DATE 30 JUN 1770
+2 PLAC Lichfield, Staffordshire, England
+1 NOTE Known as Polly; daughter of Charles Howard, a Lichfield solicitor. She was the first wife of Erasmus Darwin.
+1 FAMS @F4@
+0 @I5@ INDI
+1 NAME Elizabeth /Collier/
+1 SEX F
+1 BIRT
+2 DATE BET 1746 AND 1747
+1 DEAT
+2 DATE 1832
+2 PLAC Breadsall Priory, Breadsall, Derbyshire, England
+1 NOTE Natural daughter of Charles Colyear, 2nd Earl of Portmore. She married Edward Sacheverel Pole in 1769 and, as his widow, Erasmus Darwin in 1781.
+1 FAMS @F5@
+0 @I6@ INDI
+1 NAME Charles /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 3 SEP 1758
+2 PLAC Lichfield, Staffordshire, England
+1 DEAT
+2 DATE 15 MAY 1778
+2 PLAC Edinburgh, Scotland
+1 NOTE Eldest son of Erasmus Darwin and a promising medical student at Edinburgh, where he died from a dissecting-room wound. His nephew Charles Robert Darwin was named after him.
+1 FAMC @F4@
+0 @I7@ INDI
+1 NAME Robert Waring /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 30 MAY 1766
+2 PLAC Lichfield, Staffordshire, England
+1 DEAT
+2 DATE 13 NOV 1848
+2 PLAC Shrewsbury, Shropshire, England
+1 NOTE Physician with a large practice in Shrewsbury, where he built The Mount around 1800. He was the father of Charles Darwin.
+1 FAMC @F4@
+1 FAMS @F2@
+0 @I8@ INDI
+1 NAME Frances Anne Violetta /Darwin/
+1 SEX F
+1 BIRT
+2 DATE 1783
+2 PLAC Derbyshire, England
+1 DEAT
+2 DATE 12 FEB 1874
+2 PLAC Leamington, Warwickshire, England
+1 NOTE Known as Violetta; daughter of Erasmus Darwin by his second wife. She was the mother of Francis Galton.
+1 FAMC @F5@
+1 FAMS @F6@
+0 @I9@ INDI
+1 NAME Samuel Tertius /Galton/
+1 SEX M
+1 BIRT
+2 DATE 23 MAR 1783
+2 PLAC Birmingham, Warwickshire, England
+1 DEAT
+2 DATE 23 OCT 1844
+2 PLAC St Leonards-on-Sea, Sussex, England
+1 NOTE Birmingham banker from a Quaker family who retired to Leamington in 1832. He was the father of Francis Galton.
+1 FAMS @F6@
+0 @I10@ INDI
+1 NAME Francis /Galton/
+1 SEX M
+1 BIRT
+2 DATE 16 FEB 1822
+2 PLAC The Larches, Sparkbrook, Birmingham, Warwickshire, England
+1 DEAT
+2 DATE 17 JAN 1911
+2 PLAC Haslemere, Surrey, England
+1 NOTE Traveller, statistician and scientific writer who explored south-western Africa in 1850-52 and studied heredity. He was a half-cousin of Charles Darwin.
+1 FAMC @F6@
+0 @I11@ INDI
+1 NAME Josiah /Wedgwood/
+1 SEX M
+1 BIRT
+2 DATE ABT 12 JUL 1730
+2 PLAC Burslem, Staffordshire, England
+1 DEAT
+2 DATE 3 JAN 1795
+2 PLAC Etruria Hall, Etruria, Staffordshire, England
+1 NOTE Potter who founded the Wedgwood firm in 1759 and built the Etruria works. He was the grandfather of both Charles and Emma Darwin.
+1 FAMS @F7@
+0 @I12@ INDI
+1 NAME Sarah /Wedgwood/
+1 SEX F
+1 BIRT
+2 DATE 1734
+1 DEAT
+2 DATE 1815
+2 PLAC Parkfields, Tittensor, Staffordshire, England
+1 NOTE Daughter of Richard Wedgwood, a cheese factor of Spen Green, Cheshire, and third cousin of her husband Josiah Wedgwood.
+1 FAMS @F7@
+0 @I13@ INDI
+1 NAME Susannah /Wedgwood/
+1 SEX F
+1 BIRT
+2 DATE 3 JAN 1765
+2 PLAC Brick House, Burslem, Staffordshire, England
+1 DEAT
+2 DATE 15 JUL 1817
+2 PLAC Shrewsbury, Shropshire, England
+1 NOTE Eldest child of Josiah Wedgwood, known in the family as Sukey. She was the mother of Charles Darwin.
+1 FAMC @F7@
+1 FAMS @F2@
+0 @I14@ INDI
+1 NAME John /Wedgwood/
+1 SEX M
+1 BIRT
+2 DATE ABT 2 APR 1766
+2 PLAC Staffordshire, England
+1 DEAT
+2 DATE 26 JAN 1844
+2 PLAC Tenby, Pembrokeshire, Wales
+1 NOTE Eldest son of Josiah Wedgwood; a banker and horticulturist who was a founder of the Horticultural Society of London in 1804.
+1 FAMC @F7@
+0 @I15@ INDI
+1 NAME Josiah /Wedgwood/
+1 SEX M
+1 BIRT
+2 DATE 3 APR 1769
+2 PLAC Staffordshire, England
+1 DEAT
+2 DATE 12 JUL 1843
+2 PLAC Maer Hall, Maer, Staffordshire, England
+1 NOTE Known as Jos; master-potter who lived at Maer Hall and became MP for Stoke-upon-Trent in 1832. He was the father of Emma Darwin.
+1 FAMC @F7@
+1 FAMS @F3@
+0 @I16@ INDI
+1 NAME Thomas /Wedgwood/
+1 SEX M
+1 BIRT
+2 DATE 14 MAY 1771
+2 PLAC Etruria, Staffordshire, England
+1 DEAT
+2 DATE 10 JUL 1805
+2 PLAC Eastbury, Tarrant Gunville, Dorset, England
+1 NOTE Early experimenter in photography who recorded images on paper and leather treated with silver nitrate. A lifelong invalid, he never married.
+1 FAMC @F7@
+0 @I17@ INDI
+1 NAME Elizabeth /Allen/
+1 SEX F
+1 BIRT
+2 DATE 1764
+1 DEAT
+2 DATE 31 MAR 1846
+2 PLAC Maer Hall, Maer, Staffordshire, England
+1 NOTE Known as Bessy; eldest daughter of John Bartlett Allen of Cresselly, Pembrokeshire. She married Josiah Wedgwood II in 1792.
+1 FAMS @F3@
+0 @I18@ INDI
+1 NAME Marianne /Darwin/
+1 SEX F
+1 BIRT
+2 DATE 7 APR 1798
+2 PLAC Shrewsbury, Shropshire, England
+1 DEAT
+2 DATE 18 JUL 1858
+1 NOTE Eldest child of Robert and Susannah Darwin. She married the physician Henry Parker in 1824 and they had five children.
+1 FAMC @F2@
+1 FAMS @F8@
+0 @I19@ INDI
+1 NAME Henry /Parker/
+1 SEX M
+1 BIRT
+2 DATE 1788
+1 DEAT
+2 DATE 1856
+1 NOTE Physician who took his MD at Edinburgh in 1814. He married Charles Darwin's eldest sister Marianne in 1824.
+1 FAMS @F8@
+0 @I20@ INDI
+1 NAME Caroline Sarah /Darwin/
+1 SEX F
+1 BIRT
+2 DATE 14 SEP 1800
+2 PLAC Shrewsbury, Shropshire, England
+1 DEAT
+2 DATE 5 JAN 1888
+2 PLAC Leith Hill Place, Surrey, England
+1 NOTE Charles Darwin's elder sister, who taught him as a child. She married her cousin Josiah Wedgwood III and planted the Rhododendron Wood at Leith Hill.
+1 FAMC @F2@
+1 FAMS @F9@
+0 @I21@ INDI
+1 NAME Josiah /Wedgwood/
+1 SEX M
+1 BIRT
+2 DATE 1795
+1 DEAT
+2 DATE 11 MAR 1880
+2 PLAC Leith Hill Place, Surrey, England
+1 NOTE Josiah Wedgwood III, known as Jos; a partner in the Etruria pottery who moved to Leith Hill Place, Surrey, in the 1840s.
+1 FAMC @F3@
+1 FAMS @F9@
+0 @I22@ INDI
+1 NAME Susan Elizabeth /Darwin/
+1 SEX F
+1 BIRT
+2 DATE 3 AUG 1803
+2 PLAC The Mount, Shrewsbury, Shropshire, England
+1 DEAT
+2 DATE 3 OCT 1866
+2 PLAC The Mount, Shrewsbury, Shropshire, England
+1 NOTE Charles Darwin's sister, who never married and lived at The Mount, the family home in Shrewsbury, until her death.
+1 FAMC @F2@
+0 @I23@ INDI
+1 NAME Erasmus Alvey /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 29 DEC 1804
+2 PLAC The Mount, Shrewsbury, Shropshire, England
+1 DEAT
+2 DATE 26 AUG 1881
+2 PLAC London, England
+1 NOTE Charles Darwin's only brother. He qualified in medicine but never practised and lived in London from 1829.
+1 FAMC @F2@
+0 @I24@ INDI
+1 NAME Emily Catherine /Darwin/
+1 SEX F
+1 BIRT
+2 DATE MAY 1810
+2 PLAC The Mount, Shrewsbury, Shropshire, England
+1 DEAT
+2 DATE 2 FEB 1866
+2 PLAC Shrewsbury, Shropshire, England
+1 NOTE Charles Darwin's youngest sister, known as Catherine. In 1863 she married Charles Langton, the widower of her cousin Charlotte Wedgwood.
+1 FAMC @F2@
+1 FAMS @F11@
+0 @I25@ INDI
+1 NAME Charles /Langton/
+1 SEX M
+1 BIRT
+2 DATE 1801
+1 DEAT
+2 DATE 1886
+1 NOTE Clergyman, rector of Onibury, who left the Church of England in 1841. He married Emma Darwin's sister Charlotte in 1832 and Charles Darwin's sister Catherine in 1863.
+1 FAMS @F10@
+1 FAMS @F11@
+0 @I26@ INDI
+1 NAME Sarah Elizabeth /Wedgwood/
+1 SEX F
+1 BIRT
+2 DATE 1793
+1 DEAT
+2 DATE 7 NOV 1880
+2 PLAC Downe, Kent, England
+1 NOTE Eldest child of Josiah Wedgwood II, known as Elizabeth. She never married and settled at Downe, near the Darwins, in 1868.
+1 FAMC @F3@
+0 @I27@ INDI
+1 NAME Charlotte /Wedgwood/
+1 SEX F
+1 BIRT
+2 DATE 1797
+1 DEAT
+2 DATE 2 JAN 1862
+2 PLAC St Leonards-on-Sea, Sussex, England
+1 NOTE Emma Darwin's sister, known as Lotty. She married Charles Langton in 1832 and their only child was Edmund.
+1 FAMC @F3@
+1 FAMS @F10@
+0 @I28@ INDI
+1 NAME Francis /Wedgwood/
+1 SEX M
+1 BIRT
+2 DATE NOV 1800
+2 PLAC Tarrant Gunville, Dorset, England
+1 DEAT
+2 DATE 1 OCT 1888
+2 PLAC Barlaston, Staffordshire, England
+1 NOTE Known as Frank; senior partner in the Wedgwood pottery at Etruria, who later lived at Barlaston.
+1 FAMC @F3@
+0 @I29@ INDI
+1 NAME Hensleigh /Wedgwood/
+1 SEX M
+1 BIRT
+2 DATE 21 JAN 1803
+2 PLAC Tarrant Gunville, Dorset, England
+1 DEAT
+2 DATE JUN 1891
+2 PLAC Gower Street, London, England
+1 NOTE Philologist and barrister, author of A Dictionary of English Etymology (1859-65). He married his cousin Frances Mackintosh in 1832.
+1 FAMC @F3@
+0 @I30@ INDI
+1 NAME Frances /Wedgwood/
+1 SEX F
+1 BIRT
+2 DATE 1806
+1 DEAT
+2 DATE 20 AUG 1832
+1 NOTE Known as Fanny; Emma Darwin's sister and closest companion, who died after a few days' illness at the age of 26.
+1 FAMC @F3@
+0 @I31@ INDI
+1 NAME William Erasmus /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 27 DEC 1839
+2 PLAC Upper Gower Street, London, England
+1 DEAT
+2 DATE 8 SEP 1914
+2 PLAC Sedbergh, Yorkshire, England
+1 NOTE Eldest child of Charles and Emma Darwin; a banker in Southampton and an amateur photographer.
+1 FAMC @F1@
+1 FAMS @F12@
+0 @I32@ INDI
+1 NAME Sara /Sedgwick/
+1 SEX F
+1 BIRT
+2 DATE 1839
+1 DEAT
+2 DATE 1902
+1 NOTE American, daughter of Theodore Sedgwick of New York. She married William Erasmus Darwin in 1877 and they lived at Bassett, near Southampton.
+1 FAMS @F12@
+0 @I33@ INDI
+1 NAME Anne Elizabeth /Darwin/
+1 SEX F
+1 BIRT
+2 DATE 2 MAR 1841
+2 PLAC Upper Gower Street, London, England
+1 DEAT
+2 DATE 23 APR 1851
+2 PLAC Great Malvern, Worcestershire, England
+1 NOTE Known as Annie; second child of Charles and Emma Darwin. Her death at Malvern at the age of ten deeply affected her father.
+1 FAMC @F1@
+0 @I34@ INDI
+1 NAME Mary Eleanor /Darwin/
+1 SEX F
+1 BIRT
+2 DATE 23 SEP 1842
+2 PLAC Down House, Downe, Kent, England
+1 DEAT
+2 DATE 16 OCT 1842
+2 PLAC Down House, Downe, Kent, England
+1 NOTE Third child of Charles and Emma Darwin, born soon after the family moved to Down House; she lived only a few weeks.
+1 FAMC @F1@
+0 @I35@ INDI
+1 NAME Henrietta Emma /Darwin/
+1 SEX F
+1 BIRT
+2 DATE 25 SEP 1843
+2 PLAC Down House, Downe, Kent, England
+1 DEAT
+2 DATE 17 DEC 1927
+2 PLAC Burrows Hill, Gomshall, Surrey, England
+1 NOTE Known as Etty; she helped her father edit his writing and later edited Emma Darwin: A Century of Family Letters.
+1 FAMC @F1@
+1 FAMS @F13@
+0 @I36@ INDI
+1 NAME Richard Buckley /Litchfield/
+1 SEX M
+1 BIRT
+2 DATE 6 JAN 1832
+2 PLAC Yarpole, Herefordshire, England
+1 DEAT
+2 DATE 11 JAN 1903
+2 PLAC Cannes, France
+1 NOTE Barrister and a founder of the Working Men's College in London, where he taught mathematics and music.
+1 FAMS @F13@
+0 @I37@ INDI
+1 NAME George Howard /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 9 JUL 1845
+2 PLAC Down House, Downe, Kent, England
+1 DEAT
+2 DATE 7 DEC 1912
+2 PLAC Cambridge, Cambridgeshire, England
+1 NOTE Astronomer and mathematician, Plumian Professor at Cambridge, known for his harmonic analysis of the tides.
+1 FAMC @F1@
+1 FAMS @F14@
+0 @I38@ INDI
+1 NAME Martha Haskins /du Puy/
+1 SEX F
+1 BIRT
+2 DATE 27 JUL 1861
+2 PLAC Pennsylvania, United States
+1 DEAT
+2 DATE 6 FEB 1947
+2 PLAC Newnham Grange, Cambridge, Cambridgeshire, England
+1 NOTE American, known as Maud, from a Philadelphia family. She married George Darwin at Erie, Pennsylvania, in 1884.
+1 FAMS @F14@
+0 @I39@ INDI
+1 NAME Elizabeth /Darwin/
+1 SEX F
+1 BIRT
+2 DATE 8 JUL 1847
+2 PLAC Down House, Downe, Kent, England
+1 DEAT
+2 DATE 1926
+1 NOTE Known as Bessy; sixth child of Charles and Emma Darwin. She never married.
+1 FAMC @F1@
+0 @I40@ INDI
+1 NAME Francis /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 16 AUG 1848
+2 PLAC Down House, Downe, Kent, England
+1 DEAT
+2 DATE 19 SEP 1925
+2 PLAC Cambridge, Cambridgeshire, England
+1 NOTE Botanist who collaborated with his father on botanical research and edited The Life and Letters of Charles Darwin (1887).
+1 FAMC @F1@
+1 FAMS @F15@
+1 FAMS @F16@
+1 FAMS @F17@
+0 @I41@ INDI
+1 NAME Amy Richenda /Ruck/
+1 SEX F
+1 BIRT
+2 DATE 1850
+1 DEAT
+2 DATE 11 SEP 1876
+2 PLAC Downe, Kent, England
+1 NOTE Daughter of Lawrence Ruck of Pantlludw, near Machynlleth. She died a few days after the birth of her son Bernard.
+1 FAMS @F15@
+0 @I42@ INDI
+1 NAME Ellen Wordsworth /Crofts/
+1 SEX F
+1 BIRT
+2 DATE 13 JAN 1856
+2 PLAC Leeds, Yorkshire, England
+1 DEAT
+2 DATE 28 AUG 1903
+2 PLAC Cambridge, Cambridgeshire, England
+1 NOTE Fellow and lecturer in English literature at Newnham College, Cambridge. She was the second wife of Francis Darwin.
+1 FAMS @F16@
+0 @I43@ INDI
+1 NAME Florence Henrietta /Fisher/
+1 SEX F
+1 BIRT
+2 DATE 31 JAN 1864
+2 PLAC Kensington, London, England
+1 DEAT
+2 DATE 5 MAR 1920
+1 NOTE Playwright and widow of the legal historian Frederic William Maitland. Her sister Adeline married Ralph Vaughan Williams.
+1 FAMS @F17@
+0 @I44@ INDI
+1 NAME Leonard /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 15 JAN 1850
+2 PLAC Down House, Downe, Kent, England
+1 DEAT
+2 DATE 26 MAR 1943
+2 PLAC Cripps Corner, Forest Row, Sussex, England
+1 NOTE Royal Engineers officer, Liberal Unionist MP for Lichfield (1892-95) and President of the Royal Geographical Society (1908-11).
+1 FAMC @F1@
+1 FAMS @F18@
+1 FAMS @F19@
+0 @I45@ INDI
+1 NAME Elizabeth Frances /Fraser/
+1 SEX F
+1 BIRT
+2 DATE 1846
+1 DEAT
+2 DATE 13 JAN 1898
+1 NOTE Known as Bee; sister of Thomas Fraser, a brother officer of Leonard Darwin. She was Leonard Darwin's first wife.
+1 FAMS @F18@
+0 @I46@ INDI
+1 NAME Charlotte Mildred /Langton/
+1 SEX F
+1 BIRT
+2 DATE 1868
+1 DEAT
+2 DATE 1940
+2 PLAC Forest Row, Sussex, England
+1 NOTE Granddaughter of Charles Langton and Charlotte Wedgwood, she took the surname Massingberd in 1887. She was the second wife of Leonard Darwin.
+1 FAMC @F22@
+1 FAMS @F19@
+0 @I47@ INDI
+1 NAME Horace /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 13 MAY 1851
+2 PLAC Down House, Downe, Kent, England
+1 DEAT
+2 DATE 22 SEP 1928
+2 PLAC Cambridge, Cambridgeshire, England
+1 NOTE Engineer who co-founded the Cambridge Scientific Instrument Company in 1881 and served as Mayor of Cambridge in 1896-97.
+1 FAMC @F1@
+1 FAMS @F20@
+0 @I48@ INDI
+1 NAME Emma Cecilia /Farrer/
+1 SEX F
+1 BIRT
+2 DATE 7 NOV 1854
+1 DEAT
+2 DATE 5 JUL 1946
+1 NOTE Known as Ida; daughter of Thomas Henry Farrer, later Lord Farrer. In 1913 she co-founded the Central Association for the Care of the Mentally Defective.
+1 FAMS @F20@
+0 @I49@ INDI
+1 NAME Charles Waring /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 6 DEC 1856
+2 PLAC Down House, Downe, Kent, England
+1 DEAT
+2 DATE 28 JUN 1858
+2 PLAC Down House, Downe, Kent, England
+1 NOTE Tenth and youngest child of Charles and Emma Darwin. He died of scarlet fever at the age of eighteen months.
+1 FAMC @F1@
+0 @I50@ INDI
+1 NAME Gwendolen Mary /Darwin/
+1 SEX F
+1 BIRT
+2 DATE 26 AUG 1885
+2 PLAC Cambridge, Cambridgeshire, England
+1 DEAT
+2 DATE 11 FEB 1957
+2 PLAC Cambridge, Cambridgeshire, England
+1 NOTE Wood engraver, known as Gwen Raverat after her marriage to the painter Jacques Raverat. She wrote the memoir Period Piece (1952).
+1 FAMC @F14@
+0 @I51@ INDI
+1 NAME Charles Galton /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 19 DEC 1887
+2 PLAC Cambridge, Cambridgeshire, England
+1 DEAT
+2 DATE 31 DEC 1962
+2 PLAC Cambridge, Cambridgeshire, England
+1 NOTE Physicist, professor of natural philosophy at Edinburgh and Director of the National Physical Laboratory (1938-49).
+1 FAMC @F14@
+0 @I52@ INDI
+1 NAME Margaret Elizabeth /Darwin/
+1 SEX F
+1 BIRT
+2 DATE 22 MAR 1890
+2 PLAC Newnham Grange, Cambridge, Cambridgeshire, England
+1 DEAT
+2 DATE 1974
+1 NOTE Known after her marriage as Margaret Keynes; she married the surgeon and bibliophile Geoffrey Keynes in 1917.
+1 FAMC @F14@
+0 @I53@ INDI
+1 NAME William Robert /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 22 AUG 1894
+1 DEAT
+2 DATE 1970
+1 NOTE Known as Billy; fourth child of George and Maud Darwin, he became a London stockbroker.
+1 FAMC @F14@
+0 @I54@ INDI
+1 NAME Bernard Richard Meirion /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 7 SEP 1876
+2 PLAC Downe, Kent, England
+1 DEAT
+2 DATE 18 OCT 1961
+1 NOTE Golf writer for The Times and Country Life and a leading amateur golfer; he is in the World Golf Hall of Fame.
+1 FAMC @F15@
+0 @I55@ INDI
+1 NAME Frances Crofts /Darwin/
+1 SEX F
+1 BIRT
+2 DATE 30 MAR 1886
+2 PLAC Cambridge, Cambridgeshire, England
+1 DEAT
+2 DATE 19 AUG 1960
+2 PLAC Cambridge, Cambridgeshire, England
+1 NOTE Poet, known as Frances Cornford after her marriage to the classicist Francis Cornford in 1909.
+1 FAMC @F16@
+0 @I56@ INDI
+1 NAME Erasmus /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 7 DEC 1881
+2 PLAC The Orchard, Cambridge, Cambridgeshire, England
+1 DEAT
+2 DATE 24 APR 1915
+2 PLAC St Julien, West Flanders, Belgium
+1 NOTE Company secretary of Bolckow Vaughan in Middlesbrough and a director of the Cambridge Scientific Instrument Company. He was killed in action near Ypres with the Green Howards.
+1 FAMC @F20@
+0 @I57@ INDI
+1 NAME Ruth Frances /Darwin/
+1 SEX F
+1 BIRT
+2 DATE 20 AUG 1883
+1 DEAT
+2 DATE 15 OCT 1972
+1 NOTE Commissioner of the Board of Control for Lunacy and Mental Deficiency. She married William Rees-Thomas in 1948.
+1 FAMC @F20@
+0 @I58@ INDI
+1 NAME Emma Nora /Darwin/
+1 SEX F
+1 BIRT
+2 DATE 22 DEC 1885
+1 DEAT
+2 DATE 29 MAY 1989
+1 NOTE Botanist and geneticist, known as Nora Barlow after her marriage to Alan Barlow in 1911. She edited Charles Darwin's Beagle diary and autobiography.
+1 FAMC @F20@
+0 @I59@ INDI
+1 NAME Katherine Elizabeth Sophy /Wedgwood/
+1 SEX F
+1 BIRT
+2 DATE FEB 1842
+1 DEAT
+2 DATE 1911
+1 NOTE Known as Sophy; the eldest surviving daughter of Josiah Wedgwood III and Caroline Darwin. She never married and inherited Leith Hill Place.
+1 FAMC @F9@
+0 @I60@ INDI
+1 NAME Margaret Susan /Wedgwood/
+1 SEX F
+1 BIRT
+2 DATE 1843
+1 DEAT
+2 DATE 1937
+1 NOTE Mother of the composer Ralph Vaughan Williams; after her husband's death in 1875 she returned with her children to Leith Hill Place.
+1 FAMC @F9@
+1 FAMS @F21@
+0 @I61@ INDI
+1 NAME Lucy Caroline /Wedgwood/
+1 SEX F
+1 BIRT
+2 DATE 17 NOV 1846
+2 PLAC Shrewsbury, Shropshire, England
+1 DEAT
+2 DATE 25 JUN 1919
+1 NOTE She helped her uncle Charles Darwin with his earthworm observations at Leith Hill Place. In 1874 she married the naval officer Matthew James Harrison.
+1 FAMC @F9@
+0 @I62@ INDI
+1 NAME Arthur Charles /Vaughan Williams/
+1 SEX M
+1 BIRT
+2 DATE ABT 1834
+1 DEAT
+2 DATE 9 FEB 1875
+1 NOTE Clergyman, vicar of Down Ampney, Gloucestershire, where his son Ralph was born in 1872.
+1 FAMS @F21@
+0 @I63@ INDI
+1 NAME Ralph /Vaughan Williams/
+1 SEX M
+1 BIRT
+2 DATE 12 OCT 1872
+2 PLAC The Vicarage, Down Ampney, Gloucestershire, England
+1 DEAT
+2 DATE 26 AUG 1958
+2 PLAC Hanover Terrace, Regent's Park, London, England
+1 NOTE Composer. His grandparents Josiah Wedgwood III and Caroline Darwin were a brother of Emma Darwin and a sister of Charles Darwin.
+1 FAMC @F21@
+0 @I64@ INDI
+1 NAME Edmund /Langton/
+1 SEX M
+1 BIRT
+2 DATE NOV 1841
+2 PLAC Maer, Staffordshire, England
+1 DEAT
+2 DATE NOV 1875
+2 PLAC Bournemouth, Hampshire, England
+1 NOTE Only child of Charles Langton and Charlotte Wedgwood. He studied at Trinity College, Cambridge, and was admitted at Lincoln's Inn in 1864.
+1 FAMC @F10@
+1 FAMS @F22@
+0 @I65@ INDI
+1 NAME Emily Caroline Langton /Massingberd/
+1 SEX F
+1 BIRT
+2 DATE 19 DEC 1847
+2 PLAC East Stonehouse, Devon, England
+1 DEAT
+2 DATE 28 JAN 1897
+1 NOTE Women's rights and temperance campaigner who founded the Pioneer Club in London in 1892. She resumed the surname Massingberd in 1887.
+1 FAMS @F22@
+0 @F1@ FAM
+1 HUSB @I1@
+1 WIFE @I2@
+1 CHIL @I31@
+1 CHIL @I33@
+1 CHIL @I34@
+1 CHIL @I35@
+1 CHIL @I37@
+1 CHIL @I39@
+1 CHIL @I40@
+1 CHIL @I44@
+1 CHIL @I47@
+1 CHIL @I49@
+1 MARR
+2 DATE 29 JAN 1839
+2 PLAC St Peter's Church, Maer, Staffordshire, England
+0 @F2@ FAM
+1 HUSB @I7@
+1 WIFE @I13@
+1 CHIL @I18@
+1 CHIL @I20@
+1 CHIL @I22@
+1 CHIL @I23@
+1 CHIL @I1@
+1 CHIL @I24@
+1 MARR
+2 DATE 18 APR 1796
+2 PLAC St Marylebone, Middlesex, England
+0 @F3@ FAM
+1 HUSB @I15@
+1 WIFE @I17@
+1 CHIL @I26@
+1 CHIL @I21@
+1 CHIL @I27@
+1 CHIL @I28@
+1 CHIL @I29@
+1 CHIL @I30@
+1 CHIL @I2@
+1 MARR
+2 DATE DEC 1792
+0 @F4@ FAM
+1 HUSB @I3@
+1 WIFE @I4@
+1 CHIL @I6@
+1 CHIL @I7@
+1 MARR
+2 DATE 30 DEC 1757
+2 PLAC Lichfield, Staffordshire, England
+0 @F5@ FAM
+1 HUSB @I3@
+1 WIFE @I5@
+1 CHIL @I8@
+1 MARR
+2 DATE 1781
+0 @F6@ FAM
+1 HUSB @I9@
+1 WIFE @I8@
+1 CHIL @I10@
+1 MARR
+2 DATE 30 MAR 1807
+0 @F7@ FAM
+1 HUSB @I11@
+1 WIFE @I12@
+1 CHIL @I13@
+1 CHIL @I14@
+1 CHIL @I15@
+1 CHIL @I16@
+1 MARR
+2 DATE 25 JAN 1764
+2 PLAC Astbury, Cheshire, England
+0 @F8@ FAM
+1 HUSB @I19@
+1 WIFE @I18@
+1 MARR
+2 DATE 1824
+0 @F9@ FAM
+1 HUSB @I21@
+1 WIFE @I20@
+1 CHIL @I59@
+1 CHIL @I60@
+1 CHIL @I61@
+1 MARR
+2 DATE 1837
+0 @F10@ FAM
+1 HUSB @I25@
+1 WIFE @I27@
+1 CHIL @I64@
+1 MARR
+2 DATE 22 MAR 1832
+0 @F11@ FAM
+1 HUSB @I25@
+1 WIFE @I24@
+1 MARR
+2 DATE OCT 1863
+0 @F12@ FAM
+1 HUSB @I31@
+1 WIFE @I32@
+1 MARR
+2 DATE 29 NOV 1877
+0 @F13@ FAM
+1 HUSB @I36@
+1 WIFE @I35@
+1 MARR
+2 DATE 31 AUG 1871
+2 PLAC Downe, Kent, England
+0 @F14@ FAM
+1 HUSB @I37@
+1 WIFE @I38@
+1 CHIL @I50@
+1 CHIL @I51@
+1 CHIL @I52@
+1 CHIL @I53@
+1 MARR
+2 DATE 22 JUL 1884
+2 PLAC Erie, Pennsylvania, United States
+0 @F15@ FAM
+1 HUSB @I40@
+1 WIFE @I41@
+1 CHIL @I54@
+1 MARR
+2 DATE 23 JUL 1874
+0 @F16@ FAM
+1 HUSB @I40@
+1 WIFE @I42@
+1 CHIL @I55@
+1 MARR
+2 DATE SEP 1883
+0 @F17@ FAM
+1 HUSB @I40@
+1 WIFE @I43@
+1 MARR
+2 DATE 1913
+0 @F18@ FAM
+1 HUSB @I44@
+1 WIFE @I45@
+1 MARR
+2 DATE 11 JUL 1882
+0 @F19@ FAM
+1 HUSB @I44@
+1 WIFE @I46@
+1 MARR
+2 DATE 29 NOV 1900
+2 PLAC Kensington, London, England
+0 @F20@ FAM
+1 HUSB @I47@
+1 WIFE @I48@
+1 CHIL @I56@
+1 CHIL @I57@
+1 CHIL @I58@
+1 MARR
+2 DATE 3 JAN 1880
+2 PLAC St Mary's Church, Bryanston Square, London, England
+0 @F21@ FAM
+1 HUSB @I62@
+1 WIFE @I60@
+1 CHIL @I63@
+1 MARR
+2 DATE 22 FEB 1868
+2 PLAC Christ Church, Coldharbour, Surrey, England
+0 @F22@ FAM
+1 HUSB @I64@
+1 WIFE @I65@
+1 CHIL @I46@
+1 MARR
+2 DATE 1867
+0 TRLR
