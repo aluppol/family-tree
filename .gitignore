@@ -1,79 +1,18 @@
 .env
-# Django project files
-*.pyc
-*.pyo
-*.pyd
+.idea/
+.DS_Store
+
 __pycache__/
-*.egg-info/
-dist/
-build/
-*.log
-*.pot
-*.pyc
-*.swp
-*.swo
-*.sqlite3
-
-# Node.js
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Virtual environment
+*.py[cod]
 .venv/
-venv/
-env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+backend/.dev-identity/
+backend/staticfiles/
+backend/spa/
 
-# Django migration files
-*/migrations/
-*/__pycache__/migrations/
-*.pyc
-*.pyo
-*.pyd
-*.egg-info/
-dist/
-build/
-*.log
-*.pot
-*.pyc
-*.swp
-*.swo
-*.sqlite3
-
-# React frontend build files
-/node_modules/
-
-# Auth service specific files
-/auth/__pycache__/
-/auth/migrations/
-/auth/*/migrations/
-/auth/static/assets/
-
-# People service specific files
-/people/__pycache__/
-/people/migrations/
-/people/*/migrations/
-/people/static/assets/
-
-db/postgres/data/
-db/mongo/data/
-db/redis/data/
-
-# Other project specific files
-*.env
-*.pyc
-*.pyo
-*.pyd
-*.egg-info/
-dist/
-build/
-*.log
-*.pot
-*.pyc
-*.swp
-*.swo
-*.sqlite3
-
-node_modules
-package-lock.json
+node_modules/
