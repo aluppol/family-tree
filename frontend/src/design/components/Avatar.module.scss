@@ -1,0 +1,68 @@
+.avatar {
+  --avatar-ring: var(--color-sex-unknown);
+
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  overflow: hidden;
+  border-radius: var(--radius-round);
+  background: var(--color-surface-muted);
+  box-shadow:
+    0 0 0 2px var(--color-surface),
+    0 0 0 4px var(--avatar-ring);
+  color: var(--avatar-ring);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 1;
+  user-select: none;
+}
+
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.female {
+  --avatar-ring: var(--color-sex-female);
+}
+
+.male {
+  --avatar-ring: var(--color-sex-male);
+}
+
+.other {
+  --avatar-ring: var(--color-sex-other);
+}
+
+.unknown {
+  --avatar-ring: var(--color-sex-unknown);
+}
+
+.small {
+  width: 2rem;
+  height: 2rem;
+  font-size: 0.8rem;
+}
+
+.medium {
+  width: 2.75rem;
+  height: 2.75rem;
+  font-size: 1rem;
+}
+
+.large {
+  width: 4.5rem;
+  height: 4.5rem;
+  font-size: 1.5rem;
+}
+
+.huge {
+  width: 10rem;
+  height: 10rem;
+  font-size: 3.25rem;
+  box-shadow:
+    0 0 0 3px var(--color-surface),
+    0 0 0 6px var(--avatar-ring);
+}

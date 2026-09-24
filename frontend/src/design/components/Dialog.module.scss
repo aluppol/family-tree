@@ -1,0 +1,69 @@
+@use '../media';
+
+:global(html:has(dialog[open])) {
+  overflow: hidden;
+}
+
+.dialog {
+  position: fixed;
+  width: min(36rem, calc(100vw - 2 * var(--space-4)));
+  max-height: calc(100dvh - 2 * var(--space-6));
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-raised);
+  overflow-y: auto;
+
+  &::backdrop {
+    background: color-mix(in srgb, var(--color-canvas) 72%, transparent);
+    backdrop-filter: blur(3px);
+  }
+
+  @include media.narrow {
+    padding: var(--space-5) var(--space-4);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dialog[open] {
+    animation: dialog-enter 160ms ease-out;
+  }
+}
+
+@keyframes dialog-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem) scale(0.98);
+  }
+}
+
+.title {
+  margin: 0 var(--space-7) var(--space-4) 0;
+  font-size: var(--font-size-lg);
+}
+
+.body {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.close {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+
+  @include media.narrow {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}

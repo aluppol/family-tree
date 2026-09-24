@@ -1,0 +1,91 @@
+.state {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  max-width: 34rem;
+  margin: var(--space-6) auto;
+  padding: var(--space-7) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-raised);
+  text-align: center;
+}
+
+.emblem,
+.dangerEmblem {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-round);
+  font-size: var(--font-size-xl);
+}
+
+.emblem {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+}
+
+.dangerEmblem {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+
+.message {
+  margin: 0;
+  color: var(--color-text-muted);
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  min-height: 12rem;
+}
+
+.spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-accent);
+  border-radius: var(--radius-round);
+  opacity: 0;
+  animation:
+    spinner-appear 200ms ease-out 150ms forwards,
+    spinner-turn 800ms linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: spinner-appear 200ms ease-out 150ms forwards;
+  }
+}
+
+@keyframes spinner-appear {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes spinner-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}

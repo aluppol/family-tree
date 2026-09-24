@@ -1,0 +1,30 @@
+.photoCard {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.preview {
+  width: 10rem;
+  height: 10rem;
+  border-radius: var(--radius-round);
+  object-fit: cover;
+  box-shadow:
+    0 0 0 3px var(--color-surface),
+    0 0 0 6px var(--color-accent);
+}
+
+.status {
+  min-height: 1.5em;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}

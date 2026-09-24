@@ -1,0 +1,40 @@
+.banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+
+  svg {
+    margin-top: 0.125rem;
+  }
+}
+
+.content {
+  min-width: 0;
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.info {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-muted);
+
+  svg {
+    color: var(--color-accent-strong);
+  }
+}
+
+.success {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+
+  svg {
+    color: var(--color-accent-strong);
+  }
+}

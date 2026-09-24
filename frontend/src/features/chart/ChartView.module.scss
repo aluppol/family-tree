@@ -1,0 +1,202 @@
+.chart {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.frame {
+  position: relative;
+  height: min(75vh, 900px);
+  min-height: 20rem;
+  overflow: clip;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-muted);
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.zoomControls {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  display: flex;
+  gap: var(--space-2);
+}
+
+.edge {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.parentage,
+.partnership {
+  stroke: var(--color-link-birth);
+}
+
+.dashed {
+  stroke: var(--color-link-other);
+  stroke-dasharray: 7 5;
+}
+
+.female {
+  --sex-colour: var(--color-sex-female);
+}
+
+.male {
+  --sex-colour: var(--color-sex-male);
+}
+
+.other {
+  --sex-colour: var(--color-sex-other);
+}
+
+.unknown {
+  --sex-colour: var(--color-sex-unknown);
+}
+
+.cardLink,
+.centreLink {
+  cursor: pointer;
+  outline: none;
+}
+
+.card {
+  fill: var(--color-surface);
+  stroke: var(--color-border-strong);
+  stroke-width: 1.5;
+  transition:
+    fill var(--transition-fast),
+    stroke var(--transition-fast);
+}
+
+.cardLink:hover .card {
+  stroke: var(--color-accent);
+}
+
+.isFocus .card {
+  fill: var(--color-accent-soft);
+  stroke: var(--color-accent);
+  stroke-width: 3;
+}
+
+.isRepeat .card {
+  stroke-dasharray: 6 4;
+}
+
+.accent {
+  fill: var(--sex-colour);
+}
+
+.focusRing,
+.centreFocusRing {
+  fill: none;
+  stroke: var(--color-focus);
+  stroke-width: 3;
+  visibility: hidden;
+}
+
+.cardLink:focus-visible .focusRing,
+.centreLink:focus-visible .centreFocusRing {
+  visibility: visible;
+}
+
+.avatar {
+  fill: var(--color-surface-muted);
+  stroke: var(--sex-colour);
+  stroke-width: 2;
+}
+
+.initials {
+  fill: var(--sex-colour);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.name {
+  fill: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.years {
+  fill: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.repeatBadge {
+  circle {
+    fill: var(--color-surface);
+    stroke: var(--color-link-other);
+    stroke-width: 1.5;
+  }
+
+  path {
+    fill: none;
+    stroke: var(--color-link-other);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+.centreButton {
+  fill: var(--color-surface);
+  stroke: var(--color-border-strong);
+  transition:
+    fill var(--transition-fast),
+    stroke var(--transition-fast);
+}
+
+.centreLink:hover .centreButton {
+  fill: var(--color-accent-soft);
+  stroke: var(--color-accent);
+}
+
+.centreGlyph {
+  fill: none;
+  stroke: var(--color-accent-strong);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.legendEntry {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.lineSample {
+  width: 2rem;
+  height: 0.5rem;
+}
+
+.badgeSample {
+  width: 1.25rem;
+  height: 1.25rem;
+}

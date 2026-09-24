@@ -1,0 +1,14 @@
+$narrow-max: 40rem;
+$medium-max: 64rem;
+
+@mixin narrow {
+  @media (max-width: $narrow-max) {
+    @content;
+  }
+}
+
+@mixin medium-down {
+  @media (max-width: $medium-max) {
+    @content;
+  }
+}
