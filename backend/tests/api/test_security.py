@@ -73,3 +73,20 @@ def test_explains_a_missing_web_build(anonymous: APIClient, settings: Settings, 
     settings.SPA_ROOT = tmp_path
     response = anonymous.get("/")
     assert (response.status_code, b"npm run dev" in response.content) == (404, True)
+
+
+@pytest.mark.parametrize(
+    ("content_type", "declared_length", "status"),
+    [
+        ("application/json", 1024 * 1024 + 1, 413),
+        ("image/jpeg", 3 * 1024 * 1024, 413),
+        ("application/json", "not-a-number", 413),
+    ],
+)
+def test_oversized_bodies_are_refused_unread(
+    member: APIClient, content_type: str, declared_length: object, status: int
+) -> None:
+    response = member.post(
+        "/api/people/", b"{}", content_type=content_type, CONTENT_LENGTH=str(declared_length)
+    )
+    assert (response.status_code, error_code(response)) == (status, "request.too_large")

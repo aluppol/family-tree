@@ -23,7 +23,6 @@ from family_tree.domain.enums import InterchangeFormat
 from family_tree.domain.errors import InvalidInput
 
 MAX_UPLOAD_BYTES = 20 * 1024 * 1024
-MAX_REQUEST_BYTES = MAX_UPLOAD_BYTES + 1024 * 1024
 TOO_LARGE = "The file is larger than 20 MB."
 DOWNLOADS: Mapping[InterchangeFormat, tuple[str, str]] = {
     InterchangeFormat.GEDCOM_551: ("family-tree.ged", "text/plain; charset=utf-8"),
@@ -69,7 +68,6 @@ class GedcomExportView(WorkspaceApiView):
 
 
 def uploaded_bytes(request: Request) -> bytes:
-    _refuse_oversized_body(request)
     upload = request.FILES.get("file")
     if not isinstance(upload, UploadedFile):
         message = "Choose a GEDCOM or GEDZIP file."
@@ -78,9 +76,3 @@ def uploaded_bytes(request: Request) -> bytes:
         raise InvalidInput("gedcom.too_large", TOO_LARGE)
     content: bytes = upload.read()
     return content
-
-
-def _refuse_oversized_body(request: Request) -> None:
-    declared_length = str(request.META.get("CONTENT_LENGTH") or "0")
-    if not declared_length.isdigit() or int(declared_length) > MAX_REQUEST_BYTES:
-        raise InvalidInput("gedcom.too_large", TOO_LARGE)

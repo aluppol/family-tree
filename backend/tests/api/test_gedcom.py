@@ -91,7 +91,7 @@ def test_refuses_an_oversized_upload_before_reading_it(member: APIClient) -> Non
     response = member.post(
         "/api/gedcom/import/", {"file": file}, format="multipart", CONTENT_LENGTH=str(50 * 1024 * 1024)
     )
-    assert (response.status_code, error_code(response)) == (400, "gedcom.too_large")
+    assert (response.status_code, error_code(response)) == (413, "request.too_large")
 
 
 def test_rejects_a_request_without_a_file(member: APIClient) -> None:

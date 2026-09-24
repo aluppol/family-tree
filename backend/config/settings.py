@@ -50,6 +50,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "family_tree.api.middleware.CrossSiteRequestGuardMiddleware",
+    "family_tree.api.middleware.RequestSizeGuardMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -120,7 +121,7 @@ SPECTACULAR_SETTINGS = {
     },
 }
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = 21 * 1024 * 1024
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = 21 * 1024 * 1024
 
 STATIC_URL = "static/"
