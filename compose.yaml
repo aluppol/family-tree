@@ -1,0 +1,84 @@
+name: family-tree
+
+x-web-environment: &web-environment
+  APP_ENV: production
+  APP_HOSTS: localhost,127.0.0.1
+  POSTGRES_HOST: db
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: family_tree
+  POSTGRES_USER: family_tree
+  IDENTITY_ISSUER: http://localhost:8080/local-identity
+  IDENTITY_AUDIENCE: familytree
+  IDENTITY_JWKS_URL: file:///identity/jwks.json
+
+services:
+  db:
+    image: postgres:18@sha256:86c951e05bf56c93d95d397747fb8820ac76cc3bedb78f43abd83eedbe3666ae
+    user: postgres
+    command: ["postgres", "-c", "shared_buffers=64MB", "-c", "max_connections=40"]
+    env_file: .env
+    environment:
+      POSTGRES_DB: family_tree
+      POSTGRES_USER: family_tree
+    volumes:
+      - database:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --username family_tree --dbname family_tree"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+    restart: unless-stopped
+
+  identity:
+    image: family-tree-web:local
+    build: .
+    user: root
+    entrypoint: ["python", "/app/manage.py", "issue_development_identity", "/identity", "--role", "guest"]
+    env_file: .env
+    environment: *web-environment
+    volumes:
+      - identity:/identity
+    restart: "no"
+
+  web:
+    image: family-tree-web:local
+    build: .
+    env_file: .env
+    environment: *web-environment
+    volumes:
+      - identity:/identity:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      identity:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+      start_period: 20s
+    restart: unless-stopped
+
+  gateway:
+    image: nginx:1.29-alpine@sha256:5616878291a2eed594aee8db4dade5878cf7edcb475e59193904b198d9b830de
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - identity:/identity:ro
+      - ./local/gateway/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./local/gateway/access-token.sh:/docker-entrypoint.d/40-access-token.sh:ro
+    depends_on:
+      web:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--output-document=/dev/null", "http://127.0.0.1:8080/healthz"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+volumes:
+  database: {}
+  identity: {}

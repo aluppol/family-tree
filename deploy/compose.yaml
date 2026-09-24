@@ -1,0 +1,65 @@
+services:
+  db:
+    image: postgres:18@sha256:86c951e05bf56c93d95d397747fb8820ac76cc3bedb78f43abd83eedbe3666ae
+    user: postgres
+    command: ["postgres", "-c", "shared_buffers=64MB", "-c", "max_connections=40"]
+    env_file: .env
+    environment:
+      POSTGRES_DB: family_tree
+      POSTGRES_USER: family_tree
+    volumes:
+      - database:/var/lib/postgresql
+    networks:
+      - data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --username family_tree --dbname family_tree"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+    mem_limit: 256m
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    restart: unless-stopped
+
+  web:
+    image: ${IMAGE_WEB}
+    env_file: .env
+    environment:
+      APP_ENV: production
+      APP_HOSTS: familytree.luppol.com
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: family_tree
+      POSTGRES_USER: family_tree
+      IDENTITY_ISSUER: https://auth.luppol.com/realms/luppol
+      IDENTITY_AUDIENCE: familytree
+      IDENTITY_JWKS_URL: https://auth.luppol.com/realms/luppol/protocol/openid-connect/certs
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - data
+      - egress
+      - back
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    mem_limit: 448m
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    restart: unless-stopped
+
+volumes:
+  database: {}
+
+networks:
+  data:
+    internal: true
+  egress: {}
+  back:
+    external: true
+    name: familytree_back
