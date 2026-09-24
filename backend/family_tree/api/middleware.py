@@ -20,7 +20,7 @@ class HealthCheckMiddleware:
     def __call__(self, request: HttpRequest) -> HttpResponse:
         if request.path != HEALTH_PATH:
             return self.get_response(request)
-        if container().database_probe():
+        if is_database_up():
             return JsonResponse({"status": "ok"})
         return JsonResponse({"status": "database unavailable"}, status=503)
 
@@ -52,3 +52,7 @@ class RequestSizeGuardMiddleware:
             body = error_body("request.too_large", f"The request is larger than {limit // 1024} KB.")
             return JsonResponse(body, status=413)
         return self.get_response(request)
+
+
+def is_database_up() -> bool:
+    return container().database_probe()

@@ -1,9 +1,12 @@
+import json
 from pathlib import Path
 
 import pytest
+from django.test import RequestFactory
 from pytest_django.fixtures import Settings
 from rest_framework.test import APIClient
 
+from family_tree.api.errors import server_error
 from tests.api.builders import error_code, profile_payload
 from tests.conftest import ClientFactory
 from tests.identity import access_token_claims, signed_token
@@ -90,3 +93,28 @@ def test_oversized_bodies_are_refused_unread(
         "/api/people/", b"{}", content_type=content_type, CONTENT_LENGTH=str(declared_length)
     )
     assert (response.status_code, error_code(response)) == (status, "request.too_large")
+
+
+def test_unsupported_methods_and_media_types_answer_in_json(member: APIClient) -> None:
+    patched = member.patch("/api/people/", {}, format="json")
+    plain_text = member.post("/api/people/", "given_names=Emma", content_type="text/plain")
+    assert (patched.status_code, error_code(patched)) == (405, "request.method_not_allowed")
+    assert (plain_text.status_code, error_code(plain_text)) == (415, "request.unsupported_media_type")
+
+
+def test_a_malformed_json_body_is_explained(member: APIClient) -> None:
+    response = member.post("/api/people/", "{not json", content_type="application/json")
+    assert (response.status_code, error_code(response)) == (400, "request.malformed")
+
+
+def test_an_unexpected_failure_answers_in_json(rf: RequestFactory) -> None:
+    response = server_error(rf.get("/api/people/"))
+    assert (response.status_code, json.loads(response.content)["error"]["code"]) == (500, "server.error")
+
+
+def test_the_health_check_reports_an_unreachable_database(
+    anonymous: APIClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("family_tree.api.middleware.is_database_up", lambda: False)
+    response = anonymous.get("/healthz")
+    assert (response.status_code, response.json()) == (503, {"status": "database unavailable"})
