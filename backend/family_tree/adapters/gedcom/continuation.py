@@ -10,7 +10,7 @@ _LINE_BREAK = re.compile(r"\r\n|\r|\n")
 
 
 def gedcom551_text_lines(head: str, continuation_level: int, text: str) -> list[str]:
-    first, *others = _LINE_BREAK.split(text)
+    first, *others = _segments(text)
     continued = f"{continuation_level} CONT"
     return [
         *_concatenated(head, continuation_level, first),
@@ -19,7 +19,7 @@ def gedcom551_text_lines(head: str, continuation_level: int, text: str) -> list[
 
 
 def gedcom7_text_lines(head: str, continuation_level: int, text: str) -> list[str]:
-    first, *others = _LINE_BREAK.split(text)
+    first, *others = _segments(text)
     continued = f"{continuation_level} CONT"
     return [
         _line(head, _escape_leading_at_sign(first)),
@@ -27,11 +27,18 @@ def gedcom7_text_lines(head: str, continuation_level: int, text: str) -> list[st
     ]
 
 
+def _segments(text: str) -> list[str]:
+    return _LINE_BREAK.split(text) if "\n" in text or "\r" in text else [text]
+
+
 def _concatenated(head: str, continuation_level: int, segment: str) -> list[str]:
+    escaped = segment.replace("@", "@@")
+    if len(head) + len(escaped) < _MAX_CONTENT_LENGTH:
+        return [_line(head, escaped)]
     concatenated = f"{continuation_level} CONC"
-    first_width = _MAX_CONTENT_LENGTH - len(head) - 1
-    next_width = _MAX_CONTENT_LENGTH - len(concatenated) - 1
-    first, *others = _chunks(segment.replace("@", "@@"), first_width, next_width)
+    first, *others = _chunks(
+        escaped, _MAX_CONTENT_LENGTH - len(head) - 1, _MAX_CONTENT_LENGTH - len(concatenated) - 1
+    )
     return [_line(head, first), *(_line(concatenated, other) for other in others)]
 
 
@@ -46,12 +53,23 @@ def _chunks(text: str, first_width: int, next_width: int) -> list[str]:
 
 
 def _safe_cut(text: str, width: int) -> int:
-    return next((cut for cut in range(width, 0, -1) if _is_safe_cut(text, cut)), width)
+    clean_cut = next((cut for cut in range(width, 0, -1) if _is_clean_cut(text, cut)), None)
+    return clean_cut if clean_cut is not None else _escape_preserving_cut(text, width)
 
 
-def _is_safe_cut(text: str, cut: int) -> bool:
-    before, after = text[cut - 1], text[cut]
-    return " " not in (before, after) and not before == after == "@"
+def _is_clean_cut(text: str, cut: int) -> bool:
+    return " " not in (text[cut - 1], text[cut]) and not _splits_escaped_at_sign(text, cut)
+
+
+def _escape_preserving_cut(text: str, width: int) -> int:
+    return width - 1 if _splits_escaped_at_sign(text, width) else width
+
+
+def _splits_escaped_at_sign(text: str, cut: int) -> bool:
+    if text[cut - 1] != "@":
+        return False
+    before = text[:cut]
+    return (len(before) - len(before.rstrip("@"))) % 2 == 1
 
 
 def _escape_leading_at_sign(text: str) -> str:

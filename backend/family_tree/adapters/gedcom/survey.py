@@ -31,13 +31,19 @@ def _unsupported_paths(
     nodes: Sequence[GedcomNode], schema: Sequence[Supported], parent_path: str
 ) -> Iterator[str]:
     for node in nodes:
-        path = f"{parent_path}.{node.tag}" if parent_path else node.tag
-        entry = next((entry for entry in schema if _supports(entry, node)), None)
-        if entry is not None:
-            yield from _unsupported_paths(node.children, entry.children, path)
-        elif node.tag not in _IGNORED_TAGS:
-            yield path
+        entry = _supporting_entry(schema, node)
+        if entry is None and node.tag not in _IGNORED_TAGS:
+            yield _path(parent_path, node.tag)
+        elif entry is not None and node.children:
+            yield from _unsupported_paths(node.children, entry.children, _path(parent_path, node.tag))
 
 
-def _supports(entry: Supported, node: GedcomNode) -> bool:
-    return entry.tag == node.tag and (entry.applies_to is None or entry.applies_to(node))
+def _supporting_entry(schema: Sequence[Supported], node: GedcomNode) -> Supported | None:
+    for entry in schema:
+        if entry.tag == node.tag and (entry.applies_to is None or entry.applies_to(node)):
+            return entry
+    return None
+
+
+def _path(parent_path: str, tag: str) -> str:
+    return f"{parent_path}.{tag}" if parent_path else tag

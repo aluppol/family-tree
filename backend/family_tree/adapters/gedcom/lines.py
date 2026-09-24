@@ -25,7 +25,7 @@ def parse_lines(text: str) -> tuple[GedcomLine, ...]:
     lines = tuple(
         _parse_line(number, content)
         for number, content in enumerate(_LINE_BREAK.split(text), start=1)
-        if content.strip()
+        if content and not content.isspace()
     )
     _require_header_first(lines)
     _require_consecutive_levels(lines)
@@ -40,13 +40,8 @@ def _parse_line(number: int, content: str) -> GedcomLine:
     match = _LINE.fullmatch(content)
     if match is None:
         raise unreadable(f"Line {number} is not a GEDCOM line: '{content[:_PREVIEW_LENGTH]}'.")
-    return GedcomLine(
-        number=number,
-        level=int(match["level"]),
-        xref=match["xref"],
-        tag=match["tag"].upper(),
-        value=match["value"] or "",
-    )
+    level, xref, tag, value = match.groups()
+    return GedcomLine(number=number, level=int(level), xref=xref, tag=tag.upper(), value=value or "")
 
 
 def _require_header_first(lines: Sequence[GedcomLine]) -> None:

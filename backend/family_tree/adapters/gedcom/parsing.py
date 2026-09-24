@@ -4,7 +4,8 @@ from family_tree.adapters.gedcom.decoding import decode_gedcom
 from family_tree.adapters.gedcom.errors import too_large
 from family_tree.adapters.gedcom.limits import MAX_INDIVIDUALS
 from family_tree.adapters.gedcom.lines import GedcomLine, parse_lines
-from family_tree.adapters.gedcom.nodes import GedcomFile, build_gedcom_file
+from family_tree.adapters.gedcom.nodes import GedcomFile
+from family_tree.adapters.gedcom.tree import build_gedcom_file
 
 
 def parse_gedcom(encoded: bytes) -> GedcomFile:

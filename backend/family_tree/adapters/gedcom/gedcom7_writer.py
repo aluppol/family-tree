@@ -5,7 +5,7 @@ from family_tree.adapters.gedcom.structures import Structure
 from family_tree.domain.enums import ParentLinkKind, Sex
 from family_tree.domain.interchange import TreeSnapshot
 
-BYTE_ORDER_MARK = "﻿"
+BYTE_ORDER_MARK = "\ufeff"
 
 GEDCOM_7_DIALECT = ExportDialect(
     preamble=BYTE_ORDER_MARK,

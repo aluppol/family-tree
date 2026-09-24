@@ -35,7 +35,7 @@ def map_event_place(event: GedcomNode | None, location: str) -> Mapped[str]:
     return Mapped(place[:MAX_PLACE_LENGTH].rstrip(), skipped_at(f"{location} PLAC", reason))
 
 
-def latest_bound_before(events: Sequence[GedcomNode]) -> GenealogicalDate | None:
+def before_first_usable_date(events: Sequence[GedcomNode]) -> GenealogicalDate | None:
     dates = (_date_or_none(event) for event in events)
     bounding = next(
         (date for date in dates if date is not None and date.qualifier is not DateQualifier.AFTER), None

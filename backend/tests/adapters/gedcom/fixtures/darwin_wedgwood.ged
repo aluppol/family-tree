@@ -1,0 +1,255 @@
+0 HEAD
+1 SOUR PAF
+2 NAME Personal Ancestral File
+2 VERS 5.2.18.0
+1 DEST PAF
+1 DATE 14 MAR 2009
+2 TIME 18:24:07
+1 SUBM @U1@
+1 FILE darwin_wedgwood.ged
+1 GEDC
+2 VERS 5.5.1
+2 FORM LINEAGE-LINKED
+1 CHAR UTF-8
+1 LANG English
+0 @U1@ SUBM
+1 NAME Down House Archive
+0 @I1@ INDI
+1 NAME Josiah /Wedgwood/
+2 GIVN Josiah
+2 SURN Wedgwood
+1 SEX M
+1 BIRT
+2 DATE 12 JUL 1730
+2 PLAC Burslem, Staffordshire, England
+1 DEAT
+2 DATE 3 JAN 1795
+2 PLAC Etruria Hall, Staffordshire, England
+1 OCCU Potter
+1 OBJE
+2 FILE portraits/josiah_wedgwood.jpg
+3 FORM jpeg
+1 _UID 7E1F4A2B8C9D4E6F
+1 FAMS @F1@
+1 CHAN
+2 DATE 14 MAR 2009
+0 @I2@ INDI
+1 NAME Sarah /Wedgwood/
+1 SEX F
+1 BIRT
+2 DATE 8 JAN 1734
+1 DEAT
+2 DATE 15 JAN 1815
+1 FAMS @F1@
+0 @I3@ INDI
+1 NAME Susannah /Wedgwood/
+1 SEX F
+1 BIRT
+2 DATE 3 JAN 1765
+2 PLAC Burslem, Staffordshire, England
+1 DEAT
+2 DATE 15 JUL 1817
+2 PLAC Shrewsbury, Shropshire, England
+1 FAMC @F1@
+1 FAMS @F4@
+0 @I4@ INDI
+1 NAME Josiah /Wedgwood/ II
+1 SEX M
+1 BIRT
+2 DATE 3 APR 1769
+1 DEAT
+2 DATE 12 JUL 1843
+2 PLAC Maer Hall, Staffordshire, England
+1 OCCU Potter
+1 FAMC @F1@
+1 FAMS @F5@
+0 @I5@ INDI
+1 NAME Elizabeth /Allen/
+1 SEX F
+1 CHR
+2 DATE 6 MAY 1764
+2 PLAC Cresselly, Pembrokeshire, Wales
+1 DEAT
+2 DATE 31 MAR 1846
+1 FAMS @F5@
+0 @I6@ INDI
+1 NAME Erasmus /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 12 DEC 1731
+2 PLAC Elston Hall, Nottinghamshire, England
+2 SOUR @S1@
+3 PAGE vol. 1, p. 3
+1 DEAT
+2 DATE 18 APR 1802
+2 PLAC Breadsall Priory, Derbyshire, England
+1 OCCU Physician
+1 NOTE Physician, natural philosopher and poet. He was the grandfather of both
+2 CONC  Charles Darwin and Francis Galton.
+1 FAMS @F2@
+1 FAMS @F3@
+0 @I7@ INDI
+1 NAME Mary /Howard/
+1 SEX F
+1 BIRT
+2 DATE 12 FEB 1740
+1 DEAT
+2 DATE 30 JUN 1770
+2 PLAC Lichfield, Staffordshire, England
+1 FAMS @F2@
+0 @I8@ INDI
+1 NAME Elizabeth /Collier/
+1 NAME Elizabeth /Pole/
+2 TYPE married
+1 SEX F
+1 BIRT
+2 DATE ABT 1747
+1 DEAT
+2 DATE 5 FEB 1832
+1 FAMS @F3@
+0 @I9@ INDI
+1 NAME Robert Waring /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 30 MAY 1766
+2 PLAC Lichfield, Staffordshire, England
+1 DEAT
+2 DATE 13 NOV 1848
+2 PLAC The Mount, Shrewsbury, Shropshire, England
+1 OCCU Physician
+1 FAMC @F2@
+1 FAMS @F4@
+0 @I10@ INDI
+1 NAME Charles Robert /Darwin/
+2 GIVN Charles Robert
+2 SURN Darwin
+1 SEX M
+1 BIRT
+2 DATE 12 FEB 1809
+2 PLAC The Mount, Shrewsbury, Shropshire, England
+1 CHR
+2 DATE 17 NOV 1809
+2 PLAC St Chad's Church, Shrewsbury, Shropshire, England
+1 DEAT
+2 DATE 19 APR 1882
+2 PLAC Down House, Downe, Kent, England
+1 BURI
+2 DATE 26 APR 1882
+2 PLAC Westminster Abbey, London, England
+1 OCCU Naturalist
+1 NOTE Naturalist and geologist. His theory of evolution by natural selecti
+2 CONC on was published in On the Origin of Species (1859).
+2 CONT
+2 CONT Buried in Westminster Abbey near John Herschel and Isaac Newton.
+1 FAMC @F4@
+1 FAMS @F6@
+0 @I11@ INDI
+1 NAME Emma /Wedgwood/
+1 SEX F
+1 BIRT
+2 DATE 2 MAY 1808
+2 PLAC Maer Hall, Staffordshire, England
+1 DEAT
+2 DATE 2 OCT 1896
+2 PLAC Downe, Kent, England
+1 NOTE @N1@
+1 FAMC @F5@
+1 FAMS @F6@
+0 @I12@ INDI
+1 NAME William Erasmus /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 27 DEC 1839
+2 PLAC Gower Street, London, England
+1 DEAT
+2 DATE 8 SEP 1914
+1 FAMC @F6@
+0 @I13@ INDI
+1 NAME Anne Elizabeth /Darwin/
+1 SEX F
+1 BIRT
+2 DATE 2 MAR 1841
+2 PLAC Gower Street, London, England
+1 DEAT
+2 DATE 23 APR 1851
+2 PLAC Malvern, Worcestershire, England
+1 FAMC @F6@
+0 @I14@ INDI
+1 NAME Henrietta Emma /Darwin/
+1 SEX F
+1 BIRT
+2 DATE 25 SEP 1843
+2 PLAC Down House, Downe, Kent, England
+1 DEAT
+2 DATE 17 DEC 1927
+1 FAMC @F6@
+0 @I15@ INDI
+1 NAME George Howard /Darwin/
+1 SEX M
+1 BIRT
+2 DATE 9 JUL 1845
+2 PLAC Down House, Downe, Kent, England
+1 DEAT
+2 DATE 7 DEC 1912
+1 OCCU Astronomer
+1 FAMC @F6@
+0 @I16@ INDI
+1 NAME Violetta /Darwin/
+1 SEX F
+1 BIRT
+2 DATE 1783
+1 DEAT
+2 DATE 1874
+1 FAMC @F3@
+0 @F1@ FAM
+1 HUSB @I1@
+1 WIFE @I2@
+1 CHIL @I3@
+1 CHIL @I4@
+1 MARR
+2 DATE 25 JAN 1764
+2 PLAC Astbury, Cheshire, England
+0 @F2@ FAM
+1 HUSB @I6@
+1 WIFE @I7@
+1 CHIL @I9@
+1 MARR
+2 DATE 30 DEC 1757
+2 PLAC Lichfield, Staffordshire, England
+0 @F3@ FAM
+1 HUSB @I6@
+1 WIFE @I8@
+1 CHIL @I16@
+1 MARR
+2 DATE 6 MAR 1781
+2 PLAC Radbourne, Derbyshire, England
+0 @F4@ FAM
+1 HUSB @I9@
+1 WIFE @I3@
+1 CHIL @I10@
+1 MARR
+2 DATE 18 APR 1796
+2 PLAC St Marylebone, London, England
+0 @F5@ FAM
+1 HUSB @I4@
+1 WIFE @I5@
+1 CHIL @I11@
+1 MARR
+2 DATE 1792
+0 @F6@ FAM
+1 HUSB @I10@
+1 WIFE @I11@
+1 CHIL @I12@
+1 CHIL @I13@
+1 CHIL @I14@
+1 CHIL @I15@
+1 MARR
+2 DATE 29 JAN 1839
+2 PLAC St Peter's Church, Maer, Staffordshire, England
+1 NOTE Married by their cousin, the Reverend John Allen Wedgwood.
+0 @N1@ NOTE Youngest child of Josiah Wedgwood II and Elizabeth Allen. She married
+1 CONC  her first cousin Charles Darwin.
+0 @S1@ SOUR
+1 TITL The Correspondence of Charles Darwin
+1 AUTH Frederick Burkhardt
+0 TRLR

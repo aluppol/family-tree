@@ -18,7 +18,7 @@ _DECODERS_BY_CHARSET: Mapping[str, Decoder] = {
     "ASCII": partial(bytes.decode, encoding="ascii"),
     "ANSEL": decode_ansel,
 }
-_DECLARED_CHARSET = re.compile(rb"^[ \t]*1[ \t]+CHAR[ \t]+([^\r\n]*)", re.MULTILINE)
+_DECLARED_CHARSET = re.compile(rb"(?:^|[\r\n])[ \t]*1[ \t]+CHAR[ \t]+([^\r\n]*)")
 _DEFAULT_CHARSET = "UTF-8"
 
 

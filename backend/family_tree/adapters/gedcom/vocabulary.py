@@ -14,6 +14,7 @@ _NOUNS_BY_PATH = {
     "FAM.MARR.WIFE": "wife's age",
     "FAM.NOTE": "family note",
     "INDI.EVEN": "custom event",
+    "INDI.NAME.TYPE": "name type",
     "INDI.OBJE": "photo",
     "INDI.TITL": "nobility title",
 }
@@ -96,14 +97,12 @@ _NOUNS_BY_TAG = {
     "TIME": "time",
     "TITL": "title",
     "TRAN": "translation",
-    "TYPE": "type",
+    "TYPE": "event type",
     "UID": "unique identifier",
     "WILL": "will",
     "WWW": "web address",
     "_UID": "unique identifier",
 }
-
-_VOWELS = frozenset("aeiou")
 
 
 def describe_omission(path: str, count: int) -> str:
@@ -121,8 +120,8 @@ def _noun_for(path: str) -> str:
 
 
 def _plural(noun: str) -> str:
-    if noun.endswith(("s", "x", "ch", "sh")):
+    if noun.endswith("s"):
         return f"{noun}es"
-    if noun.endswith("y") and noun[-2] not in _VOWELS:
+    if noun.endswith("y"):
         return f"{noun[:-1]}ies"
     return f"{noun}s"

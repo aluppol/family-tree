@@ -1,7 +1,7 @@
 from dataclasses import replace
 
 from family_tree.adapters.gedcom.biography import map_biography
-from family_tree.adapters.gedcom.events import latest_bound_before, map_life_event
+from family_tree.adapters.gedcom.events import before_first_usable_date, map_life_event
 from family_tree.adapters.gedcom.mapped import Mapped, repeated_identifier
 from family_tree.adapters.gedcom.names import map_name
 from family_tree.adapters.gedcom.nodes import GedcomFile, GedcomNode
@@ -28,7 +28,7 @@ def map_individual(
     birth = _map_birth(individual, key)
     death = _map_death(individual, key)
     biography = map_biography(individual, key, gedcom)
-    photo = photos.photo_of(individual, gedcom)
+    photo = photos.photo_of(individual)
     profile = PersonProfile(
         given_names=name.value.given_names,
         surname=name.value.surname,
@@ -45,7 +45,7 @@ def _map_birth(individual: GedcomNode, key: str) -> Mapped[LifeEvent]:
     birth = map_life_event(individual.first_child("BIRT"), f"{key} BIRT")
     if birth.value.date is not None:
         return birth
-    baptism_bound = latest_bound_before(individual.children_tagged("CHR", "BAPM"))
+    baptism_bound = before_first_usable_date(individual.children_tagged("CHR", "BAPM"))
     return Mapped(replace(birth.value, date=baptism_bound), birth.skipped)
 
 
@@ -57,4 +57,4 @@ def _map_death(individual: GedcomNode, key: str) -> Mapped[LifeEvent | None]:
     death = map_life_event(death_event, f"{key} DEAT")
     if death.value.date is not None:
         return Mapped(death.value, death.skipped)
-    return Mapped(replace(death.value, date=latest_bound_before(burials)), death.skipped)
+    return Mapped(replace(death.value, date=before_first_usable_date(burials)), death.skipped)

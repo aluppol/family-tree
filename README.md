@@ -13,6 +13,8 @@ Most of us know almost nothing about our great-great-grandparents. Family Tree k
 |---|---|---|
 | ![Charles Darwin's profile with parents and partners](docs/screenshots/profile.png) | ![The chart in the dark theme](docs/screenshots/chart-dark.png) | ![A profile at 390 px wide](docs/screenshots/mobile.png) |
 
+**Live demo:** https://familytree.luppol.com, behind the luppol.com sign-in, with a guest login for visitors. It opens once the demo server's gateway for this app is wired; until then run it locally in one command (below).
+
 The demo family is real: Charles Darwin married his first cousin Emma Wedgwood, and his sister Caroline married Emma's brother, so Josiah Wedgwood I is an ancestor of their children twice over. Every date is checked against published sources ([docs/demo-family-sources.md](docs/demo-family-sources.md)).
 
 ## Features

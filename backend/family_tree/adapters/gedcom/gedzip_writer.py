@@ -17,13 +17,6 @@ _UNIX_SYSTEM = 3
 _READABLE_FILE_MODE = 0o644 << 16
 
 
-@dataclass(frozen=True, slots=True, kw_only=True)
-class _ArchiveMember:
-    name: str
-    content: bytes
-    compression: int
-
-
 class GedzipWriter:
     def write(self, snapshot: TreeSnapshot) -> bytes:
         media_files = _media_files(snapshot)
@@ -40,6 +33,13 @@ class GedzipWriter:
             name=GEDZIP_GEDCOM_NAME, content=gedcom, compression=zipfile.ZIP_DEFLATED
         )
         return _zip_archive([gedcom_member, *photos])
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class _ArchiveMember:
+    name: str
+    content: bytes
+    compression: int
 
 
 def _media_files(snapshot: TreeSnapshot) -> Mapping[PersonId, MediaFile]:
