@@ -4,14 +4,10 @@ import pytest
 from django.core.management import call_command
 from rest_framework.test import APIClient
 
-from tests.api.builders import add_person
+from tests.api.builders import add_person, guest
 from tests.conftest import ClientFactory
 
 DEMO_PEOPLE = 65
-
-
-def guest(client_for: ClientFactory, session_id: str) -> APIClient:
-    return client_for("shared-guest", roles=("guest",), session_id=session_id)
 
 
 def test_a_guest_gets_a_sandbox_with_the_demo_family(client_for: ClientFactory) -> None:

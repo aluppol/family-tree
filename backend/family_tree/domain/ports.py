@@ -2,7 +2,7 @@ from collections.abc import Mapping, Sequence
 from types import TracebackType
 from typing import Protocol, Self
 
-from family_tree.domain.enums import ParentLinkKind
+from family_tree.domain.enums import ParentLinkKind, UsageMeasure
 from family_tree.domain.identifiers import ParentLinkId, PartnershipId, PersonId, TreeId
 from family_tree.domain.interchange import InterchangeDocument, TreeSnapshot
 from family_tree.domain.people import Person, PersonProfile
@@ -30,6 +30,8 @@ class FamilyTreeRepository(Protocol):
 
     def add(self, owner: WorkspaceOwner) -> FamilyTree: ...
 
+    def lock(self, tree_id: TreeId) -> None: ...
+
     def set_home_person(self, tree_id: TreeId, person_id: PersonId | None) -> None: ...
 
     def count_guest_workspaces(self) -> int: ...
@@ -37,6 +39,10 @@ class FamilyTreeRepository(Protocol):
     def delete_guest_workspaces(self) -> None: ...
 
     def delete_oldest_guest_workspaces(self, keep: int) -> None: ...
+
+
+class WorkspaceMeter(Protocol):
+    def usage(self, tree_id: TreeId, measure: UsageMeasure) -> int: ...
 
 
 class PersonRepository(Protocol):

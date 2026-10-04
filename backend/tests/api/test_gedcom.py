@@ -7,7 +7,7 @@ import pytest
 from rest_framework.test import APIClient
 
 from family_tree.adapters.demo.bundled import DEMO_FAMILY_FILE
-from tests.api.builders import error_code
+from tests.api.builders import error_code, people_count, upload
 
 SMALL_FAMILY = b"""0 HEAD
 1 GEDC
@@ -41,17 +41,6 @@ SMALL_FAMILY = b"""0 HEAD
 2 DATE 18 APR 1796
 0 TRLR
 """
-
-
-def upload(client: APIClient, path: str, content: bytes, name: str = "family.ged") -> Any:
-    file = io.BytesIO(content)
-    file.name = name
-    return client.post(path, {"file": file}, format="multipart")
-
-
-def people_count(client: APIClient) -> int:
-    count: int = client.get("/api/workspace/").json()["people_count"]
-    return count
 
 
 def test_preview_reports_without_saving(member: APIClient) -> None:

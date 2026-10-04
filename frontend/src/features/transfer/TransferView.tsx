@@ -11,6 +11,8 @@ interface ExportChoice {
   description: string;
 }
 
+const MEGABYTE = 1024 * 1024;
+
 const EXPORT_CHOICES: readonly ExportChoice[] = [
   { format: 'gedcom-7.0', label: 'GEDCOM 7.0', description: 'The current standard, for up-to-date genealogy programs.' },
   { format: 'gedcom-5.5.1', label: 'GEDCOM 5.5.1', description: 'The classic format almost every program can read.' },
@@ -19,20 +21,21 @@ const EXPORT_CHOICES: readonly ExportChoice[] = [
 
 export interface TransferViewProps {
   step: ImportStep;
+  largestUploadBytes: number | undefined;
   onFileSelect: (file: File) => void;
   onImport: () => void;
   onStartOver: () => void;
 }
 
-export function TransferView({ step, onFileSelect, onImport, onStartOver }: TransferViewProps): ReactElement {
+export function TransferView({ step, largestUploadBytes, onFileSelect, onImport, onStartOver }: TransferViewProps): ReactElement {
   return (
     <PageContainer>
       <PageHeader title="Import & export" description="Bring in a family from another genealogy program, or take yours with you." />
       <div className={styles.columns}>
         <CardSection title="Import a GEDCOM file">
           <p className={styles.explanation}>
-            GEDCOM 5.5.1 or 7.0 (.ged) or GEDZIP (.gdz or .zip), up to 20 MB. The people in the file are added to your tree; nothing already in it
-            is changed.
+            GEDCOM 5.5.1 or 7.0 (.ged) or GEDZIP (.gdz or .zip){uploadLimitOf(largestUploadBytes)}. The people in the file are added to your tree;
+            nothing already in it is changed.
           </p>
           <ImportStepView step={step} onFileSelect={onFileSelect} onImport={onImport} onStartOver={onStartOver} />
         </CardSection>
@@ -40,6 +43,10 @@ export function TransferView({ step, onFileSelect, onImport, onStartOver }: Tran
       </div>
     </PageContainer>
   );
+}
+
+function uploadLimitOf(largestUploadBytes: number | undefined): string {
+  return largestUploadBytes === undefined ? '' : `, up to ${String(largestUploadBytes / MEGABYTE)} MB`;
 }
 
 function ExportSection(): ReactElement {

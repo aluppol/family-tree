@@ -201,6 +201,7 @@ class WorkspaceSerializer(serializers.Serializer[WorkspaceOverview]):
     home_person_id = serializers.IntegerField(source="tree.home_person_id", allow_null=True)
     people_count = serializers.IntegerField()
     is_sandbox = serializers.BooleanField(source="tree.is_sandbox")
+    largest_upload_bytes = serializers.IntegerField(source="allowance.largest_upload_bytes")
 
 
 class ViewerSerializer(serializers.Serializer[Principal]):

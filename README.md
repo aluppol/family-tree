@@ -30,6 +30,7 @@ The demo family is real: Charles Darwin married his first cousin Emma Wedgwood, 
 | Photos | Upload a portrait (resized in the browser), shown on the profile and on chart cards; type checked by content, not by name | `backend/tests/api/test_photos.py` |
 | GEDCOM | Import GEDCOM 5.5.1, 7.0 and GEDZIP with a preview of what will be added and what is skipped and why, all or nothing; export all three | `backend/tests/adapters/gedcom`, `backend/tests/api/test_gedcom.py` |
 | Scale | 5,000 people import in seconds; the chart is always four SQL queries, whatever the size of the family | `backend/tests/api/test_performance.py`, `test_chart.py` |
+| Demo sandbox | Each guest gets a private copy of the demo family that holds up to 300 people, 1,500 parent links and partnerships and 2.5 MB of family data and photos, and imports files up to 2 MB; a test fills a sandbox to every limit with worst-case data and proves that 500 of them stay under 2 GiB on disk; a change past a limit is refused with a plain explanation, and changes to one tree take turns | `backend/tests/api/test_allowances.py`, `test_workspace_locking.py`, `backend/tests/adapters/test_workspace_room.py` |
 | API | Every endpoint documented as OpenAPI 3 at `/api/docs/` | `backend/tests/api/test_schema.py` |
 
 ## Quick start

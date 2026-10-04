@@ -57,3 +57,9 @@ class InterchangeFormat(StrEnum):
     GEDCOM_551 = "gedcom-5.5.1"
     GEDCOM_7 = "gedcom-7.0"
     GEDZIP = "gedzip"
+
+
+class UsageMeasure(StrEnum):
+    PEOPLE = "people"
+    RELATIONSHIPS = "relationships"
+    STORED_BYTES = "stored_bytes"

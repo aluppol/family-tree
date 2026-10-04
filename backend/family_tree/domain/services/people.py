@@ -20,7 +20,7 @@ from family_tree.domain.read_models import (
 )
 from family_tree.domain.relationships import ParentLink, Partnership
 from family_tree.domain.services.workspaces import WorkspaceService
-from family_tree.domain.workspaces import Principal, ensure_room_for
+from family_tree.domain.workspaces import Principal
 
 
 class PeopleService:
@@ -64,27 +64,31 @@ class PeopleService:
         ensure_profile_plausible(profile)
         tree = self._workspaces.tree_of(principal)
         with self._unit_of_work:
-            ensure_room_for(tree, self._people.count(tree.id), 1)
+            self._workspaces.lock(tree)
             person = self._people.add(tree.id, profile)
+            self._workspaces.ensure_within_allowance(tree)
             self._unit_of_work.commit()
         return person
 
     def update(self, principal: Principal, person_id: PersonId, profile: PersonProfile) -> Person:
         ensure_profile_plausible(profile)
-        tree_id = self._workspaces.tree_of(principal).id
+        tree = self._workspaces.tree_of(principal)
         with self._unit_of_work:
-            self._people.get(tree_id, person_id)
-            ensure_birth_fits_family(profile.birth_date(), self._family_births(tree_id, person_id))
-            person = Person(id=person_id, tree_id=tree_id, profile=profile)
+            self._workspaces.lock(tree)
+            self._people.get(tree.id, person_id)
+            ensure_birth_fits_family(profile.birth_date(), self._family_births(tree.id, person_id))
+            person = Person(id=person_id, tree_id=tree.id, profile=profile)
             self._people.update(person)
+            self._workspaces.ensure_within_allowance(tree)
             self._unit_of_work.commit()
         return person
 
     def delete(self, principal: Principal, person_id: PersonId) -> None:
-        tree_id = self._workspaces.tree_of(principal).id
+        tree = self._workspaces.tree_of(principal)
         with self._unit_of_work:
-            self._people.get(tree_id, person_id)
-            self._people.delete(tree_id, person_id)
+            self._workspaces.lock(tree)
+            self._people.get(tree.id, person_id)
+            self._people.delete(tree.id, person_id)
             self._unit_of_work.commit()
 
     def _family_births(self, tree_id: TreeId, person_id: PersonId) -> FamilyBirths:

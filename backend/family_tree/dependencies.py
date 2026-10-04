@@ -13,6 +13,7 @@ from family_tree.adapters.identity.development import write_development_identity
 from family_tree.adapters.identity.tokens import JwtTokenVerifier, signing_keys_at
 from family_tree.adapters.persistence.graph import PostgresKinshipGraph
 from family_tree.adapters.persistence.health import is_database_reachable
+from family_tree.adapters.persistence.meter import PostgresWorkspaceMeter
 from family_tree.adapters.persistence.people import DjangoPersonRepository
 from family_tree.adapters.persistence.photos import DjangoPhotoStore
 from family_tree.adapters.persistence.relationships import (
@@ -57,6 +58,7 @@ class _Adapters:
     partnerships: DjangoPartnershipRepository
     photos: DjangoPhotoStore
     graph: PostgresKinshipGraph
+    meter: PostgresWorkspaceMeter
 
 
 @cache
@@ -94,6 +96,7 @@ def _adapters(database_alias: str) -> _Adapters:
         partnerships=DjangoPartnershipRepository(database_alias),
         photos=DjangoPhotoStore(database_alias),
         graph=PostgresKinshipGraph(database_alias),
+        meter=PostgresWorkspaceMeter(database_alias),
     )
 
 
@@ -130,6 +133,7 @@ def _workspace_service(adapters: _Adapters) -> WorkspaceService:
         unit_of_work=adapters.unit_of_work,
         trees=adapters.trees,
         people=adapters.people,
+        meter=adapters.meter,
         demo_family=BundledDemoFamily(GedcomReader()),
         importer=_importer(adapters),
     )

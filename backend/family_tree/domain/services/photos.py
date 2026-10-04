@@ -26,15 +26,18 @@ class PhotoService:
 
     def replace_photo(self, principal: Principal, person_id: PersonId, content: bytes) -> None:
         photo = photo_from_bytes(content)
-        tree_id = self._workspaces.tree_of(principal).id
+        tree = self._workspaces.tree_of(principal)
         with self._unit_of_work:
-            self._people.get(tree_id, person_id)
-            self._photos.save(tree_id, person_id, photo)
+            self._workspaces.lock(tree)
+            self._people.get(tree.id, person_id)
+            self._photos.save(tree.id, person_id, photo)
+            self._workspaces.ensure_within_allowance(tree)
             self._unit_of_work.commit()
 
     def remove_photo(self, principal: Principal, person_id: PersonId) -> None:
-        tree_id = self._workspaces.tree_of(principal).id
+        tree = self._workspaces.tree_of(principal)
         with self._unit_of_work:
-            self._people.get(tree_id, person_id)
-            self._photos.delete(tree_id, person_id)
+            self._workspaces.lock(tree)
+            self._people.get(tree.id, person_id)
+            self._photos.delete(tree.id, person_id)
             self._unit_of_work.commit()

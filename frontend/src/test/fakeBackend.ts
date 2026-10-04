@@ -19,6 +19,10 @@ import type { FamilySeed, StoredPerson } from './fixtures';
 
 export type CandidateRelation = 'parent' | 'child' | 'partner';
 
+const MEGABYTE = 1024 * 1024;
+const SANDBOX_UPLOAD_BYTES = 2 * MEGABYTE;
+const MEMBER_UPLOAD_BYTES = 20 * MEGABYTE;
+
 export class FakeFamilyBackend {
   private people = new Map<number, StoredPerson>();
   private parentLinks = new Map<number, ParentLink>();
@@ -36,7 +40,12 @@ export class FakeFamilyBackend {
   }
 
   workspace(): Workspace {
-    return { home_person_id: this.homePersonId, people_count: this.people.size, is_sandbox: this.isSandbox };
+    return {
+      home_person_id: this.homePersonId,
+      people_count: this.people.size,
+      is_sandbox: this.isSandbox,
+      largest_upload_bytes: this.isSandbox ? SANDBOX_UPLOAD_BYTES : MEMBER_UPLOAD_BYTES,
+    };
   }
 
   setHomePerson(personId: number | null): Workspace {

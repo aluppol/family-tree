@@ -1,16 +1,9 @@
 from rest_framework.test import APIClient
 
 from family_tree.domain.photos import JPEG_SIGNATURE, MAX_PHOTO_BYTES, PNG_SIGNATURE
-from tests.api.builders import add_person, error_code
+from tests.api.builders import add_person, error_code, put_photo
 
 JPEG = JPEG_SIGNATURE + bytes(range(64))
-
-
-def put_photo(client: APIClient, person_id: int, content: bytes, content_type: str = "image/jpeg") -> int:
-    status: int = client.put(
-        f"/api/people/{person_id}/photo/", content, content_type=content_type
-    ).status_code
-    return status
 
 
 def test_stores_and_serves_a_photo(member: APIClient) -> None:

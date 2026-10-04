@@ -1,6 +1,7 @@
 import { screen, within } from '@testing-library/react';
 import { http } from 'msw';
 import { expect, test } from 'vitest';
+import { darwinFamily } from '../../test/fixtures';
 import { apiErrorResponse } from '../../test/handlers';
 import { fakeBackend, mockServer, setUpMockServer } from '../../test/mockServer';
 import { renderApp } from '../../test/renderApp';
@@ -41,6 +42,17 @@ test('a failed import keeps the preview and shows why', async () => {
   await user.click(await screen.findByRole('button', { name: 'Import 3 people' }));
   expect(await screen.findByRole('alert')).toHaveTextContent('Your tree cannot hold more people.');
   expect(screen.getByText('small.ged is ready to import.')).toBeInTheDocument();
+});
+
+test('a guest is told how large a file the demo sandbox takes', async () => {
+  renderApp('/transfer');
+  expect(await screen.findByText(/\(\.gdz or \.zip\), up to 2 MB\./)).toBeInTheDocument();
+});
+
+test('a member is told how large a file their tree takes', async () => {
+  fakeBackend.seed({ ...darwinFamily(), isSandbox: false });
+  renderApp('/transfer');
+  expect(await screen.findByText(/\(\.gdz or \.zip\), up to 20 MB\./)).toBeInTheDocument();
 });
 
 test('the tree can be exported in three formats', async () => {

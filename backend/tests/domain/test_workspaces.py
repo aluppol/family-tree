@@ -1,17 +1,8 @@
 import pytest
 
 from family_tree.domain.enums import OwnerKind, Role
-from family_tree.domain.errors import AccessDenied, InvalidInput
-from family_tree.domain.identifiers import TreeId
-from family_tree.domain.workspaces import (
-    MEMBER_PEOPLE_LIMIT,
-    SANDBOX_PEOPLE_LIMIT,
-    FamilyTree,
-    Principal,
-    WorkspaceOwner,
-    ensure_room_for,
-    workspace_owner_of,
-)
+from family_tree.domain.errors import AccessDenied
+from family_tree.domain.workspaces import Principal, WorkspaceOwner, workspace_owner_of
 
 
 def principal(roles: frozenset[Role], session_id: str | None = "session-1") -> Principal:
@@ -39,15 +30,3 @@ def test_each_principal_owns_one_workspace(
 def test_a_principal_without_a_role_has_no_workspace() -> None:
     with pytest.raises(AccessDenied):
         workspace_owner_of(principal(frozenset()))
-
-
-@pytest.mark.parametrize(
-    ("kind", "limit"),
-    [(OwnerKind.MEMBER, MEMBER_PEOPLE_LIMIT), (OwnerKind.GUEST, SANDBOX_PEOPLE_LIMIT)],
-)
-def test_trees_have_a_size_limit(kind: OwnerKind, limit: int) -> None:
-    tree = FamilyTree(id=TreeId(1), owner=WorkspaceOwner(kind, "key"), home_person_id=None)
-    ensure_room_for(tree, limit - 10, 10)
-    with pytest.raises(InvalidInput) as raised:
-        ensure_room_for(tree, limit - 10, 11)
-    assert raised.value.code == "workspace.limit_reached"

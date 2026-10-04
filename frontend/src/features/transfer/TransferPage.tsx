@@ -2,6 +2,7 @@ import type { UseMutationResult } from '@tanstack/react-query';
 import { type ReactElement, useState } from 'react';
 import type { ImportReport, ImportResult } from '../../api/types';
 import { useDocumentTitle } from '../shell/useDocumentTitle';
+import { useWorkspace } from '../workspace/workspaceQueries';
 import type { ImportStep } from './ImportStepView';
 import { useImportGedcom, usePreviewImport } from './transferMutations';
 import { TransferView } from './TransferView';
@@ -11,6 +12,7 @@ export function TransferPage(): ReactElement {
   const [file, setFile] = useState<File | null>(null);
   const preview = usePreviewImport();
   const importFile = useImportGedcom();
+  const workspace = useWorkspace();
   function handleFileSelect(chosenFile: File): void {
     setFile(chosenFile);
     importFile.reset();
@@ -27,7 +29,7 @@ export function TransferPage(): ReactElement {
     importFile.reset();
   }
   const step = importStepOf({ file, preview, importFile });
-  return <TransferView step={step} onFileSelect={handleFileSelect} onImport={handleImport} onStartOver={handleStartOver} />;
+  return <TransferView step={step} largestUploadBytes={workspace.data?.largest_upload_bytes} onFileSelect={handleFileSelect} onImport={handleImport} onStartOver={handleStartOver} />;
 }
 
 interface ImportProgress {

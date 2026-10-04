@@ -22,8 +22,6 @@ from family_tree.dependencies import container
 from family_tree.domain.enums import InterchangeFormat
 from family_tree.domain.errors import InvalidInput
 
-MAX_UPLOAD_BYTES = 20 * 1024 * 1024
-TOO_LARGE = "The file is larger than 20 MB."
 DOWNLOADS: Mapping[InterchangeFormat, tuple[str, str]] = {
     InterchangeFormat.GEDCOM_551: ("family-tree.ged", "text/plain; charset=utf-8"),
     InterchangeFormat.GEDCOM_7: ("family-tree.ged", "text/plain; charset=utf-8"),
@@ -72,7 +70,5 @@ def uploaded_bytes(request: Request) -> bytes:
     if not isinstance(upload, UploadedFile):
         message = "Choose a GEDCOM or GEDZIP file."
         raise InvalidInput("validation.invalid", message, {"file": [message]})
-    if upload.size is None or upload.size > MAX_UPLOAD_BYTES:
-        raise InvalidInput("gedcom.too_large", TOO_LARGE)
     content: bytes = upload.read()
     return content

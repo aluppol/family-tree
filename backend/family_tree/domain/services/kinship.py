@@ -45,58 +45,68 @@ class KinshipService:
         self._graph = graph
 
     def link_parent(self, principal: Principal, draft: ParentLinkDraft) -> ParentLink:
-        tree_id = self._workspaces.tree_of(principal).id
+        tree = self._workspaces.tree_of(principal)
         with self._unit_of_work:
-            ensure_parent_link_allowed(self._new_link_proposal(tree_id, draft))
-            link = self._parent_links.add(tree_id, draft.parent_id, draft.child_id, draft.kind)
+            self._workspaces.lock(tree)
+            ensure_parent_link_allowed(self._new_link_proposal(tree.id, draft))
+            link = self._parent_links.add(tree.id, draft.parent_id, draft.child_id, draft.kind)
+            self._workspaces.ensure_within_allowance(tree)
             self._unit_of_work.commit()
         return link
 
     def change_parent_link_kind(
         self, principal: Principal, link_id: ParentLinkId, kind: ParentLinkKind
     ) -> ParentLink:
-        tree_id = self._workspaces.tree_of(principal).id
+        tree = self._workspaces.tree_of(principal)
         with self._unit_of_work:
-            changed = replace(self._parent_links.get(tree_id, link_id), kind=kind)
-            ensure_parent_link_allowed(self._kind_change_proposal(tree_id, changed))
+            self._workspaces.lock(tree)
+            changed = replace(self._parent_links.get(tree.id, link_id), kind=kind)
+            ensure_parent_link_allowed(self._kind_change_proposal(tree.id, changed))
             self._parent_links.change_kind(changed)
+            self._workspaces.ensure_within_allowance(tree)
             self._unit_of_work.commit()
         return changed
 
     def unlink_parent(self, principal: Principal, link_id: ParentLinkId) -> None:
-        tree_id = self._workspaces.tree_of(principal).id
+        tree = self._workspaces.tree_of(principal)
         with self._unit_of_work:
-            self._parent_links.get(tree_id, link_id)
-            self._parent_links.delete(tree_id, link_id)
+            self._workspaces.lock(tree)
+            self._parent_links.get(tree.id, link_id)
+            self._parent_links.delete(tree.id, link_id)
             self._unit_of_work.commit()
 
     def add_partnership(self, principal: Principal, draft: PartnershipDraft) -> Partnership:
-        tree_id = self._workspaces.tree_of(principal).id
+        tree = self._workspaces.tree_of(principal)
         partner_ids = (draft.first_partner_id, draft.second_partner_id)
         with self._unit_of_work:
+            self._workspaces.lock(tree)
             ensure_partnership_allowed(partner_ids, draft.terms)
-            self._people.get(tree_id, draft.first_partner_id)
-            self._people.get(tree_id, draft.second_partner_id)
-            partnership = self._partnerships.add(tree_id, partner_ids, draft.terms)
+            self._people.get(tree.id, draft.first_partner_id)
+            self._people.get(tree.id, draft.second_partner_id)
+            partnership = self._partnerships.add(tree.id, partner_ids, draft.terms)
+            self._workspaces.ensure_within_allowance(tree)
             self._unit_of_work.commit()
         return partnership
 
     def change_partnership_terms(
         self, principal: Principal, partnership_id: PartnershipId, terms: PartnershipTerms
     ) -> Partnership:
-        tree_id = self._workspaces.tree_of(principal).id
+        tree = self._workspaces.tree_of(principal)
         with self._unit_of_work:
-            changed = replace(self._partnerships.get(tree_id, partnership_id), terms=terms)
+            self._workspaces.lock(tree)
+            changed = replace(self._partnerships.get(tree.id, partnership_id), terms=terms)
             ensure_partnership_allowed((changed.first_partner_id, changed.second_partner_id), terms)
             self._partnerships.update_terms(changed)
+            self._workspaces.ensure_within_allowance(tree)
             self._unit_of_work.commit()
         return changed
 
     def remove_partnership(self, principal: Principal, partnership_id: PartnershipId) -> None:
-        tree_id = self._workspaces.tree_of(principal).id
+        tree = self._workspaces.tree_of(principal)
         with self._unit_of_work:
-            self._partnerships.get(tree_id, partnership_id)
-            self._partnerships.delete(tree_id, partnership_id)
+            self._workspaces.lock(tree)
+            self._partnerships.get(tree.id, partnership_id)
+            self._partnerships.delete(tree.id, partnership_id)
             self._unit_of_work.commit()
 
     def parent_candidates(self, principal: Principal, child_id: PersonId, text: str) -> list[PersonSummary]:

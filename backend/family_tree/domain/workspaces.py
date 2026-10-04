@@ -1,12 +1,11 @@
 from dataclasses import dataclass
 
+from family_tree.domain.allowances import WorkspaceAllowance
 from family_tree.domain.enums import OwnerKind, Role
-from family_tree.domain.errors import AccessDenied, InvalidInput
+from family_tree.domain.errors import AccessDenied
 from family_tree.domain.identifiers import PersonId, TreeId
 
 MEMBER_ROLES = frozenset({Role.USER, Role.ADMIN})
-MEMBER_PEOPLE_LIMIT = 50_000
-SANDBOX_PEOPLE_LIMIT = 10_000
 
 
 @dataclass(frozen=True, slots=True)
@@ -44,6 +43,7 @@ class Principal:
 class WorkspaceOverview:
     tree: FamilyTree
     people_count: int
+    allowance: WorkspaceAllowance
 
 
 def workspace_owner_of(principal: Principal) -> WorkspaceOwner:
@@ -52,10 +52,3 @@ def workspace_owner_of(principal: Principal) -> WorkspaceOwner:
     if principal.is_guest():
         return WorkspaceOwner(OwnerKind.GUEST, principal.session_id or principal.subject)
     raise AccessDenied("auth.forbidden", "Your account has no access to Family Tree.")
-
-
-def ensure_room_for(tree: FamilyTree, people_count: int, additional_people: int) -> None:
-    limit = SANDBOX_PEOPLE_LIMIT if tree.is_sandbox() else MEMBER_PEOPLE_LIMIT
-    if people_count + additional_people > limit:
-        message = f"A family tree here holds at most {limit:,} people."
-        raise InvalidInput("workspace.limit_reached", message)

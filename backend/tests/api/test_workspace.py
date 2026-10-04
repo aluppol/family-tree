@@ -16,6 +16,7 @@ def test_a_new_member_starts_with_an_empty_tree(member: APIClient) -> None:
         "home_person_id": None,
         "people_count": 0,
         "is_sandbox": False,
+        "largest_upload_bytes": 20 * 1024 * 1024,
     }
 
 

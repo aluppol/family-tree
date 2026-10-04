@@ -126,6 +126,7 @@ export interface Workspace {
   home_person_id: number | null;
   people_count: number;
   is_sandbox: boolean;
+  largest_upload_bytes: number;
 }
 
 export interface Viewer {
