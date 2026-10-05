@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 import styles from './Shell.module.scss';
 
 const SOURCE_REPOSITORY_URL = 'https://github.com/aluppol/family-tree';
+const PRIVACY_NOTICE_URL = 'https://albert.luppol.com/privacy/';
 
 export function SiteFooter(): ReactElement {
   return (
@@ -13,6 +14,9 @@ export function SiteFooter(): ReactElement {
         </li>
         <li>
           <a href={SOURCE_REPOSITORY_URL}>Source code</a>
+        </li>
+        <li>
+          <a href={PRIVACY_NOTICE_URL}>Privacy and terms</a>
         </li>
       </ul>
     </footer>

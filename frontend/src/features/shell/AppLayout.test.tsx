@@ -67,13 +67,14 @@ test('a personal workspace has no sandbox banner', async () => {
   expect(screen.queryByText('Demo sandbox — changes are reset every night.')).not.toBeInTheDocument();
 });
 
-test('a skip link leads to the main content and the footer links to the API and the source', () => {
+test('a skip link leads to the main content and the footer links to the API, the source and the privacy notice', () => {
   renderApp('/transfer');
   expect(screen.getByRole('link', { name: 'Skip to main content' })).toHaveAttribute('href', '#main-content');
   expect(screen.getByRole('main')).toHaveAttribute('id', 'main-content');
   const footer = screen.getByRole('contentinfo');
   expect(within(footer).getByRole('link', { name: 'API' })).toHaveAttribute('href', '/api/docs/');
   expect(within(footer).getByRole('link', { name: 'Source code' })).toHaveAttribute('href', 'https://github.com/aluppol/family-tree');
+  expect(within(footer).getByRole('link', { name: 'Privacy and terms' })).toHaveAttribute('href', 'https://albert.luppol.com/privacy/');
 });
 
 test('each page sets the document title', async () => {
