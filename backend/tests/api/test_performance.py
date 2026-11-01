@@ -19,16 +19,16 @@ def ahnentafel_gedcom(people: int) -> bytes:
     return "\n".join(lines).encode("utf-8")
 
 
-def test_a_five_thousand_person_tree_imports_and_opens_quickly(member: APIClient) -> None:
+def test_a_five_thousand_person_tree_imports_and_opens_quickly(administrator: APIClient) -> None:
     started = time.perf_counter()
     upload = BytesIO(ahnentafel_gedcom(PEOPLE))
     upload.name = "ahnentafel.ged"
-    response = member.post("/api/gedcom/import/", {"file": upload}, format="multipart")
+    response = administrator.post("/api/gedcom/import/", {"file": upload}, format="multipart")
     import_seconds = time.perf_counter() - started
     assert (response.status_code, response.json()["people_count"]) == (201, PEOPLE), response.content
     focus = response.json()["home_person_id"]
     started = time.perf_counter()
-    chart = member.get(f"/api/people/{focus}/chart/", {"ancestors": "8", "descendants": "6"}).json()
+    chart = administrator.get(f"/api/people/{focus}/chart/", {"ancestors": "8", "descendants": "6"}).json()
     chart_seconds = time.perf_counter() - started
     assert len(chart["people"]) == 2**9 - 1
     assert (import_seconds < IMPORT_SECONDS_LIMIT, chart_seconds < CHART_SECONDS_LIMIT) == (True, True), (

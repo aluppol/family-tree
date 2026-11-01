@@ -5,6 +5,7 @@ from typing import Protocol, Self
 from family_tree.domain.enums import ParentLinkKind, UsageMeasure
 from family_tree.domain.identifiers import ParentLinkId, PartnershipId, PersonId, TreeId
 from family_tree.domain.interchange import InterchangeDocument, TreeSnapshot
+from family_tree.domain.members import InactivityPeriod, MemberActivity
 from family_tree.domain.people import Person, PersonProfile
 from family_tree.domain.photos import Photo
 from family_tree.domain.read_models import ChartScope, FamilyChart, PeoplePage, PeopleQuery, PersonSummary
@@ -43,6 +44,18 @@ class FamilyTreeRepository(Protocol):
 
 class WorkspaceMeter(Protocol):
     def usage(self, tree_id: TreeId, measure: UsageMeasure) -> int: ...
+
+
+class MemberActivityRepository(Protocol):
+    def record_activity(self, owner: WorkspaceOwner) -> None: ...
+
+    def record_administrator_activity(self, owner: WorkspaceOwner) -> None: ...
+
+    def count_members(self) -> int: ...
+
+    def inactive_members(self, period: InactivityPeriod) -> list[MemberActivity]: ...
+
+    def delete_inactive_members(self, period: InactivityPeriod) -> None: ...
 
 
 class PersonRepository(Protocol):

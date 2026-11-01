@@ -13,6 +13,7 @@ from family_tree.adapters.identity.development import write_development_identity
 from family_tree.adapters.identity.tokens import JwtTokenVerifier, signing_keys_at
 from family_tree.adapters.persistence.graph import PostgresKinshipGraph
 from family_tree.adapters.persistence.health import is_database_reachable
+from family_tree.adapters.persistence.members import DjangoMemberActivityRepository
 from family_tree.adapters.persistence.meter import PostgresWorkspaceMeter
 from family_tree.adapters.persistence.people import DjangoPersonRepository
 from family_tree.adapters.persistence.photos import DjangoPhotoStore
@@ -29,6 +30,7 @@ from family_tree.domain.services.demo import DemoSandboxService
 from family_tree.domain.services.importing import DocumentImporter
 from family_tree.domain.services.interchange import InterchangeService
 from family_tree.domain.services.kinship import KinshipService
+from family_tree.domain.services.members import MemberService
 from family_tree.domain.services.people import PeopleService
 from family_tree.domain.services.photos import PhotoService
 from family_tree.domain.services.workspaces import WorkspaceService
@@ -46,6 +48,7 @@ class Container:
     photos: PhotoService
     interchange: InterchangeService
     demo: DemoSandboxService
+    members: MemberService
     database_probe: Callable[[], bool]
 
 
@@ -59,6 +62,7 @@ class _Adapters:
     photos: DjangoPhotoStore
     graph: PostgresKinshipGraph
     meter: PostgresWorkspaceMeter
+    member_activity: DjangoMemberActivityRepository
 
 
 @cache
@@ -79,6 +83,7 @@ def container() -> Container:
         ),
         interchange=_interchange_service(adapters, workspaces),
         demo=DemoSandboxService(unit_of_work=adapters.unit_of_work, trees=adapters.trees),
+        members=MemberService(unit_of_work=adapters.unit_of_work, activity=adapters.member_activity),
         database_probe=partial(is_database_reachable, DATABASE_ALIAS),
     )
 
@@ -97,6 +102,7 @@ def _adapters(database_alias: str) -> _Adapters:
         photos=DjangoPhotoStore(database_alias),
         graph=PostgresKinshipGraph(database_alias),
         meter=PostgresWorkspaceMeter(database_alias),
+        member_activity=DjangoMemberActivityRepository(database_alias),
     )
 
 

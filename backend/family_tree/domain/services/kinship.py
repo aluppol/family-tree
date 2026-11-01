@@ -50,7 +50,7 @@ class KinshipService:
             self._workspaces.lock(tree)
             ensure_parent_link_allowed(self._new_link_proposal(tree.id, draft))
             link = self._parent_links.add(tree.id, draft.parent_id, draft.child_id, draft.kind)
-            self._workspaces.ensure_within_allowance(tree)
+            self._workspaces.ensure_within_allowance(principal, tree)
             self._unit_of_work.commit()
         return link
 
@@ -63,7 +63,7 @@ class KinshipService:
             changed = replace(self._parent_links.get(tree.id, link_id), kind=kind)
             ensure_parent_link_allowed(self._kind_change_proposal(tree.id, changed))
             self._parent_links.change_kind(changed)
-            self._workspaces.ensure_within_allowance(tree)
+            self._workspaces.ensure_within_allowance(principal, tree)
             self._unit_of_work.commit()
         return changed
 
@@ -84,7 +84,7 @@ class KinshipService:
             self._people.get(tree.id, draft.first_partner_id)
             self._people.get(tree.id, draft.second_partner_id)
             partnership = self._partnerships.add(tree.id, partner_ids, draft.terms)
-            self._workspaces.ensure_within_allowance(tree)
+            self._workspaces.ensure_within_allowance(principal, tree)
             self._unit_of_work.commit()
         return partnership
 
@@ -97,7 +97,7 @@ class KinshipService:
             changed = replace(self._partnerships.get(tree.id, partnership_id), terms=terms)
             ensure_partnership_allowed((changed.first_partner_id, changed.second_partner_id), terms)
             self._partnerships.update_terms(changed)
-            self._workspaces.ensure_within_allowance(tree)
+            self._workspaces.ensure_within_allowance(principal, tree)
             self._unit_of_work.commit()
         return changed
 

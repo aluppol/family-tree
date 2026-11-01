@@ -3,19 +3,27 @@ from typing import Any
 import pytest
 
 from family_tree.domain.allowances import (
+    ADMINISTRATOR_ALLOWANCE,
     ALLOWANCES,
     GUEST_ALLOWANCE,
     MEGABYTE,
     MEMBER_ALLOWANCE,
     WorkspaceAllowance,
-    allowance_of,
     ensure_upload_allowed,
     ensure_usage_allowed,
     find_usage_violation,
     usage_of_document,
     usage_with,
 )
-from family_tree.domain.enums import OwnerKind, ParentLinkKind, PartnershipKind, PhotoType, Sex, UsageMeasure
+from family_tree.domain.enums import (
+    OwnerKind,
+    ParentLinkKind,
+    PartnershipKind,
+    PhotoType,
+    Role,
+    Sex,
+    UsageMeasure,
+)
 from family_tree.domain.errors import InvalidInput, RuleViolation
 from family_tree.domain.interchange import (
     InterchangeDocument,
@@ -26,15 +34,32 @@ from family_tree.domain.interchange import (
 from family_tree.domain.people import LifeEvent, PersonProfile
 from family_tree.domain.photos import Photo
 from family_tree.domain.relationships import PartnershipTerms
+from family_tree.domain.workspaces import Principal, allowance_of
 from tests.contract import ContractCase, assert_matches, case_ids
 
 FULL_SANDBOX_BYTES = 5 * MEGABYTE // 2
+FULL_MEMBER_TREE_BYTES = 200 * MEGABYTE
 PHOTO = Photo(PhotoType.JPEG, b"\xff\xd8\xff" + bytes(997))
+GUEST = frozenset({Role.GUEST})
+MEMBER = frozenset({Role.USER})
+ADMINISTRATOR = frozenset({Role.USER, Role.ADMIN})
+FULL_MEMBER_TREE: dict[str, Any] = {
+    "roles": MEMBER,
+    "people": 2_000,
+    "relationships": 10_000,
+    "stored_bytes": FULL_MEMBER_TREE_BYTES,
+}
+HUGE_ADMINISTRATOR_TREE: dict[str, Any] = {
+    "roles": ADMINISTRATOR,
+    "people": 50_000,
+    "relationships": 10**9,
+    "stored_bytes": 10**12,
+}
 
 
 def _base_input() -> dict[str, Any]:
     return {
-        "owner_kind": OwnerKind.GUEST,
+        "roles": GUEST,
         "people": 300,
         "relationships": 1_500,
         "stored_bytes": FULL_SANDBOX_BYTES,
@@ -72,18 +97,45 @@ ALLOWANCE_CASES: list[ContractCase] = [
         "expected_overrides": _refusal("The demo sandbox holds at most 300 people."),
     },
     {
-        "id": "a member tree filled to its people limit",
-        "input_overrides": {"owner_kind": OwnerKind.MEMBER, "people": 50_000},
+        "id": "a member tree filled to every limit",
+        "input_overrides": FULL_MEMBER_TREE,
         "expected_overrides": {},
     },
     {
         "id": "one person too many for a member",
-        "input_overrides": {"owner_kind": OwnerKind.MEMBER, "people": 50_001},
+        "input_overrides": FULL_MEMBER_TREE | {"people": 2_001},
+        "expected_overrides": _refusal("A family tree here holds at most 2,000 people."),
+    },
+    {
+        "id": "one relationship too many for a member",
+        "input_overrides": FULL_MEMBER_TREE | {"relationships": 10_001},
+        "expected_overrides": _refusal(
+            "A family tree here holds at most 10,000 parent links and partnerships."
+        ),
+    },
+    {
+        "id": "one byte too many for a member",
+        "input_overrides": FULL_MEMBER_TREE | {"stored_bytes": FULL_MEMBER_TREE_BYTES + 1},
+        "expected_overrides": _refusal("A family tree here holds at most 200 MB of family data and photos."),
+    },
+    {
+        "id": "an administrator tree is held only to the people limit",
+        "input_overrides": HUGE_ADMINISTRATOR_TREE,
+        "expected_overrides": {},
+    },
+    {
+        "id": "one person too many for an administrator",
+        "input_overrides": HUGE_ADMINISTRATOR_TREE | {"people": 50_001},
         "expected_overrides": _refusal("A family tree here holds at most 50,000 people."),
     },
     {
-        "id": "a member tree has no relationship or storage limit",
-        "input_overrides": {"owner_kind": OwnerKind.MEMBER, "relationships": 10**9, "stored_bytes": 10**12},
+        "id": "the administrator role alone exempts a tree from the member limits",
+        "input_overrides": FULL_MEMBER_TREE | {"roles": frozenset({Role.ADMIN}), "people": 2_001},
+        "expected_overrides": {},
+    },
+    {
+        "id": "the administrator role outranks the guest role",
+        "input_overrides": {"roles": frozenset({Role.GUEST, Role.ADMIN}), "people": 301},
         "expected_overrides": {},
     },
 ]
@@ -93,7 +145,7 @@ ALLOWANCE_CASES: list[ContractCase] = [
 def test_allowance_rules(case: ContractCase) -> None:
     given = _base_input() | case["input_overrides"]
     usage = {measure: given[measure.value] for measure in UsageMeasure}
-    violation = find_usage_violation(allowance_of(given["owner_kind"]), usage)
+    violation = find_usage_violation(allowance_of(principal_with(given["roles"])), usage)
     actual = {
         "code": None if violation is None else violation.code,
         "message": None if violation is None else violation.message,
@@ -102,8 +154,9 @@ def test_allowance_rules(case: ContractCase) -> None:
 
 
 def test_ensure_usage_allowed_raises_the_violation() -> None:
-    with pytest.raises(RuleViolation, match="at most 50,000 people"):
-        ensure_usage_allowed(MEMBER_ALLOWANCE, {UsageMeasure.PEOPLE: 50_001})
+    usage = {UsageMeasure.PEOPLE: 2_001, UsageMeasure.RELATIONSHIPS: 0, UsageMeasure.STORED_BYTES: 0}
+    with pytest.raises(RuleViolation, match="at most 2,000 people"):
+        ensure_usage_allowed(MEMBER_ALLOWANCE, usage)
 
 
 @pytest.mark.parametrize(
@@ -111,6 +164,7 @@ def test_ensure_usage_allowed_raises_the_violation() -> None:
     [
         (GUEST_ALLOWANCE, "The file is larger than 2 MB."),
         (MEMBER_ALLOWANCE, "The file is larger than 20 MB."),
+        (ADMINISTRATOR_ALLOWANCE, "The file is larger than 20 MB."),
     ],
 )
 def test_uploads_larger_than_the_allowance_are_refused(allowance: WorkspaceAllowance, message: str) -> None:
@@ -136,6 +190,12 @@ def test_usage_with_an_addition_adds_every_measure_of_the_usage() -> None:
 
 def test_every_kind_of_owner_has_an_allowance() -> None:
     assert set(ALLOWANCES) == set(OwnerKind)
+
+
+def principal_with(roles: frozenset[Role]) -> Principal:
+    return Principal(
+        subject="owner", session_id="session", username="owner", display_name="Owner", roles=roles
+    )
 
 
 def two_partners_with_a_child() -> InterchangeDocument:

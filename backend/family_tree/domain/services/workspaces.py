@@ -3,7 +3,6 @@ from collections.abc import Callable, Mapping
 from family_tree.domain.allowances import (
     WorkspaceAllowance,
     WorkspaceUsage,
-    allowance_of,
     ensure_upload_allowed,
     ensure_usage_allowed,
     usage_of_document,
@@ -27,6 +26,7 @@ from family_tree.domain.workspaces import (
     Principal,
     WorkspaceOverview,
     WorkspaceOwner,
+    allowance_of,
     workspace_owner_of,
 )
 
@@ -74,7 +74,7 @@ class WorkspaceService:
 
     def overview(self, principal: Principal) -> WorkspaceOverview:
         tree = self.tree_of(principal)
-        allowance = allowance_of(tree.owner.kind)
+        allowance = allowance_of(principal)
         return WorkspaceOverview(tree=tree, people_count=self._people.count(tree.id), allowance=allowance)
 
     def choose_home_person(self, principal: Principal, person_id: PersonId | None) -> None:
@@ -89,17 +89,19 @@ class WorkspaceService:
     def lock(self, tree: FamilyTree) -> None:
         self._trees.lock(tree.id)
 
-    def ensure_within_allowance(self, tree: FamilyTree) -> None:
-        allowance = allowance_of(tree.owner.kind)
+    def ensure_within_allowance(self, principal: Principal, tree: FamilyTree) -> None:
+        allowance = allowance_of(principal)
         ensure_usage_allowed(allowance, self._measured_usage(tree, allowance))
 
-    def ensure_document_within_allowance(self, tree: FamilyTree, document: InterchangeDocument) -> None:
-        allowance = allowance_of(tree.owner.kind)
+    def ensure_document_within_allowance(
+        self, principal: Principal, tree: FamilyTree, document: InterchangeDocument
+    ) -> None:
+        allowance = allowance_of(principal)
         usage = usage_with(self._measured_usage(tree, allowance), usage_of_document(document))
         ensure_usage_allowed(allowance, usage)
 
-    def ensure_upload_within_allowance(self, tree: FamilyTree, upload_bytes: int) -> None:
-        ensure_upload_allowed(allowance_of(tree.owner.kind), upload_bytes)
+    def ensure_upload_within_allowance(self, principal: Principal, upload_bytes: int) -> None:
+        ensure_upload_allowed(allowance_of(principal), upload_bytes)
 
     def _provision_member_workspace(self, owner: WorkspaceOwner) -> None:
         self._trees.add(owner)

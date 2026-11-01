@@ -29,5 +29,10 @@ def other_member(client_for: ClientFactory) -> APIClient:
 
 
 @pytest.fixture
+def administrator(client_for: ClientFactory) -> APIClient:
+    return client_for("administrator-one", roles=("USER", "ADMIN"))
+
+
+@pytest.fixture
 def anonymous(db: None) -> APIClient:
     return APIClient()

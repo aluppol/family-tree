@@ -8,14 +8,17 @@ import pytest
 from rest_framework.test import APIClient
 
 from family_tree.adapters.persistence.meter import PostgresWorkspaceMeter
+from family_tree.adapters.persistence.people import DjangoPersonRepository
 from family_tree.adapters.persistence.photos import DjangoPhotoStore
+from family_tree.adapters.persistence.trees import DjangoFamilyTreeRepository
 from family_tree.dependencies import container
-from family_tree.domain.allowances import GUEST_ALLOWANCE
-from family_tree.domain.enums import UsageMeasure
+from family_tree.domain.allowances import GUEST_ALLOWANCE, MEMBER_ALLOWANCE
+from family_tree.domain.enums import OwnerKind, Role, Sex, UsageMeasure
 from family_tree.domain.errors import RuleViolation
 from family_tree.domain.identifiers import PersonId
-from family_tree.domain.photos import photo_from_bytes
-from family_tree.domain.workspaces import FamilyTree
+from family_tree.domain.people import LifeEvent, PersonProfile
+from family_tree.domain.photos import MAX_PHOTO_BYTES, photo_from_bytes
+from family_tree.domain.workspaces import FamilyTree, Principal, WorkspaceOwner
 from tests.api.builders import (
     add_person,
     error_code,
@@ -37,6 +40,16 @@ DATABASE = "default"
 PEOPLE_CEILING = GUEST_ALLOWANCE.ceilings[UsageMeasure.PEOPLE]
 RELATIONSHIP_CEILING = GUEST_ALLOWANCE.ceilings[UsageMeasure.RELATIONSHIPS]
 STORED_BYTES_CEILING = GUEST_ALLOWANCE.ceilings[UsageMeasure.STORED_BYTES]
+MEMBER_PEOPLE_CEILING = MEMBER_ALLOWANCE.ceilings[UsageMeasure.PEOPLE]
+MEMBER_RELATIONSHIP_CEILING = MEMBER_ALLOWANCE.ceilings[UsageMeasure.RELATIONSHIPS]
+MEMBER_STORED_BYTES_CEILING = MEMBER_ALLOWANCE.ceilings[UsageMeasure.STORED_BYTES]
+RACING_GUEST = Principal(
+    subject="shared-guest",
+    session_id="race",
+    username="shared-guest",
+    display_name="Shared Guest",
+    roles=frozenset({Role.GUEST}),
+)
 LARGE_PHOTO_BYTES = 1_600_000
 FILLER_LINE_LENGTH = 200
 STORYTELLERS = 120
@@ -190,6 +203,70 @@ def test_a_guest_file_past_the_upload_limit_is_refused_before_it_is_parsed(
     assert people_count(visitor) == before
 
 
+def test_a_member_fills_the_tree_up_to_its_people_limit(member: APIClient) -> None:
+    assert upload(member, "/api/gedcom/import/", visitors_gedcom(MEMBER_PEOPLE_CEILING)).status_code == 201
+    refused = member.post("/api/people/", profile_payload("One more"), format="json")
+    assert (refused.status_code, error_code(refused), error_message(refused)) == (
+        400,
+        "workspace.limit_reached",
+        "A family tree here holds at most 2,000 people.",
+    )
+    assert people_count(member) == MEMBER_PEOPLE_CEILING
+
+
+def test_a_file_with_more_people_than_a_member_tree_has_room_for_adds_nobody(member: APIClient) -> None:
+    response = upload(member, "/api/gedcom/import/", visitors_gedcom(MEMBER_PEOPLE_CEILING + 1))
+    assert (response.status_code, error_message(response), people_count(member)) == (
+        400,
+        "A family tree here holds at most 2,000 people.",
+        0,
+    )
+
+
+def test_a_member_links_people_up_to_the_relationship_limit(member: APIClient) -> None:
+    couple = remarried_couple_gedcom(MEMBER_RELATIONSHIP_CEILING)
+    assert upload(member, "/api/gedcom/import/", couple).status_code == 201
+    ann, bob = [person["id"] for person in member.get("/api/people/", {"search": "Caller"}).json()["results"]]
+    partners = {"first_partner_id": ann, "second_partner_id": bob, "terms": marriage_terms()}
+    refused = member.post("/api/partnerships/", partners, format="json")
+    assert (refused.status_code, error_message(refused)) == (
+        400,
+        "A family tree here holds at most 10,000 parent links and partnerships.",
+    )
+
+
+def test_a_photo_that_would_overfill_a_member_tree_is_refused(client_for: ClientFactory) -> None:
+    photographer = client_for("photographer")
+    newcomer = add_person(photographer, "Newcomer")
+    fill_with_photos(member_tree("photographer"), room_left=LARGE_PHOTO_BYTES - 1)
+    refused = photographer.put(
+        f"/api/people/{newcomer}/photo/", random_jpeg(LARGE_PHOTO_BYTES), content_type="image/jpeg"
+    )
+    assert (refused.status_code, error_code(refused), error_message(refused)) == (
+        400,
+        "workspace.limit_reached",
+        "A family tree here holds at most 200 MB of family data and photos.",
+    )
+    assert photographer.get(f"/api/people/{newcomer}/").json()["has_photo"] is False
+
+
+def test_a_member_file_past_the_upload_limit_is_refused_before_it_is_parsed(member: APIClient) -> None:
+    response = upload(
+        member, "/api/gedcom/preview/", padded_gedcom(MEMBER_ALLOWANCE.largest_upload_bytes + 1)
+    )
+    assert (response.status_code, error_code(response), error_message(response)) == (
+        400,
+        "gedcom.too_large",
+        "The file is larger than 20 MB.",
+    )
+
+
+def test_an_administrator_tree_is_not_held_to_the_member_limits(administrator: APIClient) -> None:
+    response = upload(administrator, "/api/gedcom/import/", visitors_gedcom(MEMBER_PEOPLE_CEILING + 1))
+    assert (response.status_code, people_count(administrator)) == (201, MEMBER_PEOPLE_CEILING + 1)
+    assert administrator.post("/api/people/", profile_payload("One more"), format="json").status_code == 201
+
+
 def test_members_store_photos_and_files_past_the_guest_limits(member: APIClient) -> None:
     first, second = add_person(member, "First"), add_person(member, "Second")
     photos = [put_photo(member, person_id, random_jpeg(LARGE_PHOTO_BYTES)) for person_id in (first, second)]
@@ -218,7 +295,26 @@ def store_photo_checking_room(tree: FamilyTree, person_id: int) -> None:
     container().workspaces.lock(tree)
     photo = photo_from_bytes(random_jpeg(LARGE_PHOTO_BYTES))
     DjangoPhotoStore(DATABASE).save(tree.id, PersonId(person_id), photo)
-    container().workspaces.ensure_within_allowance(tree)
+    container().workspaces.ensure_within_allowance(RACING_GUEST, tree)
+
+
+def member_tree(subject: str) -> FamilyTree:
+    tree = DjangoFamilyTreeRepository(DATABASE).find_by_owner(WorkspaceOwner(OwnerKind.MEMBER, subject))
+    assert tree is not None
+    return tree
+
+
+def fill_with_photos(tree: FamilyTree, room_left: int) -> None:
+    portraits = MEMBER_STORED_BYTES_CEILING // MAX_PHOTO_BYTES
+    profile = PersonProfile(
+        given_names="Portrait", surname="Sitter", sex=Sex.UNKNOWN, birth=LifeEvent(), death=None, biography=""
+    )
+    *sitters, last = DjangoPersonRepository(DATABASE).add_many(tree.id, [profile] * portraits)
+    full_size = photo_from_bytes(random_jpeg(MAX_PHOTO_BYTES))
+    for sitter in sitters:
+        DjangoPhotoStore(DATABASE).save(tree.id, sitter.id, full_size)
+    remainder = MEMBER_STORED_BYTES_CEILING - measured(tree, UsageMeasure.STORED_BYTES) - room_left
+    DjangoPhotoStore(DATABASE).save(tree.id, last.id, photo_from_bytes(random_jpeg(remainder)))
 
 
 def overfull_sandbox(client_for: ClientFactory, session_id: str) -> OverfullSandbox:

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from family_tree.domain.allowances import WorkspaceAllowance
+from family_tree.domain.allowances import ADMINISTRATOR_ALLOWANCE, ALLOWANCES, WorkspaceAllowance
 from family_tree.domain.enums import OwnerKind, Role
 from family_tree.domain.errors import AccessDenied
 from family_tree.domain.identifiers import PersonId, TreeId
@@ -38,6 +38,9 @@ class Principal:
     def is_guest(self) -> bool:
         return not self.is_member() and Role.GUEST in self.roles
 
+    def is_administrator(self) -> bool:
+        return Role.ADMIN in self.roles
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class WorkspaceOverview:
@@ -52,3 +55,9 @@ def workspace_owner_of(principal: Principal) -> WorkspaceOwner:
     if principal.is_guest():
         return WorkspaceOwner(OwnerKind.GUEST, principal.session_id or principal.subject)
     raise AccessDenied("auth.forbidden", "Your account has no access to Family Tree.")
+
+
+def allowance_of(principal: Principal) -> WorkspaceAllowance:
+    if principal.is_administrator():
+        return ADMINISTRATOR_ALLOWANCE
+    return ALLOWANCES[workspace_owner_of(principal).kind]

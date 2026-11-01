@@ -66,7 +66,7 @@ class PeopleService:
         with self._unit_of_work:
             self._workspaces.lock(tree)
             person = self._people.add(tree.id, profile)
-            self._workspaces.ensure_within_allowance(tree)
+            self._workspaces.ensure_within_allowance(principal, tree)
             self._unit_of_work.commit()
         return person
 
@@ -79,7 +79,7 @@ class PeopleService:
             ensure_birth_fits_family(profile.birth_date(), self._family_births(tree.id, person_id))
             person = Person(id=person_id, tree_id=tree.id, profile=profile)
             self._people.update(person)
-            self._workspaces.ensure_within_allowance(tree)
+            self._workspaces.ensure_within_allowance(principal, tree)
             self._unit_of_work.commit()
         return person
 

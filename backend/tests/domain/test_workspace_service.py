@@ -4,8 +4,9 @@ from unittest.mock import call, create_autospec
 
 import pytest
 
+from family_tree.domain.allowances import MEGABYTE
 from family_tree.domain.enums import OwnerKind, Role, Sex, UsageMeasure
-from family_tree.domain.errors import RuleViolation, WorkspaceAlreadyExists
+from family_tree.domain.errors import InvalidInput, RuleViolation, WorkspaceAlreadyExists
 from family_tree.domain.identifiers import PersonId, TreeId
 from family_tree.domain.interchange import InterchangeDocument, InterchangePerson
 from family_tree.domain.people import LifeEvent, PersonProfile
@@ -17,6 +18,21 @@ from family_tree.domain.workspaces import FamilyTree, Principal, WorkspaceOwner
 MEMBER = Principal(
     subject="racer", session_id=None, username="racer", display_name="Racer", roles=frozenset({Role.USER})
 )
+ADMINISTRATOR = Principal(
+    subject="keeper",
+    session_id=None,
+    username="keeper",
+    display_name="Keeper",
+    roles=frozenset({Role.USER, Role.ADMIN}),
+)
+GUEST = Principal(
+    subject="visitor",
+    session_id="visit",
+    username="visitor",
+    display_name="Visitor",
+    roles=frozenset({Role.GUEST}),
+)
+EVERY_MEASURE = [UsageMeasure.PEOPLE, UsageMeasure.RELATIONSHIPS, UsageMeasure.STORED_BYTES]
 ONE_PERSON = InterchangeDocument(
     people=(
         InterchangePerson(
@@ -114,30 +130,52 @@ def test_locking_a_workspace_locks_its_tree() -> None:
 
 
 @pytest.mark.parametrize(
-    ("owner_kind", "measures"),
+    ("principal", "owner_kind", "measures"),
     [
-        (OwnerKind.MEMBER, [UsageMeasure.PEOPLE]),
-        (OwnerKind.GUEST, [UsageMeasure.PEOPLE, UsageMeasure.RELATIONSHIPS, UsageMeasure.STORED_BYTES]),
+        (MEMBER, OwnerKind.MEMBER, EVERY_MEASURE),
+        (ADMINISTRATOR, OwnerKind.MEMBER, [UsageMeasure.PEOPLE]),
+        (GUEST, OwnerKind.GUEST, EVERY_MEASURE),
     ],
 )
 def test_only_what_the_allowance_limits_is_measured(
-    owner_kind: OwnerKind, measures: list[UsageMeasure]
+    principal: Principal, owner_kind: OwnerKind, measures: list[UsageMeasure]
 ) -> None:
     meter = meter_reading(0)
     service_with(create_autospec(FamilyTreeRepository, instance=True), meter).ensure_within_allowance(
-        tree_of(owner_kind)
+        principal, tree_of(owner_kind)
     )
     assert meter.usage.call_args_list == [call(TreeId(7), measure) for measure in measures]
 
 
 def test_a_tree_past_its_allowance_is_refused() -> None:
-    service = service_with(create_autospec(FamilyTreeRepository, instance=True), meter_reading(50_001))
+    service = service_with(create_autospec(FamilyTreeRepository, instance=True), meter_reading(2_001))
+    with pytest.raises(RuleViolation, match="at most 2,000 people"):
+        service.ensure_within_allowance(MEMBER, tree_of(OwnerKind.MEMBER))
+
+
+def test_an_administrator_tree_is_held_only_to_the_administrator_allowance() -> None:
+    trees, member_tree = create_autospec(FamilyTreeRepository, instance=True), tree_of(OwnerKind.MEMBER)
+    service_with(trees, meter_reading(50_000)).ensure_within_allowance(ADMINISTRATOR, member_tree)
     with pytest.raises(RuleViolation, match="at most 50,000 people"):
-        service.ensure_within_allowance(tree_of(OwnerKind.MEMBER))
+        service_with(trees, meter_reading(50_001)).ensure_within_allowance(ADMINISTRATOR, member_tree)
 
 
 def test_a_document_is_judged_together_with_what_the_tree_holds() -> None:
     trees, member_tree = create_autospec(FamilyTreeRepository, instance=True), tree_of(OwnerKind.MEMBER)
-    service_with(trees, meter_reading(49_999)).ensure_document_within_allowance(member_tree, ONE_PERSON)
-    with pytest.raises(RuleViolation, match="at most 50,000 people"):
-        service_with(trees, meter_reading(50_000)).ensure_document_within_allowance(member_tree, ONE_PERSON)
+    service_with(trees, meter_reading(1_999)).ensure_document_within_allowance(
+        MEMBER, member_tree, ONE_PERSON
+    )
+    with pytest.raises(RuleViolation, match="at most 2,000 people"):
+        service_with(trees, meter_reading(2_000)).ensure_document_within_allowance(
+            MEMBER, member_tree, ONE_PERSON
+        )
+
+
+@pytest.mark.parametrize(("principal", "largest_bytes"), [(MEMBER, 20 * MEGABYTE), (GUEST, 2 * MEGABYTE)])
+def test_uploads_are_judged_by_the_allowance_of_the_principal(
+    principal: Principal, largest_bytes: int
+) -> None:
+    service = service_with(create_autospec(FamilyTreeRepository, instance=True), meter_reading(0))
+    service.ensure_upload_within_allowance(principal, largest_bytes)
+    with pytest.raises(InvalidInput, match="The file is larger than"):
+        service.ensure_upload_within_allowance(principal, largest_bytes + 1)

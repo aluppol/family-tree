@@ -9,6 +9,8 @@ from rest_framework.test import APIClient
 
 from family_tree.adapters.persistence.people import DjangoPersonRepository
 from family_tree.dependencies import container
+from family_tree.domain.allowances import GUEST_ALLOWANCE
+from family_tree.domain.enums import UsageMeasure
 from family_tree.domain.identifiers import PersonId
 from family_tree.domain.workspaces import FamilyTree
 from tests.api.builders import (
@@ -16,6 +18,7 @@ from tests.api.builders import (
     error_code,
     marriage_terms,
     open_sandbox,
+    people_count,
     profile_payload,
     put_photo,
     random_jpeg,
@@ -110,6 +113,20 @@ def test_choosing_a_home_person_deleted_meanwhile_answers_not_found(client_for: 
             assert not wait([pending], timeout=STILL_WAITING_SECONDS).done
         response = pending.result(timeout=WAIT_SECONDS)
     assert (response.status_code, error_code(response)) == (404, "person.not_found")
+
+
+@pytest.mark.django_db(transaction=True)
+def test_a_file_too_large_for_the_room_left_is_refused_without_waiting_for_the_tree(
+    client_for: ClientFactory,
+) -> None:
+    visitor, tree = open_sandbox(client_for, "crowded")
+    room = GUEST_ALLOWANCE.ceilings[UsageMeasure.PEOPLE] - people_count(visitor)
+    with ThreadPoolExecutor(max_workers=1) as requests, held_open(lambda: container().workspaces.lock(tree)):
+        pending = requests.submit(
+            run_and_close, lambda: upload(visitor, "/api/gedcom/import/", visitors_gedcom(room + 1))
+        )
+        response = pending.result(timeout=WAIT_SECONDS / 2)
+    assert (response.status_code, error_code(response)) == (400, "workspace.limit_reached")
 
 
 def prepared_sandbox(client_for: ClientFactory) -> Sandbox:

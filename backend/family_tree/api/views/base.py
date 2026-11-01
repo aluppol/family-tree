@@ -10,4 +10,6 @@ from family_tree.dependencies import container
 class WorkspaceApiView(APIView):
     def initial(self, request: Request, *args: Any, **kwargs: Any) -> None:
         super().initial(request, *args, **kwargs)
-        container().workspaces.ensure_workspace(principal_of(request))
+        principal = principal_of(request)
+        container().workspaces.ensure_workspace(principal)
+        container().members.record_activity(principal)

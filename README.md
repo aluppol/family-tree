@@ -29,7 +29,8 @@ The demo family is real: Charles Darwin married his first cousin Emma Wedgwood, 
 | Chart | An hourglass of ancestors above and descendants below, couples side by side, children under the couple, repeated ancestors marked; pan and zoom with mouse, trackpad or touch | `frontend/src/features/chart`, `backend/tests/api/test_chart.py` |
 | Photos | Upload a portrait (resized in the browser), shown on the profile and on chart cards; type checked by content, not by name | `backend/tests/api/test_photos.py` |
 | GEDCOM | Import GEDCOM 5.5.1, 7.0 and GEDZIP with a preview of what will be added and what is skipped and why, all or nothing; export all three | `backend/tests/adapters/gedcom`, `backend/tests/api/test_gedcom.py` |
-| Scale | 5,000 people import in seconds; the chart is always four SQL queries, whatever the size of the family | `backend/tests/api/test_performance.py`, `test_chart.py` |
+| Scale | 5,000 people import in seconds (an administrator's tree); the chart is always four SQL queries, whatever the size of the family | `backend/tests/api/test_performance.py`, `test_chart.py` |
+| Member trees | Each member's tree holds up to 2,000 people, 10,000 parent links and partnerships and 200 MB of family data and photos, and imports files up to 20 MB; an administrator's tree is held only to 50,000 people; a change past a limit is refused with a plain explanation | `backend/tests/api/test_allowances.py`, `backend/tests/domain/test_allowances.py` |
 | Demo sandbox | Each guest gets a private copy of the demo family that holds up to 300 people, 1,500 parent links and partnerships and 2.5 MB of family data and photos, and imports files up to 2 MB; a test fills a sandbox to every limit with worst-case data and proves that 500 of them stay under 2 GiB on disk; a change past a limit is refused with a plain explanation, and changes to one tree take turns | `backend/tests/api/test_allowances.py`, `test_workspace_locking.py`, `backend/tests/adapters/test_workspace_room.py` |
 | API | Every endpoint documented as OpenAPI 3 at `/api/docs/` | `backend/tests/api/test_schema.py` |
 
@@ -100,6 +101,17 @@ flowchart LR
 The code has no comments and functions stay under 30 lines; tests enforce both (`backend/tests/test_code_rules.py`, the `code/no-comments` ESLint rule).
 
 CI (`.github/workflows/ci.yml`) runs all of the above on every push to `dev`, builds the image, starts the production compose file with throwaway secrets and runs `deploy/smoke.sh`. A green `dev` commit is promoted to `main`, which deploys it (`deploy.yml`).
+
+## Operating the live instance
+
+Every member's tree remembers the day its owner was last active (written at most once a day). Long-inactive members are cleaned up by hand, never on a timer, with two commands inside the running `web` container:
+
+```bash
+docker compose exec -T web python /app/manage.py inactive_members 365          # how many members, and who has been inactive for 365+ days
+docker compose exec -T web python /app/manage.py remove_inactive_members 365   # remove exactly those members' trees
+```
+
+The list shows only each member's Keycloak subject and last-active date (UTC); the app stores no names or e-mails. Guests, administrators (realm role `ADMIN`) and members not seen since activity tracking began are never listed or removed. Removing a tree leaves the Keycloak account in place, so a returning member starts with an empty tree.
 
 ## API
 

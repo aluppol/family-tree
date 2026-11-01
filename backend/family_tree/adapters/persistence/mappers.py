@@ -20,6 +20,7 @@ from family_tree.domain.enums import (
     Sex,
 )
 from family_tree.domain.identifiers import ParentLinkId, PartnershipId, PersonId, TreeId
+from family_tree.domain.members import MemberActivity
 from family_tree.domain.people import LifeEvent, Person, PersonProfile
 from family_tree.domain.photos import Photo
 from family_tree.domain.read_models import PersonSummary
@@ -37,6 +38,12 @@ class FamilyTreeMapper:
             owner=WorkspaceOwner(OwnerKind(record.owner_kind), record.owner_key),
             home_person_id=None if record.home_person_id is None else PersonId(record.home_person_id),
         )
+
+
+class MemberActivityMapper:
+    @staticmethod
+    def from_row(row: Mapping[str, Any]) -> MemberActivity:
+        return MemberActivity(subject=row["owner_key"], last_active_at=row["last_active_at"])
 
 
 class PersonMapper:

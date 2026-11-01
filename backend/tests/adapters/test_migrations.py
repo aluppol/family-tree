@@ -59,3 +59,13 @@ def test_legacy_people_move_into_a_legacy_tree() -> None:
         (2, 3, "birth"),
     ]
     assert fetch("SELECT count(*) FROM information_schema.schemata WHERE schema_name = 'people'") == [(0,)]
+
+
+@pytest.mark.django_db(transaction=True)
+def test_trees_that_predate_activity_tracking_have_no_activity_and_no_administrator_mark() -> None:
+    migrate_to([("people", "0005_drop_legacy_columns")])
+    with connection.cursor() as cursor:
+        cursor.execute("INSERT INTO family_tree (owner_kind, owner_key) VALUES ('member', 'early')")
+    migrate_to(latest_migrations())
+    rows = fetch("SELECT owner_key, last_active_at, was_seen_as_administrator FROM family_tree")
+    assert rows == [("early", None, False)]

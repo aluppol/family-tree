@@ -31,7 +31,7 @@ class PhotoService:
             self._workspaces.lock(tree)
             self._people.get(tree.id, person_id)
             self._photos.save(tree.id, person_id, photo)
-            self._workspaces.ensure_within_allowance(tree)
+            self._workspaces.ensure_within_allowance(principal, tree)
             self._unit_of_work.commit()
 
     def remove_photo(self, principal: Principal, person_id: PersonId) -> None:

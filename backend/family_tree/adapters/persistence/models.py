@@ -9,6 +9,8 @@ class FamilyTreeRecord(models.Model):
         "PersonRecord", null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
     )
     created_at = models.DateTimeField(db_default=Now())
+    last_active_at = models.DateTimeField(null=True, blank=True)
+    was_seen_as_administrator = models.BooleanField(db_default=False)
 
     class Meta:
         db_table = "family_tree"

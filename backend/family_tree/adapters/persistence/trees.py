@@ -38,12 +38,12 @@ class DjangoFamilyTreeRepository:
         return self._guest_records().count()
 
     def delete_guest_workspaces(self) -> None:
-        self._delete_locked(self._guest_records().select_for_update())
+        delete_locked_trees(self._guest_records().select_for_update())
 
     def delete_oldest_guest_workspaces(self, keep: int) -> None:
         newest_first = self._guest_records().order_by("-created_at", "-id")
         stale_ids = list(newest_first.values_list("id", flat=True)[keep:])
-        self._delete_locked(self._records().filter(id__in=stale_ids).select_for_update(skip_locked=True))
+        delete_locked_trees(self._records().filter(id__in=stale_ids).select_for_update(skip_locked=True))
 
     def _records(self) -> QuerySet[FamilyTreeRecord]:
         return FamilyTreeRecord.objects.using(self._database)
@@ -51,6 +51,7 @@ class DjangoFamilyTreeRepository:
     def _guest_records(self) -> QuerySet[FamilyTreeRecord]:
         return self._records().filter(owner_kind=OwnerKind.GUEST.value)
 
-    def _delete_locked(self, trees: QuerySet[FamilyTreeRecord]) -> None:
-        locked_ids = list(trees.order_by("id").values_list("id", flat=True))
-        self._records().filter(id__in=locked_ids).delete()
+
+def delete_locked_trees(trees: QuerySet[FamilyTreeRecord]) -> None:
+    locked_ids = list(trees.order_by("id").values_list("id", flat=True))
+    FamilyTreeRecord.objects.using(trees.db).filter(id__in=locked_ids).delete()

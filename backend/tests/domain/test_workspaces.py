@@ -1,8 +1,14 @@
 import pytest
 
+from family_tree.domain.allowances import (
+    ADMINISTRATOR_ALLOWANCE,
+    GUEST_ALLOWANCE,
+    MEMBER_ALLOWANCE,
+    WorkspaceAllowance,
+)
 from family_tree.domain.enums import OwnerKind, Role
 from family_tree.domain.errors import AccessDenied
-from family_tree.domain.workspaces import Principal, WorkspaceOwner, workspace_owner_of
+from family_tree.domain.workspaces import Principal, WorkspaceOwner, allowance_of, workspace_owner_of
 
 
 def principal(roles: frozenset[Role], session_id: str | None = "session-1") -> Principal:
@@ -30,3 +36,38 @@ def test_each_principal_owns_one_workspace(
 def test_a_principal_without_a_role_has_no_workspace() -> None:
     with pytest.raises(AccessDenied):
         workspace_owner_of(principal(frozenset()))
+
+
+@pytest.mark.parametrize(
+    ("roles", "allowance"),
+    [
+        (frozenset({Role.GUEST}), GUEST_ALLOWANCE),
+        (frozenset({Role.USER}), MEMBER_ALLOWANCE),
+        (frozenset({Role.USER, Role.GUEST}), MEMBER_ALLOWANCE),
+        (frozenset({Role.ADMIN}), ADMINISTRATOR_ALLOWANCE),
+        (frozenset({Role.USER, Role.ADMIN}), ADMINISTRATOR_ALLOWANCE),
+        (frozenset({Role.GUEST, Role.ADMIN}), ADMINISTRATOR_ALLOWANCE),
+    ],
+)
+def test_each_principal_is_held_to_the_allowance_of_its_role(
+    roles: frozenset[Role], allowance: WorkspaceAllowance
+) -> None:
+    assert allowance_of(principal(roles)) is allowance
+
+
+@pytest.mark.parametrize(
+    ("roles", "is_administrator"),
+    [
+        (frozenset({Role.ADMIN}), True),
+        (frozenset({Role.USER, Role.ADMIN}), True),
+        (frozenset({Role.USER}), False),
+        (frozenset({Role.GUEST}), False),
+    ],
+)
+def test_only_the_admin_role_makes_an_administrator(roles: frozenset[Role], is_administrator: bool) -> None:
+    assert principal(roles).is_administrator() is is_administrator
+
+
+def test_a_principal_without_a_role_has_no_allowance() -> None:
+    with pytest.raises(AccessDenied):
+        allowance_of(principal(frozenset()))

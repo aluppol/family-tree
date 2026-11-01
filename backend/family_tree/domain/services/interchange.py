@@ -16,7 +16,7 @@ from family_tree.domain.ports import (
 )
 from family_tree.domain.services.importing import DocumentImporter, report_of
 from family_tree.domain.services.workspaces import WorkspaceService
-from family_tree.domain.workspaces import FamilyTree, Principal
+from family_tree.domain.workspaces import Principal
 
 
 class InterchangeService:
@@ -40,18 +40,18 @@ class InterchangeService:
         self._people, self._parent_links, self._partnerships, self._photos = repositories
 
     def preview(self, principal: Principal, payload: bytes) -> ImportReport:
-        return report_of(self._vetted_document(self._workspaces.tree_of(principal), payload))
+        return report_of(self._vetted_document(principal, payload))
 
     def import_file(self, principal: Principal, payload: bytes) -> ImportOutcome:
         tree = self._workspaces.tree_of(principal)
-        document = self._vetted_document(tree, payload)
-        self._workspaces.ensure_document_within_allowance(tree, document)
+        document = self._vetted_document(principal, payload)
+        self._workspaces.ensure_document_within_allowance(principal, tree, document)
         with self._unit_of_work:
             self._workspaces.lock(tree)
             outcome = self._importer.import_document(tree.id, document)
             if tree.home_person_id is None:
                 self._trees.set_home_person(tree.id, outcome.home_person_id)
-            self._workspaces.ensure_within_allowance(tree)
+            self._workspaces.ensure_within_allowance(principal, tree)
             self._unit_of_work.commit()
         return outcome
 
@@ -59,8 +59,8 @@ class InterchangeService:
         writer = self._writer_for(interchange_format)
         return writer.write(self._snapshot(self._workspaces.tree_of(principal).id))
 
-    def _vetted_document(self, tree: FamilyTree, payload: bytes) -> InterchangeDocument:
-        self._workspaces.ensure_upload_within_allowance(tree, len(payload))
+    def _vetted_document(self, principal: Principal, payload: bytes) -> InterchangeDocument:
+        self._workspaces.ensure_upload_within_allowance(principal, len(payload))
         return vet_document(self._reader.read(payload))
 
     def _snapshot(self, tree_id: TreeId) -> TreeSnapshot:

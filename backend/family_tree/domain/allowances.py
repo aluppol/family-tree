@@ -29,6 +29,17 @@ class WorkspaceAllowance:
 
 MEMBER_ALLOWANCE = WorkspaceAllowance(
     workspace_phrase="A family tree here",
+    ceilings=MappingProxyType(
+        {
+            UsageMeasure.PEOPLE: 2_000,
+            UsageMeasure.RELATIONSHIPS: 10_000,
+            UsageMeasure.STORED_BYTES: 200 * MEGABYTE,
+        }
+    ),
+    largest_upload_bytes=20 * MEGABYTE,
+)
+ADMINISTRATOR_ALLOWANCE = WorkspaceAllowance(
+    workspace_phrase="A family tree here",
     ceilings=MappingProxyType({UsageMeasure.PEOPLE: 50_000}),
     largest_upload_bytes=20 * MEGABYTE,
 )
@@ -46,10 +57,6 @@ GUEST_ALLOWANCE = WorkspaceAllowance(
 ALLOWANCES: Mapping[OwnerKind, WorkspaceAllowance] = MappingProxyType(
     {OwnerKind.MEMBER: MEMBER_ALLOWANCE, OwnerKind.GUEST: GUEST_ALLOWANCE}
 )
-
-
-def allowance_of(owner_kind: OwnerKind) -> WorkspaceAllowance:
-    return ALLOWANCES[owner_kind]
 
 
 def usage_of_document(document: InterchangeDocument) -> WorkspaceUsage:
