@@ -1,7 +1,7 @@
 import type { PersonSummary } from '../../../api/types';
 import { childLinksOf, type FamilyIndex, otherPartnerIn, type Parentage, parentLinksOf, unionsOf } from './familyIndex';
 import { birthOrderKey, dateSortValue, distinctBy, kindRank, sortedBy } from './ordering';
-import { firstStep, partnerKey, stepToChild, type TraversalStep } from './traversal';
+import { firstOccurrenceKeys, firstStep, partnerKey, stepToChild, type TraversalStep } from './traversal';
 
 export interface DescentTree {
   readonly key: string;
@@ -31,10 +31,14 @@ interface Offspring {
 }
 
 export function buildDescent(index: FamilyIndex, focus: PersonSummary): DescentTree {
-  return descentTree(firstStep(index, focus));
+  const start = firstStep(index, focus);
+  return descentTree(start, firstOccurrenceKeys(start, childSteps));
 }
 
-function descentTree(step: TraversalStep): DescentTree {
+function descentTree(step: TraversalStep, expandedKeys: ReadonlySet<string>): DescentTree {
+  if (!expandedKeys.has(step.key)) {
+    return { key: step.key, person: step.person, partners: [], childGroups: [] };
+  }
   const recordedPartners = partnersInOrder(step);
   const offspring = offspringOf(step, recordedPartners);
   const partners = distinctBy([...recordedPartners, ...coParentsOf(offspring)], (partner) => partner.id);
@@ -42,8 +46,12 @@ function descentTree(step: TraversalStep): DescentTree {
     key: step.key,
     person: step.person,
     partners: partners.map((partner) => ({ key: partnerKey(step, partner), person: partner })),
-    childGroups: childGroupsOf({ step, partners, offspring }),
+    childGroups: childGroupsOf({ step, partners, offspring, expandedKeys }),
   };
+}
+
+function childSteps(step: TraversalStep): TraversalStep[] {
+  return childLinksToDraw(step).map((link) => stepToChild(step, link.child));
 }
 
 function partnersInOrder({ index, person }: TraversalStep): PersonSummary[] {
@@ -55,10 +63,12 @@ function partnersInOrder({ index, person }: TraversalStep): PersonSummary[] {
 }
 
 function offspringOf(step: TraversalStep, partners: readonly PersonSummary[]): Offspring[] {
+  return childLinksToDraw(step).map((link) => ({ link, coParentLink: coParentLinkOf({ index: step.index, link, partners }) }));
+}
+
+function childLinksToDraw(step: TraversalStep): Parentage[] {
   const links = sortedBy(childLinksOf(step.index, step.person), (link) => [...birthOrderKey(link.child), kindRank(link.kind)]);
-  return distinctBy(links, (link) => link.child.id)
-    .filter((link) => !step.lineage.has(link.child.id))
-    .map((link) => ({ link, coParentLink: coParentLinkOf({ index: step.index, link, partners }) }));
+  return distinctBy(links, (link) => link.child.id).filter((link) => !step.lineage.has(link.child.id));
 }
 
 function coParentLinkOf({ index, link, partners }: { index: FamilyIndex; link: Parentage; partners: readonly PersonSummary[] }): Parentage | undefined {
@@ -76,21 +86,29 @@ function coParentsOf(offspring: readonly Offspring[]): PersonSummary[] {
   return offspring.flatMap(({ coParentLink }) => (coParentLink === undefined ? [] : [coParentLink.parent]));
 }
 
-function childGroupsOf({ step, partners, offspring }: { step: TraversalStep; partners: readonly PersonSummary[]; offspring: readonly Offspring[] }): ChildGroup[] {
+interface FamilyToDraw {
+  readonly step: TraversalStep;
+  readonly partners: readonly PersonSummary[];
+  readonly offspring: readonly Offspring[];
+  readonly expandedKeys: ReadonlySet<string>;
+}
+
+function childGroupsOf(family: FamilyToDraw): ChildGroup[] {
+  const { step, partners, offspring, expandedKeys } = family;
   const partnerGroups = partners.map((partner, position) => ({
     partnerPosition: position,
-    children: offspring.filter(({ coParentLink }) => coParentLink?.parent.id === partner.id).map((entry) => branchOf(step, entry)),
+    children: offspring.filter(({ coParentLink }) => coParentLink?.parent.id === partner.id).map((entry) => branchOf(step, entry, expandedKeys)),
   }));
   const singleParentGroup = {
     partnerPosition: null,
-    children: offspring.filter(({ coParentLink }) => coParentLink === undefined).map((entry) => branchOf(step, entry)),
+    children: offspring.filter(({ coParentLink }) => coParentLink === undefined).map((entry) => branchOf(step, entry, expandedKeys)),
   };
   return [...partnerGroups, singleParentGroup].filter((group) => group.children.length > 0);
 }
 
-function branchOf(step: TraversalStep, { link, coParentLink }: Offspring): DescendantBranch {
+function branchOf(step: TraversalStep, { link, coParentLink }: Offspring, expandedKeys: ReadonlySet<string>): DescendantBranch {
   return {
-    tree: descentTree(stepToChild(step, link.child)),
+    tree: descentTree(stepToChild(step, link.child), expandedKeys),
     isDashed: isNonBirth(link) || isNonBirth(coParentLink),
   };
 }

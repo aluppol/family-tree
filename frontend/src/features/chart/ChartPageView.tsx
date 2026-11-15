@@ -4,7 +4,6 @@ import { Banner, ButtonLink, Icon, LoadingState, PageContainer, PageHeader } fro
 import { profilePath, treePath } from '../../routePaths';
 import styles from './ChartPage.module.scss';
 import { ChartView } from './ChartView';
-import { GenerationControls, type Generations } from './GenerationControls';
 import type { HourglassLayout } from './layout/types';
 import type { ChartLinks } from './PersonNode';
 
@@ -12,9 +11,6 @@ export interface ChartPageViewProps {
   personId: number;
   focusName: string | undefined;
   layout: HourglassLayout | undefined;
-  generations: Generations;
-  isUpdating: boolean;
-  onGenerationsChange: (generations: Generations) => void;
   onNavigate: (href: string) => void;
 }
 
@@ -22,7 +18,7 @@ const CHART_LINKS: ChartLinks = { profile: profilePath, tree: treePath };
 
 const FAMILY_TREE = 'Family tree';
 
-export function ChartPageView({ personId, focusName, layout, generations, isUpdating, onGenerationsChange, onNavigate }: ChartPageViewProps): ReactElement {
+export function ChartPageView({ personId, focusName, layout, onNavigate }: ChartPageViewProps): ReactElement {
   return (
     <PageContainer>
       <PageHeader
@@ -30,7 +26,6 @@ export function ChartPageView({ personId, focusName, layout, generations, isUpda
         description={focusName === undefined ? undefined : FAMILY_TREE}
         actions={<ProfileLink personId={personId} />}
       />
-      <GenerationControls generations={generations} isUpdating={isUpdating} onGenerationsChange={onGenerationsChange} />
       {layout === undefined ? (
         <LoadingState label="Loading the family tree…" />
       ) : (

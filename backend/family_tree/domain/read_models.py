@@ -7,8 +7,6 @@ from family_tree.domain.identifiers import PersonId
 from family_tree.domain.people import Person
 from family_tree.domain.relationships import ParentLink, Partnership
 
-MAX_ANCESTOR_GENERATIONS = 8
-MAX_DESCENDANT_GENERATIONS = 6
 MAX_PAGE_SIZE = 100
 MAX_SEARCH_LENGTH = 100
 
@@ -67,12 +65,6 @@ class PersonDossier:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ChartScope:
     focus_id: PersonId
-    ancestor_generations: int
-    descendant_generations: int
-
-    def __post_init__(self) -> None:
-        _require_within("ancestors", self.ancestor_generations, 0, MAX_ANCESTOR_GENERATIONS)
-        _require_within("descendants", self.descendant_generations, 0, MAX_DESCENDANT_GENERATIONS)
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

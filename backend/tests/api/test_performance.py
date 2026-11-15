@@ -1,11 +1,17 @@
+import sys
 import time
 from io import BytesIO
 
+import pytest
 from rest_framework.test import APIClient
 
 PEOPLE = 5000
 IMPORT_SECONDS_LIMIT = 30
 CHART_SECONDS_LIMIT = 1
+
+untraced_only = pytest.mark.skipif(
+    sys.gettrace() is not None, reason="Timings are meaningless while a tracer such as coverage is running."
+)
 
 
 def ahnentafel_gedcom(people: int) -> bytes:
@@ -19,21 +25,31 @@ def ahnentafel_gedcom(people: int) -> bytes:
     return "\n".join(lines).encode("utf-8")
 
 
-def test_a_five_thousand_person_tree_imports_and_opens_quickly(administrator: APIClient) -> None:
+def test_a_five_thousand_person_tree_imports_quickly_and_charts_everyone(administrator: APIClient) -> None:
     started = time.perf_counter()
+    focus = _import_ahnentafel(administrator)
+    import_seconds = time.perf_counter() - started
+    chart = administrator.get(f"/api/people/{focus}/chart/").json()
+    assert len(chart["people"]) == _people_in_the_first_ones_ancestry(PEOPLE)
+    assert import_seconds < IMPORT_SECONDS_LIMIT, f"import {import_seconds:.1f} s"
+
+
+@untraced_only
+def test_the_chart_of_five_thousand_people_opens_within_a_second(administrator: APIClient) -> None:
+    focus = _import_ahnentafel(administrator)
+    started = time.perf_counter()
+    administrator.get(f"/api/people/{focus}/chart/")
+    chart_seconds = time.perf_counter() - started
+    assert chart_seconds < CHART_SECONDS_LIMIT, f"chart {chart_seconds:.2f} s"
+
+
+def _import_ahnentafel(client: APIClient) -> int:
     upload = BytesIO(ahnentafel_gedcom(PEOPLE))
     upload.name = "ahnentafel.ged"
-    response = administrator.post("/api/gedcom/import/", {"file": upload}, format="multipart")
-    import_seconds = time.perf_counter() - started
+    response = client.post("/api/gedcom/import/", {"file": upload}, format="multipart")
     assert (response.status_code, response.json()["people_count"]) == (201, PEOPLE), response.content
-    focus = response.json()["home_person_id"]
-    started = time.perf_counter()
-    chart = administrator.get(f"/api/people/{focus}/chart/", {"ancestors": "8", "descendants": "6"}).json()
-    chart_seconds = time.perf_counter() - started
-    assert len(chart["people"]) == 2**9 - 1
-    assert (import_seconds < IMPORT_SECONDS_LIMIT, chart_seconds < CHART_SECONDS_LIMIT) == (True, True), (
-        f"import {import_seconds:.1f} s, chart {chart_seconds:.2f} s"
-    )
+    focus: int = response.json()["home_person_id"]
+    return focus
 
 
 def _individual(number: int, people: int) -> list[str]:
@@ -57,3 +73,7 @@ def _birth_year(number: int) -> int:
 
 def _has_parents(number: int, people: int) -> bool:
     return 2 * number + 1 <= people
+
+
+def _people_in_the_first_ones_ancestry(people: int) -> int:
+    return sum(1 for number in range(1, people + 1) if number == 1 or _has_parents(number // 2, people))

@@ -28,6 +28,20 @@ export function partnerKey(step: TraversalStep, partner: PersonSummary): string 
   return `${step.key}+${String(partner.id)}`;
 }
 
+export function firstOccurrenceKeys(start: TraversalStep, nextSteps: (step: TraversalStep) => readonly TraversalStep[]): ReadonlySet<string> {
+  const claimedPeople = new Set([start.person.id]);
+  const keys = new Set([start.key]);
+  const queue = [start];
+  for (const step of queue) {
+    for (const next of nextSteps(step).filter((candidate) => !claimedPeople.has(candidate.person.id))) {
+      claimedPeople.add(next.person.id);
+      keys.add(next.key);
+      queue.push(next);
+    }
+  }
+  return keys;
+}
+
 function stepTo({ step, person, marker }: { step: TraversalStep; person: PersonSummary; marker: string }): TraversalStep {
   return {
     index: step.index,

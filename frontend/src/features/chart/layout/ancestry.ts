@@ -1,7 +1,7 @@
 import type { PersonSummary } from '../../../api/types';
 import { type FamilyIndex, type Parentage, parentLinksOf } from './familyIndex';
 import { distinctBy, kindRank, sexRank, type SortKey, sortedBy } from './ordering';
-import { firstStep, stepToParent, type TraversalStep } from './traversal';
+import { firstOccurrenceKeys, firstStep, stepToParent, type TraversalStep } from './traversal';
 
 export interface AncestorTree {
   readonly key: string;
@@ -15,19 +15,28 @@ export interface ParentGroup {
 }
 
 export function buildAncestry(index: FamilyIndex, focus: PersonSummary): AncestorTree {
-  return ancestorTree(firstStep(index, focus));
+  const start = firstStep(index, focus);
+  return ancestorTree(start, firstOccurrenceKeys(start, parentSteps));
 }
 
-function ancestorTree(step: TraversalStep): AncestorTree {
-  const parentages = parentsInOrder(step).filter((parentage) => !step.lineage.has(parentage.parent.id));
+function ancestorTree(step: TraversalStep, expandedKeys: ReadonlySet<string>): AncestorTree {
+  const parentages = expandedKeys.has(step.key) ? parentsToDraw(step) : [];
   return {
     key: step.key,
     person: step.person,
     parentGroups: groupsOfParents(parentages).map((group) => ({
-      parents: group.map((parentage) => ancestorTree(stepToParent(step, parentage.parent))),
+      parents: group.map((parentage) => ancestorTree(stepToParent(step, parentage.parent), expandedKeys)),
       isDashed: group.some((parentage) => parentage.kind !== 'birth'),
     })),
   };
+}
+
+function parentSteps(step: TraversalStep): TraversalStep[] {
+  return parentsToDraw(step).map((parentage) => stepToParent(step, parentage.parent));
+}
+
+function parentsToDraw(step: TraversalStep): Parentage[] {
+  return parentsInOrder(step).filter((parentage) => !step.lineage.has(parentage.parent.id));
 }
 
 function parentsInOrder({ index, person }: TraversalStep): Parentage[] {

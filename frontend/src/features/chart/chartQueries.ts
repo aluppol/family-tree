@@ -5,8 +5,7 @@ import type { FamilyChart } from '../../api/types';
 
 export function useFamilyChart(request: FamilyChartRequest): UseQueryResult<FamilyChart> {
   return useQuery({
-    queryKey: [...CHARTS_KEY, request.personId, request.ancestors, request.descendants],
+    queryKey: [...CHARTS_KEY, request.personId],
     queryFn: () => fetchFamilyChart(request),
-    placeholderData: (previousChart) => (previousChart?.focus_id === request.personId ? previousChart : undefined),
   });
 }

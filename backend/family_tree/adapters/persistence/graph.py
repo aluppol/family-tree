@@ -13,21 +13,19 @@ from family_tree.domain.relationships import ParentLink, Partnership
 CANDIDATE_LIMIT = 20
 
 LINEAGE_SQL = """
-WITH RECURSIVE ancestry(person_id, generation) AS (
-    SELECT %(focus)s::bigint, 0
+WITH RECURSIVE ancestry(person_id) AS (
+    SELECT %(focus)s::bigint
     UNION
-    SELECT link.parent_id, ancestry.generation + 1
-    FROM parent_link AS link JOIN ancestry ON link.child_id = ancestry.person_id
-    WHERE link.tree_id = %(tree)s AND ancestry.generation < %(ancestors)s
+    SELECT link.parent_id FROM parent_link AS link JOIN ancestry ON link.child_id = ancestry.person_id
+    WHERE link.tree_id = %(tree)s
 ),
-descent(person_id, generation) AS (
-    SELECT %(focus)s::bigint, 0
+descent(person_id) AS (
+    SELECT %(focus)s::bigint
     UNION
-    SELECT link.child_id, descent.generation + 1
-    FROM parent_link AS link JOIN descent ON link.parent_id = descent.person_id
-    WHERE link.tree_id = %(tree)s AND descent.generation < %(descendants)s
+    SELECT link.child_id FROM parent_link AS link JOIN descent ON link.parent_id = descent.person_id
+    WHERE link.tree_id = %(tree)s
 )
-SELECT 'ancestor', person_id FROM ancestry WHERE generation > 0
+SELECT 'ancestor', person_id FROM ancestry WHERE person_id <> %(focus)s
 UNION
 SELECT 'descendant', person_id FROM descent
 """
@@ -88,12 +86,7 @@ class PostgresKinshipGraph:
         return self._candidates(tree_id, text, {person_id})
 
     def _lineage(self, tree_id: TreeId, scope: ChartScope) -> tuple[set[PersonId], set[PersonId]]:
-        parameters = {
-            "tree": tree_id,
-            "focus": scope.focus_id,
-            "ancestors": scope.ancestor_generations,
-            "descendants": scope.descendant_generations,
-        }
+        parameters = {"tree": tree_id, "focus": scope.focus_id}
         with connections[self._database].cursor() as cursor:
             cursor.execute(LINEAGE_SQL, parameters)
             rows = cursor.fetchall()

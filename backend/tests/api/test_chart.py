@@ -1,6 +1,6 @@
+from itertools import pairwise
 from typing import Any
 
-import pytest
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from rest_framework.test import APIClient
@@ -38,13 +38,18 @@ def add_descendants(client: APIClient, people: dict[str, int], index: int) -> No
     link_parent(client, child_id, add_person(client, f"grandchild {index}", 1820 + index))
 
 
-def chart(client: APIClient, person_id: int, ancestors: int = 4, descendants: int = 3) -> dict[str, Any]:
-    response = client.get(
-        f"/api/people/{person_id}/chart/", {"ancestors": ancestors, "descendants": descendants}
-    )
+def chart(client: APIClient, person_id: int, query: dict[str, Any] | None = None) -> dict[str, Any]:
+    response = client.get(f"/api/people/{person_id}/chart/", query or {})
     assert response.status_code == 200, response.content
     body: dict[str, Any] = response.json()
     return body
+
+
+def build_line(client: APIClient, generations: int) -> list[int]:
+    line = [add_person(client, f"generation {number}", 1500 + 25 * number) for number in range(generations)]
+    for parent_id, child_id in pairwise(line):
+        link_parent(client, parent_id, child_id)
+    return line
 
 
 def given_names_in(body: dict[str, Any]) -> set[str]:
@@ -61,10 +66,18 @@ def test_the_chart_holds_ancestors_descendants_and_partners(member: APIClient) -
     assert len(body["parent_links"]) == 4 + 2 * 3
 
 
-def test_generation_limits_trim_the_chart(member: APIClient) -> None:
+def test_the_chart_reaches_every_generation(member: APIClient) -> None:
+    line = build_line(member, generations=12)
+    everyone = {f"generation {number}" for number in range(12)}
+    from_the_top, from_the_bottom = chart(member, line[0]), chart(member, line[-1])
+    assert (given_names_in(from_the_top), given_names_in(from_the_bottom)) == (everyone, everyone)
+    assert (len(from_the_top["parent_links"]), len(from_the_bottom["parent_links"])) == (11, 11)
+
+
+def test_the_chart_ignores_the_old_generation_parameters(member: APIClient) -> None:
     people = build_family(member, width=1)
-    body = chart(member, people["focus"], ancestors=1, descendants=1)
-    assert given_names_in(body) == {"father", "mother", "focus", "partner", "child 0"}
+    limited = chart(member, people["focus"], {"ancestors": 1, "descendants": 1})
+    assert given_names_in(limited) == given_names_in(chart(member, people["focus"]))
 
 
 def test_the_chart_takes_a_fixed_number_of_queries(member: APIClient) -> None:
@@ -74,14 +87,6 @@ def test_the_chart_takes_a_fixed_number_of_queries(member: APIClient) -> None:
     with CaptureQueriesContext(connection) as large_queries:
         chart(member, large["focus"])
     assert len(small_queries) == len(large_queries)
-
-
-@pytest.mark.parametrize(
-    "query", [{"ancestors": 9}, {"descendants": 7}, {"ancestors": -1}, {"ancestors": "many"}]
-)
-def test_rejects_out_of_range_generations(member: APIClient, query: dict[str, Any]) -> None:
-    person_id = add_person(member, "Focus")
-    assert member.get(f"/api/people/{person_id}/chart/", query).status_code == 400
 
 
 def test_the_chart_of_a_missing_person_is_not_found(member: APIClient) -> None:

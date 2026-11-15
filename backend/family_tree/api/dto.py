@@ -25,8 +25,6 @@ from family_tree.domain.people import (
     PersonProfile,
 )
 from family_tree.domain.read_models import (
-    MAX_ANCESTOR_GENERATIONS,
-    MAX_DESCENDANT_GENERATIONS,
     MAX_PAGE_SIZE,
     MAX_SEARCH_LENGTH,
     FamilyChart,
@@ -48,8 +46,6 @@ from family_tree.domain.relationships import (
 from family_tree.domain.workspaces import Principal, WorkspaceOverview
 
 DEFAULT_PAGE_SIZE = 50
-DEFAULT_ANCESTOR_GENERATIONS = 4
-DEFAULT_DESCENDANT_GENERATIONS = 3
 
 
 def choices_of(enumeration: type[StrEnum]) -> list[str]:
@@ -295,18 +291,6 @@ class PeopleQuerySerializer(serializers.Serializer[PeopleQuery]):
         return domain_value(
             lambda: PeopleQuery(text=attrs["search"], offset=attrs["offset"], limit=attrs["limit"])
         )
-
-
-class ChartQuerySerializer(serializers.Serializer[tuple[int, int]]):
-    ancestors = serializers.IntegerField(
-        min_value=0, max_value=MAX_ANCESTOR_GENERATIONS, default=DEFAULT_ANCESTOR_GENERATIONS
-    )
-    descendants = serializers.IntegerField(
-        min_value=0, max_value=MAX_DESCENDANT_GENERATIONS, default=DEFAULT_DESCENDANT_GENERATIONS
-    )
-
-    def validate(self, attrs: dict[str, Any]) -> tuple[int, int]:
-        return attrs["ancestors"], attrs["descendants"]
 
 
 class CandidateQuerySerializer(serializers.Serializer[str]):

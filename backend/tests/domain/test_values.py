@@ -2,10 +2,9 @@ import pytest
 
 from family_tree.domain.enums import PhotoType, Sex
 from family_tree.domain.errors import InvalidInput
-from family_tree.domain.identifiers import PersonId
 from family_tree.domain.people import LifeEvent, PersonProfile
 from family_tree.domain.photos import JPEG_SIGNATURE, MAX_PHOTO_BYTES, PNG_SIGNATURE, photo_from_bytes
-from family_tree.domain.read_models import ChartScope, PeopleQuery
+from family_tree.domain.read_models import PeopleQuery
 
 
 def profile(given_names: str = "Emma", surname: str = "Wedgwood", place: str = "") -> PersonProfile:
@@ -78,9 +77,3 @@ def test_rejects_other_files(content: bytes, code: str) -> None:
 def test_people_queries_are_bounded(offset: int, limit: int, text: str) -> None:
     with pytest.raises(InvalidInput):
         PeopleQuery(text=text, offset=offset, limit=limit)
-
-
-@pytest.mark.parametrize(("ancestors", "descendants"), [(-1, 0), (9, 0), (0, 7)])
-def test_chart_scopes_are_bounded(ancestors: int, descendants: int) -> None:
-    with pytest.raises(InvalidInput):
-        ChartScope(focus_id=PersonId(1), ancestor_generations=ancestors, descendant_generations=descendants)

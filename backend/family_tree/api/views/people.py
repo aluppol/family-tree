@@ -6,7 +6,6 @@ from rest_framework.response import Response
 from family_tree.api.authentication import principal_of
 from family_tree.api.dto import (
     CandidateQuerySerializer,
-    ChartQuerySerializer,
     FamilyChartSerializer,
     PeoplePageSerializer,
     PeopleQuerySerializer,
@@ -66,14 +65,9 @@ class PersonView(WorkspaceApiView):
 
 
 class PersonChartView(WorkspaceApiView):
-    @extend_schema(
-        parameters=[ChartQuerySerializer], responses=FamilyChartSerializer, summary="Hourglass chart"
-    )
+    @extend_schema(responses=FamilyChartSerializer, summary="Hourglass chart with every generation")
     def get(self, request: Request, person_id: int) -> Response:
-        ancestors, descendants = validated(ChartQuerySerializer, request.query_params)
-        scope = ChartScope(
-            focus_id=PersonId(person_id), ancestor_generations=ancestors, descendant_generations=descendants
-        )
+        scope = ChartScope(focus_id=PersonId(person_id))
         return Response(FamilyChartSerializer(container().charts.chart(principal_of(request), scope)).data)
 
 

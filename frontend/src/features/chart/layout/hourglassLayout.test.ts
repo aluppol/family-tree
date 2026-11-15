@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { FamilyChart } from '../../../api/types';
-import { type FamilyScript, familyChart, type ParentLine } from '../testing/familyScript';
+import { type FamilyScript, familyChart, type ParentLine, type PartnerLine, type PersonLine } from '../testing/familyScript';
 import { generatedFamily, type GeneratorSettings } from '../testing/generatedFamily';
 import { CARD_HEIGHT, CARD_WIDTH, PARTNER_PITCH, rowCentreY } from './geometry';
 import { layoutHourglass } from './hourglassLayout';
@@ -244,6 +244,18 @@ const CYCLIC_DATA: FamilyScript = {
   ],
 };
 
+const COUSIN_PARENTS_WITH_OLDER_ROOTS: FamilyScript = {
+  ...COUSIN_PARENTS,
+  people: [...COUSIN_PARENTS.people, ['Thomas', 'male', 1700], ['Mary', 'female', 1705]],
+  parents: [...(COUSIN_PARENTS.parents ?? []), ['Thomas', 'Josiah I'], ['Mary', 'Josiah I']],
+};
+
+const COUSIN_MARRIAGE_BELOW_WITH_GRANDCHILD: FamilyScript = {
+  ...COUSIN_MARRIAGE_BELOW,
+  people: [...COUSIN_MARRIAGE_BELOW.people, ['Leonard', 'male', 1870]],
+  parents: [...(COUSIN_MARRIAGE_BELOW.parents ?? []), ['William', 'Leonard']],
+};
+
 const LAYOUT_CASES: readonly LayoutCase[] = [
   { id: 'a single person', script: SINGLE_PERSON, rows: { '0': ['Ada'] } },
   {
@@ -302,6 +314,28 @@ const LAYOUT_CASES: readonly LayoutCase[] = [
       '1': ['Susannah', 'Robert', 'Josiah II', 'Bessy'],
       '2': ['Charles', 'Emma', 'Emma (repeat)', 'Charles (repeat)'],
       '3': ['William', 'William (repeat)'],
+    },
+  },
+  {
+    id: 'a repeated ancestor whose own parents are drawn once',
+    script: COUSIN_PARENTS_WITH_OLDER_ROOTS,
+    rows: {
+      '-4': ['Thomas', 'Mary'],
+      '-3': ['Josiah I', 'Sarah', 'Josiah I (repeat)', 'Sarah (repeat)'],
+      '-2': ['Robert', 'Susannah', 'Josiah II', 'Bessy'],
+      '-1': ['Charles', 'Emma'],
+      '0': ['George'],
+    },
+  },
+  {
+    id: 'a repeated descendant whose own child is drawn once',
+    script: COUSIN_MARRIAGE_BELOW_WITH_GRANDCHILD,
+    rows: {
+      '0': ['Josiah I', 'Sarah'],
+      '1': ['Susannah', 'Robert', 'Josiah II', 'Bessy'],
+      '2': ['Charles', 'Emma', 'Emma (repeat)', 'Charles (repeat)'],
+      '3': ['William', 'William (repeat)'],
+      '4': ['Leonard'],
     },
   },
   { id: 'a parent link recorded twice', script: DUPLICATED_LINKS, rows: { '-1': ['Mary'], '0': ['Tom'], '1': ['Ann'] } },
@@ -417,6 +451,38 @@ describe('layoutHourglass determinism and speed', () => {
     expect(Math.min(...durations)).toBeLessThan(150);
   });
 });
+
+describe('layoutHourglass with relatives married to each other', () => {
+  it('expands each person of a fourteen-generation inbred line once instead of once per path', () => {
+    const generations = 14;
+    const above = layoutHourglass(familyChart(inbredLine(generations, `A${String(generations)}`)));
+    const below = layoutHourglass(familyChart(inbredLine(generations, 'A0')));
+    expect(above.nodes).toHaveLength(4 * generations);
+    expect(above.nodes.filter((node) => !node.isRepeat)).toHaveLength(2 * generations + 2);
+    expect(below.nodes).toHaveLength(6 * generations);
+  });
+});
+
+function inbredLine(generations: number, focus: string): FamilyScript {
+  const couples = Array.from({ length: generations + 1 }, (_, generation) => [`A${String(generation)}`, `B${String(generation)}`] as const);
+  return {
+    focus,
+    people: couples.flatMap(([husband, wife], generation): PersonLine[] => [
+      [husband, 'male', 1000 + 30 * generation],
+      [wife, 'female', 1001 + 30 * generation],
+    ]),
+    parents: couples.slice(1).flatMap(([husband, wife], position): ParentLine[] => {
+      const [father, mother] = couples[position] ?? ['', ''];
+      return [
+        [father, husband],
+        [mother, husband],
+        [father, wife],
+        [mother, wife],
+      ];
+    }),
+    partners: couples.map(([husband, wife], generation): PartnerLine => [husband, wife, 1020 + 30 * generation]),
+  };
+}
 
 function millisecondsToLayOut(chart: FamilyChart): number {
   const startedAt = performance.now();

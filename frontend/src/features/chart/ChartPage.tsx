@@ -1,4 +1,4 @@
-import { type ReactElement, useCallback, useMemo, useState } from 'react';
+import { type ReactElement, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import type { FamilyChart } from '../../api/types';
 import { fullName } from '../people/personName';
@@ -8,10 +8,7 @@ import { PageError } from '../shell/PageStates';
 import { useDocumentTitle } from '../shell/useDocumentTitle';
 import { ChartPageView } from './ChartPageView';
 import { useFamilyChart } from './chartQueries';
-import type { Generations } from './GenerationControls';
 import { layoutHourglass } from './layout/hourglassLayout';
-
-const DEFAULT_GENERATIONS: Generations = { ancestors: 4, descendants: 3 };
 
 export function ChartPage(): ReactElement {
   const personId = usePersonIdParam();
@@ -19,8 +16,7 @@ export function ChartPage(): ReactElement {
 }
 
 function FamilyChartScreen({ personId }: { personId: number }): ReactElement {
-  const [generations, setGenerations] = useState(DEFAULT_GENERATIONS);
-  const chart = useFamilyChart({ personId, ...generations });
+  const chart = useFamilyChart({ personId });
   const navigate = useNavigate();
   const layout = useMemo(() => (chart.data === undefined ? undefined : layoutHourglass(chart.data)), [chart.data]);
   const focusName = focusNameOf(chart.data);
@@ -39,9 +35,6 @@ function FamilyChartScreen({ personId }: { personId: number }): ReactElement {
       personId={personId}
       focusName={focusName}
       layout={layout}
-      generations={generations}
-      isUpdating={chart.isPlaceholderData}
-      onGenerationsChange={setGenerations}
       onNavigate={handleNavigate}
     />
   );

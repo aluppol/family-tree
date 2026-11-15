@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { delay, http, HttpResponse } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import type { ReactElement } from 'react';
 import { createMemoryRouter, RouterProvider, useParams } from 'react-router';
@@ -67,38 +67,13 @@ describe('ChartPage errors', () => {
   });
 });
 
-describe('ChartPage generations', () => {
-  it('asks for four generations up and three down, then refetches the numbers the viewer picks', async () => {
+describe('ChartPage whole tree', () => {
+  it('asks for the whole tree and offers no generation choice', async () => {
     const searches = serveDarwinFamily();
-    const { user } = renderPageAt('/tree/1');
-    await screen.findByRole('heading', { level: 1, name: 'Charles Robert Darwin' });
-    await user.selectOptions(screen.getByRole('combobox', { name: 'Ancestor generations' }), '6');
-    await user.selectOptions(screen.getByRole('combobox', { name: 'Descendant generations' }), '0');
-    await waitFor(() => {
-      expect(searches).toEqual(['?ancestors=4&descendants=3', '?ancestors=6&descendants=3', '?ancestors=6&descendants=0']);
-    });
-  });
-
-  it('offers one to eight generations up and none to six down', async () => {
-    serveDarwinFamily();
     renderPageAt('/tree/1');
     await screen.findByRole('heading', { level: 1, name: 'Charles Robert Darwin' });
-    expect(optionsOf('Ancestor generations')).toEqual(['1', '2', '3', '4', '5', '6', '7', '8']);
-    expect(optionsOf('Descendant generations')).toEqual(['0', '1', '2', '3', '4', '5', '6']);
-  });
-});
-
-describe('ChartPage updates and hints', () => {
-  it('keeps the current tree on screen while the new generations load', async () => {
-    serveDarwinFamily({ latency: 100 });
-    const { user } = renderPageAt('/tree/1');
-    await screen.findByRole('heading', { level: 1, name: 'Charles Robert Darwin' });
-    await user.selectOptions(screen.getByRole('combobox', { name: 'Ancestor generations' }), '2');
-    expect(screen.getByText('Updating the tree…')).toBeInTheDocument();
-    expect(screen.getByRole('group', { name: 'Family tree of Charles Robert Darwin' })).toBeInTheDocument();
-    await waitFor(() => {
-      expect(screen.queryByText('Updating the tree…')).not.toBeInTheDocument();
-    });
+    expect(searches).toEqual(['']);
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
   });
 
   it('suggests adding relatives when the person stands alone', async () => {
@@ -147,12 +122,11 @@ function ProfileStub(): ReactElement {
   return <h1>Profile of person {personId}</h1>;
 }
 
-function serveDarwinFamily({ latency = 0 }: { latency?: number } = {}): string[] {
+function serveDarwinFamily(): string[] {
   const searches: string[] = [];
   server.use(
-    http.get(CHART_PATH, async ({ request, params }) => {
+    http.get(CHART_PATH, ({ request, params }) => {
       searches.push(new URL(request.url).search);
-      await delay(searches.length > 1 ? latency : 0);
       return HttpResponse.json(darwinFamilyChart(Number(params.personId)));
     }),
   );
@@ -161,9 +135,4 @@ function serveDarwinFamily({ latency = 0 }: { latency?: number } = {}): string[]
 
 function serveError(status: number, { code, message }: { code: string; message: string }): void {
   server.use(http.get(CHART_PATH, () => HttpResponse.json({ error: { code, message, fields: {} } }, { status })));
-}
-
-function optionsOf(label: string): string[] {
-  const select = screen.getByRole('combobox', { name: label });
-  return Array.from(select.querySelectorAll('option'), (option) => option.value);
 }
