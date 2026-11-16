@@ -11,9 +11,9 @@ def map_partnership_terms(family: GedcomNode, key: str) -> Mapped[PartnershipTer
     marriage = family.first_child("MARR")
     start = _partnership_start(family, key) if marriage is None else map_life_event(marriage, f"{key} MARR")
     end = _partnership_end(family, key)
-    kind = PartnershipKind.PARTNERSHIP if marriage is None else PartnershipKind.MARRIAGE
     return Mapped(
-        PartnershipTerms(kind=kind, start=start.value, end=end.value), (*start.skipped, *end.skipped)
+        PartnershipTerms(kind=PartnershipKind.MARRIAGE, start=start.value, end=end.value),
+        (*start.skipped, *end.skipped),
     )
 
 

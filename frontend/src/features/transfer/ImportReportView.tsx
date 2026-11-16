@@ -17,7 +17,7 @@ export function ImportReportView({ fileName, report }: ImportReportViewProps): R
       <dl className={styles.counts}>
         <Count term="People" count={report.people_count} />
         <Count term="Parent links" count={report.parent_link_count} />
-        <Count term="Partnerships" count={report.partnership_count} />
+        <Count term="Marriages" count={report.partnership_count} />
         <Count term="Photos" count={report.photo_count} />
       </dl>
       {report.skipped.length > 0 && <SkippedRecords skipped={report.skipped} />}

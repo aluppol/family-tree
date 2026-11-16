@@ -73,7 +73,7 @@ function DoneStep({ result, onStartOver }: { result: ImportResult; onStartOver: 
       <Banner tone="success">
         <p role="status">
           Imported {countOf(result.people_count, 'person', 'people')}, {countOf(result.parent_link_count, 'parent link', 'parent links')} and{' '}
-          {countOf(result.partnership_count, 'partnership', 'partnerships')}.
+          {countOf(result.partnership_count, 'marriage', 'marriages')}.
         </p>
       </Banner>
       <div className={styles.stepActions}>

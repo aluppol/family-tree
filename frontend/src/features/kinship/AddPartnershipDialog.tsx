@@ -29,14 +29,14 @@ export function AddPartnershipDialog({ person, onClose }: AddPartnershipDialogPr
       createPartnership.mutate({ first_partner_id: person.id, second_partner_id: selectedPerson.id, terms: parsed.terms }, { onSuccess: onClose });
     }
   }
-  const partnerError = hasTriedWithoutPartner && selectedPerson === null ? 'Choose a partner from the suggestions.' : undefined;
+  const partnerError = hasTriedWithoutPartner && selectedPerson === null ? 'Choose a spouse from the suggestions.' : undefined;
   return (
-    <Dialog isOpen title={`Add a partner of ${fullName(person)}`} onClose={onClose}>
+    <Dialog isOpen title={`Add a spouse of ${fullName(person)}`} onClose={onClose}>
       <form className={styles.dialogForm} noValidate onSubmit={handleSubmit}>
-        <SearchCombobox label="Partner" placeholder="Search by name" emptyMessage="No one matches" error={partnerError} {...candidateSearch} />
+        <SearchCombobox label="Spouse" placeholder="Search by name" emptyMessage="No one matches" error={partnerError} {...candidateSearch} />
         <PartnershipTermsFields draft={draft} errors={errors} onDraftChange={setDraft} />
         <InlineError error={createPartnership.error} />
-        <DialogFormActions submitLabel="Add partner" pendingLabel="Adding…" isPending={createPartnership.isPending} onCancel={onClose} />
+        <DialogFormActions submitLabel="Add spouse" pendingLabel="Adding…" isPending={createPartnership.isPending} onCancel={onClose} />
       </form>
     </Dialog>
   );

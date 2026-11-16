@@ -25,7 +25,7 @@ export function EditPartnershipDialog({ partnership, onClose }: EditPartnershipD
     }
   }
   return (
-    <Dialog isOpen title={`Partnership with ${fullName(partnership.partner)}`} onClose={onClose}>
+    <Dialog isOpen title={`Marriage with ${fullName(partnership.partner)}`} onClose={onClose}>
       <form className={styles.dialogForm} noValidate onSubmit={handleSubmit}>
         <PartnershipTermsFields draft={draft} errors={errors} onDraftChange={setDraft} />
         <InlineError error={changeTerms.error} />

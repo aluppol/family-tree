@@ -28,13 +28,13 @@ test('the profile shows the facts, the biography with its line breaks and the ac
   expect(screen.getByRole('link', { name: 'Show in tree' })).toHaveAttribute('href', '/tree/1');
 });
 
-test('the profile lists parents, partners and children with links to their profiles', async () => {
+test('the profile lists parents, spouses and children with links to their profiles', async () => {
   renderApp(profileOf(DARWIN_IDS.charles));
   const parents = await screen.findByRole('region', { name: 'Parents' });
   expect(within(parents).getByRole('link', { name: 'Robert Waring Darwin' })).toHaveAttribute('href', '/people/3');
   expect(within(parents).getByRole('link', { name: 'Susannah Wedgwood' })).toHaveAttribute('href', '/people/4');
-  const partners = screen.getByRole('region', { name: 'Partners' });
-  expect(partners).toHaveTextContent('Emma Wedgwood1808–1896MarriageMarried 29 Jan 1839, Maer');
+  const spouses = screen.getByRole('region', { name: 'Spouses' });
+  expect(spouses).toHaveTextContent('Emma Wedgwood1808–1896WifeMarried 29 Jan 1839, Maer');
   expect(within(screen.getByRole('region', { name: 'Children' })).getByRole('link', { name: 'William Erasmus Darwin' })).toBeInTheDocument();
 });
 

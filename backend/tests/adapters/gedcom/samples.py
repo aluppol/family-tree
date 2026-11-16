@@ -71,7 +71,7 @@ def _household_partnerships() -> list[Partnership]:
         partnership(
             1, 1, 2, terms(PartnershipKind.MARRIAGE, LifeEvent(date=exact(1839, 1, 29), place="Maer"))
         ),
-        partnership(2, 2, 5, terms(PartnershipKind.PARTNERSHIP, london, separated)),
+        partnership(2, 2, 5, terms(PartnershipKind.MARRIAGE, london, separated)),
     ]
 
 
@@ -212,20 +212,20 @@ def _every_partnership() -> list[Partnership]:
             3, 1, 10, terms(PartnershipKind.MARRIAGE, None, _end(PartnershipEndReason.ANNULMENT, exact(1830)))
         ),
         partnership(
-            4, 13, 14, terms(PartnershipKind.PARTNERSHIP, leeds, _end(PartnershipEndReason.SEPARATION, None))
+            4, 13, 14, terms(PartnershipKind.MARRIAGE, leeds, _end(PartnershipEndReason.SEPARATION, None))
         ),
         partnership(
-            5, 16, 17, terms(PartnershipKind.PARTNERSHIP, None, _end(PartnershipEndReason.DIVORCE, None))
+            5, 16, 17, terms(PartnershipKind.MARRIAGE, None, _end(PartnershipEndReason.DIVORCE, None))
         ),
         partnership(6, 11, 12, terms(PartnershipKind.MARRIAGE, LifeEvent(place="St Chad's, Shrewsbury"))),
         partnership(
-            7, 3, 9, terms(PartnershipKind.PARTNERSHIP, None, _end(PartnershipEndReason.ANNULMENT, None))
+            7, 3, 9, terms(PartnershipKind.MARRIAGE, None, _end(PartnershipEndReason.ANNULMENT, None))
         ),
         partnership(
             8,
             4,
             7,
-            terms(PartnershipKind.PARTNERSHIP, None, _end(PartnershipEndReason.SEPARATION, exact(1901))),
+            terms(PartnershipKind.MARRIAGE, None, _end(PartnershipEndReason.SEPARATION, exact(1901))),
         ),
     ]
 

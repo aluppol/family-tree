@@ -61,6 +61,40 @@ def test_legacy_people_move_into_a_legacy_tree() -> None:
     assert fetch("SELECT count(*) FROM information_schema.schemata WHERE schema_name = 'people'") == [(0,)]
 
 
+def insert_returning_id(sql: str, parameters: tuple[int | str, ...]) -> int:
+    with connection.cursor() as cursor:
+        cursor.execute(f"{sql} RETURNING id", parameters)
+        row = cursor.fetchone()
+    assert row is not None
+    row_id: int = row[0]
+    return row_id
+
+
+def insert_person(tree_id: int, given_names: str) -> int:
+    return insert_returning_id(
+        "INSERT INTO person"
+        " (tree_id, given_names, surname, sex, birth_place, is_deceased, death_place, biography)"
+        " VALUES (%s, %s, '', 'unknown', '', false, '', '')",
+        (tree_id, given_names),
+    )
+
+
+@pytest.mark.django_db(transaction=True)
+def test_every_partnership_becomes_a_marriage() -> None:
+    migrate_to([("people", "0006_member_activity")])
+    tree_id = insert_returning_id(
+        "INSERT INTO family_tree (owner_kind, owner_key) VALUES (%s, %s)", ("member", "couple")
+    )
+    partners = (tree_id, insert_person(tree_id, "Milan"), insert_person(tree_id, "Mara"))
+    insert_returning_id(
+        "INSERT INTO partnership (tree_id, first_partner_id, second_partner_id, kind, start_place)"
+        " VALUES (%s, %s, %s, 'partnership', '')",
+        partners,
+    )
+    migrate_to(latest_migrations())
+    assert fetch("SELECT kind FROM partnership") == [("marriage",)]
+
+
 @pytest.mark.django_db(transaction=True)
 def test_trees_that_predate_activity_tracking_have_no_activity_and_no_administrator_mark() -> None:
     migrate_to([("people", "0005_drop_legacy_columns")])

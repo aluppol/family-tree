@@ -116,8 +116,7 @@ GEDCOM_551_LINES = (
     "0 @F2@ FAM",
     "1 HUSB @I5@",
     "1 WIFE @I2@",
-    "1 EVEN Partnership",
-    "2 TYPE Partnership",
+    "1 MARR",
     "2 DATE ABT 1850",
     "2 PLAC London",
     "1 EVEN Separation",
@@ -196,8 +195,7 @@ GEDCOM_7_LINES = (
     "0 @F2@ FAM",
     "1 HUSB @I5@",
     "1 WIFE @I2@",
-    "1 EVEN Partnership",
-    "2 TYPE Partnership",
+    "1 MARR",
     "2 DATE ABT 1850",
     "2 PLAC London",
     "1 EVEN Separation",
@@ -331,7 +329,6 @@ def people(*sexes: Sex) -> list[Person]:
 
 
 MARRIED = terms(PartnershipKind.MARRIAGE)
-PARTNERED = terms(PartnershipKind.PARTNERSHIP)
 BIRTH = ParentLinkKind.BIRTH
 ADOPTED = ParentLinkKind.ADOPTED
 OTHER = ParentLinkKind.OTHER
@@ -347,9 +344,9 @@ FAMILY_LAYOUT_CASES: list[ContractCase] = [
     {
         "id": "same_sex_partners_keep_their_order",
         "input_overrides": {
-            "snapshot": snapshot(people(Sex.FEMALE, Sex.FEMALE), [], [partnership(1, 2, 1, PARTNERED)])
+            "snapshot": snapshot(people(Sex.FEMALE, Sex.FEMALE), [], [partnership(1, 2, 1, MARRIED)])
         },
-        "expected_overrides": {"families": [["0 @F1@ FAM", "1 HUSB @I2@", "1 WIFE @I1@"]]},
+        "expected_overrides": {"families": [["0 @F1@ FAM", "1 HUSB @I2@", "1 WIFE @I1@", "1 MARR Y"]]},
     },
     {
         "id": "single_mother_is_the_wife",
@@ -381,13 +378,13 @@ FAMILY_LAYOUT_CASES: list[ContractCase] = [
             "snapshot": snapshot(
                 people(Sex.MALE, Sex.FEMALE, Sex.MALE),
                 [parent_link(1, 1, 3, BIRTH), parent_link(2, 2, 3, BIRTH)],
-                [partnership(2, 1, 2, PARTNERED), partnership(1, 2, 1, MARRIED)],
+                [partnership(2, 1, 2, MARRIED), partnership(1, 2, 1, MARRIED)],
             )
         },
         "expected_overrides": {
             "families": [
                 ["0 @F1@ FAM", "1 HUSB @I1@", "1 WIFE @I2@", "1 CHIL @I3@", "1 MARR Y"],
-                ["0 @F2@ FAM", "1 HUSB @I1@", "1 WIFE @I2@"],
+                ["0 @F2@ FAM", "1 HUSB @I1@", "1 WIFE @I2@", "1 MARR Y"],
             ]
         },
     },
@@ -435,12 +432,12 @@ FAMILY_LAYOUT_CASES: list[ContractCase] = [
             "snapshot": snapshot(
                 people(Sex.MALE, Sex.FEMALE, Sex.FEMALE, Sex.MALE),
                 [parent_link(1, 3, 4, OTHER), parent_link(2, 1, 4, OTHER), parent_link(3, 2, 4, OTHER)],
-                [partnership(1, 1, 2, PARTNERED)],
+                [partnership(1, 1, 2, MARRIED)],
             )
         },
         "expected_overrides": {
             "families": [
-                ["0 @F1@ FAM", "1 HUSB @I1@", "1 WIFE @I2@", "1 CHIL @I4@"],
+                ["0 @F1@ FAM", "1 HUSB @I1@", "1 WIFE @I2@", "1 CHIL @I4@", "1 MARR Y"],
                 ["0 @F2@ FAM", "1 WIFE @I3@", "1 CHIL @I4@"],
             ]
         },

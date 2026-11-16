@@ -15,7 +15,7 @@ test('a small GEDCOM file is previewed, imported and shown in the tree', async (
   await expect(page.getByText('small.ged is ready to import.')).toBeVisible();
   await expect(page.getByRole('definition').first()).toHaveText('3');
   await page.getByRole('button', { name: 'Import 3 people' }).click();
-  await expect(page.getByText('Imported 3 people, 2 parent links and 1 partnership.')).toBeVisible();
+  await expect(page.getByText('Imported 3 people, 2 parent links and 1 marriage.')).toBeVisible();
   await page.getByRole('link', { name: 'Show the tree' }).click();
   await page.waitForURL(/\/tree\/\d+$/);
   const tree = familyTreeOf(page, `Ada ${IMPORTED_SURNAME}`);

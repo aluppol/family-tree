@@ -4,12 +4,12 @@ from dataclasses import dataclass
 from operator import attrgetter
 
 from family_tree.adapters.gedcom.export_dialect import ExportDialect
-from family_tree.adapters.gedcom.family_events import PARTNERSHIP_TYPE, SEPARATION_TYPE
+from family_tree.adapters.gedcom.family_events import SEPARATION_TYPE
 from family_tree.adapters.gedcom.family_plan import PlannedFamily, plan_families
 from family_tree.adapters.gedcom.structures import Structure, individual_xref, media_xref
 from family_tree.domain.date_notation import format_date_notation
 from family_tree.domain.dates import GenealogicalDate
-from family_tree.domain.enums import ParentLinkKind, PartnershipEndReason, PartnershipKind, PhotoType
+from family_tree.domain.enums import ParentLinkKind, PartnershipEndReason, PhotoType
 from family_tree.domain.identifiers import PersonId
 from family_tree.domain.interchange import TreeSnapshot
 from family_tree.domain.people import LifeEvent, Person, PersonProfile
@@ -129,10 +129,7 @@ def _partnership_events(terms: PartnershipTerms | None) -> tuple[Structure, ...]
 
 
 def _partnership_start(terms: PartnershipTerms) -> tuple[Structure, ...]:
-    if terms.kind is PartnershipKind.MARRIAGE:
-        return _life_event("MARR", terms.start) or (Structure(tag="MARR", text=ASSERTED),)
-    details = (*_date(terms.start.date), *_optional("PLAC", terms.start.place))
-    return _typed_event(PARTNERSHIP_TYPE, details) if details else ()
+    return _life_event("MARR", terms.start) or (Structure(tag="MARR", text=ASSERTED),)
 
 
 def _partnership_end(end: PartnershipEnd | None) -> tuple[Structure, ...]:

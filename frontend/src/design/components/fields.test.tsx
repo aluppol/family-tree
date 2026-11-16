@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { expect, test, vi } from 'vitest';
-import type { PartnershipKind } from '../../api/types';
+import type { ParentLinkKind } from '../../api/types';
 import { CheckboxField } from './CheckboxField';
 import { FileButton } from './FileButton';
 import { SelectField, type SelectOption } from './SelectField';
@@ -30,15 +30,15 @@ test('TextArea labels its text area and shows its error', () => {
 
 test('SelectField reports the chosen option value', async () => {
   const handleValueChange = vi.fn();
-  const options: SelectOption<PartnershipKind>[] = [
-    { value: 'marriage', label: 'Marriage' },
-    { value: 'partnership', label: 'Partnership' },
+  const options: SelectOption<ParentLinkKind>[] = [
+    { value: 'birth', label: 'Birth' },
+    { value: 'adopted', label: 'Adopted' },
   ];
-  render(<SelectField label="Kind" options={options} value="marriage" onValueChange={handleValueChange} error="Choose a kind." />);
+  render(<SelectField label="Kind" options={options} value="birth" onValueChange={handleValueChange} error="Choose a kind." />);
   const select = screen.getByRole('combobox', { name: 'Kind' });
   expect(select).toHaveAccessibleDescription('Choose a kind.');
-  await userEvent.selectOptions(select, 'Partnership');
-  expect(handleValueChange).toHaveBeenCalledWith('partnership');
+  await userEvent.selectOptions(select, 'Adopted');
+  expect(handleValueChange).toHaveBeenCalledWith('adopted');
 });
 
 test('CheckboxField toggles through its label', async () => {

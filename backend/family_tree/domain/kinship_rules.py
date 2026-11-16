@@ -63,10 +63,10 @@ def find_partnership_violation(
     partner_keys: tuple[Hashable, Hashable], terms: PartnershipTerms
 ) -> RuleViolation | None:
     if partner_keys[0] == partner_keys[1]:
-        return RuleViolation("kinship.self_partner", "A person cannot be their own partner.")
+        return RuleViolation("kinship.self_partner", "A person cannot be their own spouse.")
     start, end = terms.start.date, None if terms.end is None else terms.end.date
     if start is not None and end is not None and is_certainly_later(start, end):
-        return RuleViolation("partnership.ends_before_start", "The partnership ends before it starts.")
+        return RuleViolation("partnership.ends_before_start", "The marriage ends before it starts.")
     return None
 
 

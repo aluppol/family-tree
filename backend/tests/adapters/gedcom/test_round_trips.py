@@ -83,7 +83,7 @@ def test_text_that_cannot_be_split_between_words_survives_intact(writer: Interch
     assert GedcomReader().read(writer.write(tree)).people[0].profile.biography == biography
 
 
-def test_unpartnered_co_parents_come_back_as_an_unmarried_partnership() -> None:
+def test_co_parents_without_a_recorded_marriage_come_back_married() -> None:
     tree = snapshot(
         [
             person(1, profile("Anne", "Darwin")),
@@ -93,9 +93,9 @@ def test_unpartnered_co_parents_come_back_as_an_unmarried_partnership() -> None:
         [parent_link(1, 1, 3, ParentLinkKind.BIRTH), parent_link(2, 2, 3, ParentLinkKind.BIRTH)],
     )
     partnerships = GedcomReader().read(Gedcom7Writer().write(tree)).partnerships
-    unmarried = PartnershipTerms(kind=PartnershipKind.PARTNERSHIP, start=LifeEvent())
+    married = PartnershipTerms(kind=PartnershipKind.MARRIAGE, start=LifeEvent())
     assert [(each.first_partner_key, each.second_partner_key, each.terms) for each in partnerships] == [
-        ("@I1@", "@I2@", unmarried)
+        ("@I1@", "@I2@", married)
     ]
 
 

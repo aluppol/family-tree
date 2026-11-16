@@ -63,7 +63,7 @@ class DjangoPartnershipRepository:
     def get(self, tree_id: TreeId, partnership_id: PartnershipId) -> Partnership:
         record = self._in_tree(tree_id).filter(id=partnership_id).first()
         if record is None:
-            raise NotFound("partnership.not_found", "This partnership does not exist.")
+            raise NotFound("partnership.not_found", "This marriage does not exist.")
         return PartnershipMapper.to_entity(record)
 
     def add(

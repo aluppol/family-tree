@@ -1,11 +1,10 @@
-import type { PartnershipEndReason, PartnershipKind, PartnershipTerms } from '../../api/types';
+import type { PartnershipEndReason, PartnershipTerms } from '../../api/types';
 import { type DateDraft, EMPTY_DATE_DRAFT, draftFromDate, parseDateDraft } from '../dates/dateDraft';
 import { formatGenealogicalDate } from '../dates/format';
 
 export type EndReasonChoice = PartnershipEndReason | 'none';
 
 export interface TermsDraft {
-  kind: PartnershipKind;
   startDate: DateDraft;
   startPlace: string;
   endReason: EndReasonChoice;
@@ -17,7 +16,6 @@ export type TermsErrors = Partial<Record<'startDate' | 'endDate', string>>;
 export type TermsParse = { terms: PartnershipTerms; errors: null } | { terms: null; errors: TermsErrors };
 
 export const EMPTY_TERMS_DRAFT: TermsDraft = {
-  kind: 'marriage',
   startDate: EMPTY_DATE_DRAFT,
   startPlace: '',
   endReason: 'none',
@@ -32,7 +30,6 @@ const END_REASON_WORDS: Record<PartnershipEndReason, string> = {
 
 export function draftFromTerms(terms: PartnershipTerms): TermsDraft {
   return {
-    kind: terms.kind,
     startDate: draftFromDate(terms.start.date),
     startPlace: terms.start.place,
     endReason: terms.end?.reason ?? 'none',
@@ -48,7 +45,7 @@ export function termsFromDraft(draft: TermsDraft): TermsParse {
   }
   return {
     terms: {
-      kind: draft.kind,
+      kind: 'marriage',
       start: { date: startDate.date, place: draft.startPlace.trim() },
       end: draft.endReason === 'none' ? null : { reason: draft.endReason, date: endDate.date },
     },
@@ -58,7 +55,7 @@ export function termsFromDraft(draft: TermsDraft): TermsParse {
 
 export function describeTerms(terms: PartnershipTerms): string | undefined {
   const startParts = [terms.start.date === null ? '' : formatGenealogicalDate(terms.start.date), terms.start.place].filter((part) => part !== '');
-  const start = startParts.length === 0 ? '' : `${terms.kind === 'marriage' ? 'Married' : 'Together from'} ${startParts.join(', ')}`;
+  const start = startParts.length === 0 ? '' : `Married ${startParts.join(', ')}`;
   const end = terms.end === null ? '' : [END_REASON_WORDS[terms.end.reason], terms.end.date === null ? '' : formatGenealogicalDate(terms.end.date)].filter((part) => part !== '').join(' ');
   const description = [start, end].filter((part) => part !== '').join(' · ');
   return description === '' ? undefined : description;

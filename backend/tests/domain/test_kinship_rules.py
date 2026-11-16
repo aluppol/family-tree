@@ -189,5 +189,5 @@ def test_partnership_rules(partner_keys: tuple[int, int], terms: PartnershipTerm
 
 
 def test_ensure_partnership_allowed_raises() -> None:
-    with pytest.raises(RuleViolation, match="their own partner"):
+    with pytest.raises(RuleViolation, match="their own spouse"):
         ensure_partnership_allowed((5, 5), _terms(None, None))

@@ -18,7 +18,7 @@ BIRTH = ParentLinkKind.BIRTH
 MARRIED_AT_MAER = PartnershipTerms(
     kind=PartnershipKind.MARRIAGE, start=LifeEvent(date=exact(1839, 1, 29), place="Maer")
 )
-UNMARRIED = PartnershipTerms(kind=PartnershipKind.PARTNERSHIP, start=LifeEvent())
+MARRIED_WITHOUT_DETAILS = PartnershipTerms(kind=PartnershipKind.MARRIAGE, start=LifeEvent())
 WILLIAM_LINKS = (("@I1@", "@I3@", BIRTH), ("@I2@", "@I3@", BIRTH))
 NOT_A_DATE = "is not a date like '12 FEB 1809', 'FEB 1809' or '1809'."
 PHOTOS_NEED_GEDZIP = "Photos need a GEDZIP file."
@@ -563,9 +563,9 @@ NOTE_CASES: list[ContractCase] = [
 
 FAMILY_CASES: list[ContractCase] = [
     {
-        "id": "family_without_marriage_is_a_partnership",
+        "id": "family_without_a_marriage_event_is_still_a_marriage",
         "input_overrides": marriage(),
-        "expected_overrides": {"partnerships": (("@I1@", "@I2@", UNMARRIED),)},
+        "expected_overrides": {"partnerships": (("@I1@", "@I2@", MARRIED_WITHOUT_DETAILS),)},
     },
     {
         "id": "marriage_asserted_with_y_has_no_details",
@@ -602,7 +602,7 @@ FAMILY_CASES: list[ContractCase] = [
                     "@I1@",
                     "@I2@",
                     PartnershipTerms(
-                        kind=PartnershipKind.PARTNERSHIP,
+                        kind=PartnershipKind.MARRIAGE,
                         start=LifeEvent(),
                         end=PartnershipEnd(reason=PartnershipEndReason.DIVORCE),
                     ),
@@ -628,7 +628,7 @@ FAMILY_CASES: list[ContractCase] = [
         },
     },
     {
-        "id": "separation_event_ends_the_partnership",
+        "id": "separation_event_ends_the_marriage",
         "input_overrides": marriage("1 EVEN", "2 TYPE Separation", "2 DATE 1845"),
         "expected_overrides": {
             "partnerships": (
@@ -636,7 +636,7 @@ FAMILY_CASES: list[ContractCase] = [
                     "@I1@",
                     "@I2@",
                     PartnershipTerms(
-                        kind=PartnershipKind.PARTNERSHIP,
+                        kind=PartnershipKind.MARRIAGE,
                         start=LifeEvent(),
                         end=PartnershipEnd(reason=PartnershipEndReason.SEPARATION, date=exact(1845)),
                     ),
@@ -653,7 +653,7 @@ FAMILY_CASES: list[ContractCase] = [
                     "@I1@",
                     "@I2@",
                     PartnershipTerms(
-                        kind=PartnershipKind.PARTNERSHIP,
+                        kind=PartnershipKind.MARRIAGE,
                         start=LifeEvent(),
                         end=PartnershipEnd(reason=PartnershipEndReason.SEPARATION),
                     ),
@@ -670,7 +670,7 @@ FAMILY_CASES: list[ContractCase] = [
                     "@I1@",
                     "@I2@",
                     PartnershipTerms(
-                        kind=PartnershipKind.PARTNERSHIP,
+                        kind=PartnershipKind.MARRIAGE,
                         start=LifeEvent(),
                         end=PartnershipEnd(reason=PartnershipEndReason.DIVORCE, date=exact(1850)),
                     ),
@@ -679,7 +679,7 @@ FAMILY_CASES: list[ContractCase] = [
         },
     },
     {
-        "id": "partnership_event_starts_an_unmarried_partnership",
+        "id": "partnership_event_gives_the_marriage_its_start",
         "input_overrides": marriage(
             "1 EVEN Partnership", "2 TYPE Partnership", "2 DATE 1835", "2 PLAC London"
         ),
@@ -689,7 +689,7 @@ FAMILY_CASES: list[ContractCase] = [
                     "@I1@",
                     "@I2@",
                     PartnershipTerms(
-                        kind=PartnershipKind.PARTNERSHIP, start=LifeEvent(date=exact(1835), place="London")
+                        kind=PartnershipKind.MARRIAGE, start=LifeEvent(date=exact(1835), place="London")
                     ),
                 ),
             )
@@ -719,10 +719,10 @@ FAMILY_CASES: list[ContractCase] = [
         },
     },
     {
-        "id": "partnership_start_date_problem_is_reported",
+        "id": "partnership_event_date_problem_is_reported",
         "input_overrides": marriage("1 EVEN", "2 TYPE Partnership", "2 DATE 1835/1836"),
         "expected_overrides": {
-            "partnerships": (("@I1@", "@I2@", UNMARRIED),),
+            "partnerships": (("@I1@", "@I2@", MARRIED_WITHOUT_DETAILS),),
             "skipped": skipped(("@F1@ EVEN DATE", undated("1835/1836", f"'1835/1836' {NOT_A_DATE}"))),
         },
     },

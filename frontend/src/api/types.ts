@@ -54,7 +54,7 @@ export interface ParentRelation {
   person: PersonSummary;
 }
 
-export type PartnershipKind = 'marriage' | 'partnership';
+export type PartnershipKind = 'marriage';
 
 export type PartnershipEndReason = 'divorce' | 'annulment' | 'separation';
 

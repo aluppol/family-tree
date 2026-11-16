@@ -10,7 +10,7 @@ MEGABYTE = 1024 * 1024
 QUANTITY_PHRASES: Mapping[UsageMeasure, Callable[[int], str]] = MappingProxyType(
     {
         UsageMeasure.PEOPLE: lambda people: f"{people:,} people",
-        UsageMeasure.RELATIONSHIPS: lambda relationships: f"{relationships:,} parent links and partnerships",
+        UsageMeasure.RELATIONSHIPS: lambda relationships: f"{relationships:,} parent links and marriages",
         UsageMeasure.STORED_BYTES: lambda stored_bytes: (
             f"{stored_bytes / MEGABYTE:g} MB of family data and photos"
         ),

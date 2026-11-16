@@ -84,7 +84,7 @@ ALLOWANCE_CASES: list[ContractCase] = [
     {
         "id": "one relationship too many for a guest",
         "input_overrides": {"relationships": 1_501},
-        "expected_overrides": _refusal("The demo sandbox holds at most 1,500 parent links and partnerships."),
+        "expected_overrides": _refusal("The demo sandbox holds at most 1,500 parent links and marriages."),
     },
     {
         "id": "one byte too many for a guest",
@@ -109,9 +109,7 @@ ALLOWANCE_CASES: list[ContractCase] = [
     {
         "id": "one relationship too many for a member",
         "input_overrides": FULL_MEMBER_TREE | {"relationships": 10_001},
-        "expected_overrides": _refusal(
-            "A family tree here holds at most 10,000 parent links and partnerships."
-        ),
+        "expected_overrides": _refusal("A family tree here holds at most 10,000 parent links and marriages."),
     },
     {
         "id": "one byte too many for a member",

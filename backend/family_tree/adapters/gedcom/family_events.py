@@ -3,7 +3,6 @@ from collections.abc import Callable
 from family_tree.adapters.gedcom.nodes import GedcomNode
 
 SEPARATION_TYPE = "Separation"
-PARTNERSHIP_TYPE = "Partnership"
 _SEPARATION_TYPES = frozenset({"separation", "separated"})
 _PARTNERSHIP_TYPES = frozenset({"partnership"})
 

@@ -6,22 +6,22 @@ import { renderApp } from '../../test/renderApp';
 
 setUpMockServer();
 
-function findPartners(): Promise<HTMLElement> {
-  return screen.findByRole('region', { name: 'Partners' });
+function findSpouses(): Promise<HTMLElement> {
+  return screen.findByRole('region', { name: 'Spouses' });
 }
 
-test('adding a partner records the kind and the start of the partnership', async () => {
+test('adding a spouse records a marriage with its wedding date and place', async () => {
   const createPartnership = vi.spyOn(fakeBackend, 'createPartnership');
   const { user } = renderApp(`/people/${String(DARWIN_IDS.robert)}`);
-  const partners = await findPartners();
-  expect(partners).toHaveTextContent('No partners recorded yet.');
-  await user.click(within(partners).getByRole('button', { name: 'Add partner' }));
-  const dialog = screen.getByRole('dialog', { name: 'Add a partner of Robert Waring Darwin' });
-  await user.type(within(dialog).getByRole('combobox', { name: 'Partner' }), 'susannah');
+  const spouses = await findSpouses();
+  expect(spouses).toHaveTextContent('No spouses recorded yet.');
+  await user.click(within(spouses).getByRole('button', { name: 'Add spouse' }));
+  const dialog = screen.getByRole('dialog', { name: 'Add a spouse of Robert Waring Darwin' });
+  await user.type(within(dialog).getByRole('combobox', { name: 'Spouse' }), 'susannah');
   await user.click(await within(dialog).findByRole('option', { name: /Susannah Wedgwood/ }));
-  await user.type(within(within(dialog).getByRole('group', { name: 'Start date' })).getByRole('textbox', { name: 'Year' }), '1796');
-  await user.type(within(dialog).getByRole('textbox', { name: 'Start place (optional)' }), 'Marylebone');
-  await user.click(within(dialog).getByRole('button', { name: 'Add partner' }));
+  await user.type(within(within(dialog).getByRole('group', { name: 'Wedding date' })).getByRole('textbox', { name: 'Year' }), '1796');
+  await user.type(within(dialog).getByRole('textbox', { name: 'Wedding place (optional)' }), 'Marylebone');
+  await user.click(within(dialog).getByRole('button', { name: 'Add spouse' }));
   await waitFor(() => {
     expect(createPartnership).toHaveBeenCalledWith({
       first_partner_id: DARWIN_IDS.robert,
@@ -29,37 +29,42 @@ test('adding a partner records the kind and the start of the partnership', async
       terms: { kind: 'marriage', start: { date: exactDate(1796), place: 'Marylebone' }, end: null },
     });
   });
-  expect(await within(partners).findByText('Married 1796, Marylebone')).toBeInTheDocument();
+  expect(await within(spouses).findByText('Married 1796, Marylebone')).toBeInTheDocument();
 });
 
-test('a partner must be chosen and an impossible date is refused before sending', async () => {
+test('a spouse must be chosen and an impossible date is refused before sending', async () => {
   const createPartnership = vi.spyOn(fakeBackend, 'createPartnership');
   const { user } = renderApp(`/people/${String(DARWIN_IDS.robert)}`);
-  await user.click(within(await findPartners()).getByRole('button', { name: 'Add partner' }));
+  await user.click(within(await findSpouses()).getByRole('button', { name: 'Add spouse' }));
   const dialog = screen.getByRole('dialog');
-  await user.type(within(within(dialog).getByRole('group', { name: 'Start date' })).getByRole('textbox', { name: 'Year' }), '0');
-  await user.click(within(dialog).getByRole('button', { name: 'Add partner' }));
-  expect(within(dialog).getByRole('combobox', { name: 'Partner' })).toHaveAccessibleDescription('Choose a partner from the suggestions.');
+  await user.type(within(within(dialog).getByRole('group', { name: 'Wedding date' })).getByRole('textbox', { name: 'Year' }), '0');
+  await user.click(within(dialog).getByRole('button', { name: 'Add spouse' }));
+  expect(within(dialog).getByRole('combobox', { name: 'Spouse' })).toHaveAccessibleDescription('Choose a spouse from the suggestions.');
   expect(within(dialog).getByText('Year must be a whole number from 1 to 9999.')).toBeInTheDocument();
   expect(createPartnership).not.toHaveBeenCalled();
 });
 
-test('a partnership can be given an end', async () => {
+test('a marriage can be given an end and offers no other kind', async () => {
   const { user } = renderApp(`/people/${String(DARWIN_IDS.charles)}`);
-  const partners = await findPartners();
-  await user.click(within(partners).getByRole('button', { name: 'Edit Emma Wedgwood' }));
-  const dialog = screen.getByRole('dialog', { name: 'Partnership with Emma Wedgwood' });
-  expect(within(dialog).getByRole('combobox', { name: 'Kind' })).toHaveValue('marriage');
+  const spouses = await findSpouses();
+  await user.click(within(spouses).getByRole('button', { name: 'Edit Emma Wedgwood' }));
+  const dialog = screen.getByRole('dialog', { name: 'Marriage with Emma Wedgwood' });
+  expect(within(dialog).queryByRole('combobox', { name: 'Kind' })).not.toBeInTheDocument();
   await user.selectOptions(within(dialog).getByRole('combobox', { name: 'Ended by' }), 'Separation');
   await user.type(within(within(dialog).getByRole('group', { name: 'End date' })).getByRole('textbox', { name: 'Year' }), '1850');
   await user.click(within(dialog).getByRole('button', { name: 'Save' }));
-  expect(await within(partners).findByText('Married 29 Jan 1839, Maer · Separated 1850')).toBeInTheDocument();
+  expect(await within(spouses).findByText('Married 29 Jan 1839, Maer · Separated 1850')).toBeInTheDocument();
 });
 
-test('removing a partnership asks for confirmation', async () => {
+test('removing a marriage asks for confirmation', async () => {
   const { user } = renderApp(`/people/${String(DARWIN_IDS.charles)}`);
-  const partners = await findPartners();
-  await user.click(within(partners).getByRole('button', { name: 'Remove Emma Wedgwood' }));
-  await user.click(within(screen.getByRole('dialog', { name: 'Remove the partnership with Emma Wedgwood?' })).getByRole('button', { name: 'Remove partnership' }));
-  expect(await within(partners).findByText('No partners recorded yet.')).toBeInTheDocument();
+  const spouses = await findSpouses();
+  await user.click(within(spouses).getByRole('button', { name: 'Remove Emma Wedgwood' }));
+  await user.click(within(screen.getByRole('dialog', { name: 'Remove the marriage with Emma Wedgwood?' })).getByRole('button', { name: 'Remove marriage' }));
+  expect(await within(spouses).findByText('No spouses recorded yet.')).toBeInTheDocument();
+});
+
+test('each spouse is called husband or wife by sex', async () => {
+  renderApp(`/people/${String(DARWIN_IDS.charles)}`);
+  expect(within(await findSpouses()).getByText('Wife')).toBeInTheDocument();
 });

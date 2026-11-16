@@ -109,7 +109,7 @@ CASES: list[ContractCase] = [
     {
         "id": "partnership that ends before it starts",
         "input_overrides": {"partnerships": (partnership("grandfather", "father", start=1800, end=1790),)},
-        "expected_overrides": {"skipped_reasons": ["The partnership ends before it starts."]},
+        "expected_overrides": {"skipped_reasons": ["The marriage ends before it starts."]},
     },
     {
         "id": "partnership with a missing partner",

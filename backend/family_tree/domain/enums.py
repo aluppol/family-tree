@@ -27,7 +27,6 @@ class ParentLinkKind(StrEnum):
 
 class PartnershipKind(StrEnum):
     MARRIAGE = "marriage"
-    PARTNERSHIP = "partnership"
 
 
 class PartnershipEndReason(StrEnum):

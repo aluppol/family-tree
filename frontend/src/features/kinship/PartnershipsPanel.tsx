@@ -1,5 +1,5 @@
 import { type ReactElement, useState } from 'react';
-import type { PartnerRelation, Person } from '../../api/types';
+import type { PartnerRelation, Person, Sex } from '../../api/types';
 import { ConfirmDialog } from '../../design/components';
 import { fullName } from '../people/personName';
 import { AddPartnershipDialog } from './AddPartnershipDialog';
@@ -12,6 +12,8 @@ type PartnershipDialog = { type: 'none' } | { type: 'adding' } | { type: 'editin
 
 const NO_DIALOG: PartnershipDialog = { type: 'none' };
 
+const SPOUSE_WORDS: Record<Sex, string> = { male: 'Husband', female: 'Wife', other: 'Spouse', unknown: 'Spouse' };
+
 export function PartnershipsPanel({ person }: { person: Person }): ReactElement {
   const [dialog, setDialog] = useState<PartnershipDialog>(NO_DIALOG);
   const entries = person.partnerships.map((partnership) => partnershipEntry(partnership, setDialog));
@@ -21,9 +23,9 @@ export function PartnershipsPanel({ person }: { person: Person }): ReactElement 
   return (
     <>
       <RelativesView
-        title="Partners"
-        addLabel="Add partner"
-        emptyText="No partners recorded yet."
+        title="Spouses"
+        addLabel="Add spouse"
+        emptyText="No spouses recorded yet."
         editLabel="Edit"
         entries={entries}
         onAdd={() => { setDialog({ type: 'adding' }); }}
@@ -39,7 +41,7 @@ function partnershipEntry(partnership: PartnerRelation, openDialog: (dialog: Par
   return {
     key: partnership.partnership_id,
     person: partnership.partner,
-    badge: partnership.terms.kind === 'marriage' ? 'Marriage' : 'Partnership',
+    badge: SPOUSE_WORDS[partnership.partner.sex],
     detail: describeTerms(partnership.terms),
     onEdit: () => {
       openDialog({ type: 'editing', partnership });
@@ -63,9 +65,9 @@ function RemovePartnershipDialog({ person, partnership, onClose }: RemovePartner
     removePartnership.mutate({ partnershipId: partnership.partnership_id, personIds: [person.id, partnership.partner.id] }, { onSuccess: onClose });
   }
   return (
-    <ConfirmDialog isOpen title={`Remove the partnership with ${partnerName}?`} confirmLabel="Remove partnership" onConfirm={handleConfirm} onCancel={onClose} isPending={removePartnership.isPending} error={removePartnership.error}>
+    <ConfirmDialog isOpen title={`Remove the marriage with ${partnerName}?`} confirmLabel="Remove marriage" onConfirm={handleConfirm} onCancel={onClose} isPending={removePartnership.isPending} error={removePartnership.error}>
       <p>
-        Only the partnership between {fullName(person)} and {partnerName} is removed. Both people stay in your tree.
+        Only the marriage between {fullName(person)} and {partnerName} is removed. Both people stay in your tree.
       </p>
     </ConfirmDialog>
   );

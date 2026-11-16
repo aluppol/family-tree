@@ -145,7 +145,7 @@ def test_a_guest_links_people_up_to_the_relationship_limit(client_for: ClientFac
     refused = visitor.post("/api/partnerships/", partners, format="json")
     assert (refused.status_code, error_message(refused)) == (
         400,
-        "The demo sandbox holds at most 1,500 parent links and partnerships.",
+        "The demo sandbox holds at most 1,500 parent links and marriages.",
     )
     assert measured(tree, UsageMeasure.RELATIONSHIPS) == RELATIONSHIP_CEILING
 
@@ -231,7 +231,7 @@ def test_a_member_links_people_up_to_the_relationship_limit(member: APIClient) -
     refused = member.post("/api/partnerships/", partners, format="json")
     assert (refused.status_code, error_message(refused)) == (
         400,
-        "A family tree here holds at most 10,000 parent links and partnerships.",
+        "A family tree here holds at most 10,000 parent links and marriages.",
     )
 
 
