@@ -12,6 +12,14 @@ Element.prototype.scrollIntoView = vi.fn();
 
 window.scrollTo = vi.fn();
 
+HTMLCanvasElement.prototype.getContext = vi.fn(() => null);
+
+Element.prototype.setPointerCapture = vi.fn();
+
+Element.prototype.releasePointerCapture = vi.fn();
+
+Element.prototype.hasPointerCapture = vi.fn(() => false);
+
 window.matchMedia = (query: string): MediaQueryList => ({
   matches: false,
   media: query,

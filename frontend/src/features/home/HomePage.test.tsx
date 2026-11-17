@@ -8,10 +8,10 @@ import { renderApp } from '../../test/renderApp';
 
 setUpMockServer();
 
-test('the home page opens the tree on the home person', async () => {
+test('the home page opens the time tower on the home person', async () => {
   const { router } = renderApp('/');
   await waitFor(() => {
-    expect(router.state.location.pathname).toBe(`/tree/${String(DARWIN_IDS.charles)}`);
+    expect(router.state.location.pathname).toBe(`/tower/${String(DARWIN_IDS.charles)}`);
   });
 });
 
@@ -22,7 +22,7 @@ test('without a home person the tree opens on the first person in the list', asy
   });
   const { router } = renderApp('/');
   await waitFor(() => {
-    expect(router.state.location.pathname).toBe('/tree/9');
+    expect(router.state.location.pathname).toBe('/tower/9');
   });
 });
 
@@ -42,6 +42,6 @@ test('an unreachable server can be retried from the home page', async () => {
   mockServer.resetHandlers();
   await user.click(screen.getByRole('button', { name: 'Try again' }));
   await waitFor(() => {
-    expect(router.state.location.pathname).toBe(`/tree/${String(darwinFamily().homePersonId)}`);
+    expect(router.state.location.pathname).toBe(`/tower/${String(darwinFamily().homePersonId)}`);
   });
 });

@@ -22,7 +22,7 @@ test('a file is previewed with its counts and skipped records before it is impor
   await user.click(screen.getByRole('button', { name: 'Import 3 people' }));
   expect(await screen.findByText('Imported 3 people, 2 parent links and 1 marriage.')).toBeInTheDocument();
   expect(fakeBackend.workspace().people_count).toBe(peopleBefore + 3);
-  expect(screen.getByRole('link', { name: 'Show the tree' })).toHaveAttribute('href', expect.stringMatching(/^\/tree\/\d+$/));
+  expect(screen.getByRole('link', { name: 'Show the tree' })).toHaveAttribute('href', expect.stringMatching(/^\/tower\/\d+$/));
   await user.click(screen.getByRole('button', { name: 'Import another file' }));
   expect(screen.getByLabelText('Choose a file')).toBeInTheDocument();
 });

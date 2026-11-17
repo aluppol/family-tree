@@ -3,7 +3,13 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from family_tree.api.authentication import principal_of
-from family_tree.api.dto import HomePersonInputSerializer, ViewerSerializer, WorkspaceSerializer, validated
+from family_tree.api.dto import (
+    HomePersonInputSerializer,
+    TreeGraphSerializer,
+    ViewerSerializer,
+    WorkspaceSerializer,
+    validated,
+)
 from family_tree.api.views.base import WorkspaceApiView
 from family_tree.dependencies import container
 
@@ -29,3 +35,9 @@ class HomePersonView(WorkspaceApiView):
         choice = validated(HomePersonInputSerializer, request.data)
         container().workspaces.choose_home_person(principal, choice.person_id)
         return Response(WorkspaceSerializer(container().workspaces.overview(principal)).data)
+
+
+class WorkspaceGraphView(WorkspaceApiView):
+    @extend_schema(responses=TreeGraphSerializer, summary="The whole family tree as one graph")
+    def get(self, request: Request) -> Response:
+        return Response(TreeGraphSerializer(container().charts.whole_tree(principal_of(request))).data)

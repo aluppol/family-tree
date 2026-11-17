@@ -16,6 +16,10 @@ export interface CandidatesKeyParts {
   search: string;
 }
 
+export function treeGraphKey(): QueryKey {
+  return [...CHARTS_KEY, 'whole-tree'];
+}
+
 export function peopleSearchKey(search: string): QueryKey {
   return [...PEOPLE_LISTS_KEY, 'search', search];
 }

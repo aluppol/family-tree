@@ -7,7 +7,7 @@ from family_tree.adapters.persistence.mappers import ParentLinkMapper, Partnersh
 from family_tree.adapters.persistence.models import ParentLinkRecord, PartnershipRecord, PersonRecord
 from family_tree.adapters.persistence.summaries import NAME_ORDER, name_matches, summaries_of
 from family_tree.domain.identifiers import PersonId, TreeId
-from family_tree.domain.read_models import ChartScope, FamilyChart, PersonSummary
+from family_tree.domain.read_models import ChartScope, FamilyChart, PersonSummary, TreeGraph
 from family_tree.domain.relationships import ParentLink, Partnership
 
 CANDIDATE_LIMIT = 20
@@ -72,6 +72,13 @@ class PostgresKinshipGraph:
             partnerships=tuple(partnerships),
         )
 
+    def whole_tree(self, tree_id: TreeId) -> TreeGraph:
+        return TreeGraph(
+            people=tuple(summaries_of(self._people(tree_id).order_by("id"))),
+            parent_links=tuple(self._tree_parent_links(tree_id)),
+            partnerships=tuple(self._tree_partnerships(tree_id)),
+        )
+
     def parent_candidates(self, tree_id: TreeId, child_id: PersonId, text: str) -> list[PersonSummary]:
         descendants = self._ids(DESCENDANT_IDS_SQL, {"tree": tree_id, "person": child_id})
         parents = ParentLinkRecord.objects.using(self._database).filter(tree_id=tree_id, child_id=child_id)
@@ -107,6 +114,14 @@ class PostgresKinshipGraph:
             tree_id=tree_id, parent_id__in=people_ids, child_id__in=people_ids
         )
         return [ParentLinkMapper.to_entity(record) for record in records.order_by("id")]
+
+    def _tree_parent_links(self, tree_id: TreeId) -> list[ParentLink]:
+        records = ParentLinkRecord.objects.using(self._database).filter(tree_id=tree_id).order_by("id")
+        return [ParentLinkMapper.to_entity(record) for record in records]
+
+    def _tree_partnerships(self, tree_id: TreeId) -> list[Partnership]:
+        records = PartnershipRecord.objects.using(self._database).filter(tree_id=tree_id).order_by("id")
+        return [PartnershipMapper.to_entity(record) for record in records]
 
     def _candidates(self, tree_id: TreeId, text: str, excluded: Collection[int]) -> list[PersonSummary]:
         matching = self._people(tree_id).exclude(id__in=excluded).filter(name_matches(text))

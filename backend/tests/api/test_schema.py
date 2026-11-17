@@ -4,6 +4,7 @@ EXPECTED_PATHS = {
     "/api/me/",
     "/api/workspace/",
     "/api/workspace/home-person/",
+    "/api/workspace/graph/",
     "/api/people/",
     "/api/people/{person_id}/",
     "/api/people/{person_id}/chart/",

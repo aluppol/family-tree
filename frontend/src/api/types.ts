@@ -122,6 +122,12 @@ export interface FamilyChart {
   partnerships: Partnership[];
 }
 
+export interface TreeGraph {
+  people: PersonSummary[];
+  parent_links: ParentLink[];
+  partnerships: Partnership[];
+}
+
 export interface Workspace {
   home_person_id: number | null;
   people_count: number;

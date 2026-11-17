@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import { Navigate } from 'react-router';
 import { LoadingState } from '../../design/components';
-import { treePath } from '../../routePaths';
+import { towerPath } from '../../routePaths';
 import { useFirstPerson } from '../people/peopleQueries';
 import { PageError } from '../shell/PageStates';
 import { useDocumentTitle } from '../shell/useDocumentTitle';
@@ -20,7 +20,7 @@ export function HomePage(): ReactElement {
     return <PageError error={workspace.error} onRetry={workspace.refetch} />;
   }
   if (workspace.data.home_person_id !== null) {
-    return <Navigate replace to={treePath(workspace.data.home_person_id)} />;
+    return <Navigate replace to={towerPath(workspace.data.home_person_id)} />;
   }
   return workspace.data.people_count > 0 ? <FirstPersonRedirect /> : <EmptyTreeView />;
 }
@@ -33,5 +33,5 @@ function FirstPersonRedirect(): ReactElement {
   if (firstPerson.isError) {
     return <PageError error={firstPerson.error} onRetry={firstPerson.refetch} />;
   }
-  return firstPerson.data === null ? <EmptyTreeView /> : <Navigate replace to={treePath(firstPerson.data.id)} />;
+  return firstPerson.data === null ? <EmptyTreeView /> : <Navigate replace to={towerPath(firstPerson.data.id)} />;
 }

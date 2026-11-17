@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { type Page, expect, test } from '@playwright/test';
-import { HOME_PERSON_NAME, openHomeTree } from './support/familyTree';
+import { HOME_PERSON_NAME, openHomeCards, openHomeTower } from './support/familyTree';
 
 interface PageUnderTest {
   name: string;
@@ -11,7 +11,8 @@ const PAGES: PageUnderTest[] = [
   { name: 'the people list', open: (page) => openPage(page, { path: '/people', heading: 'People' }) },
   { name: 'the new person form', open: (page) => openPage(page, { path: '/people/new', heading: 'Add a person' }) },
   { name: 'import and export', open: (page) => openPage(page, { path: '/transfer', heading: 'Import & export' }) },
-  { name: 'the tree', open: openHomeTree },
+  { name: 'the time tower', open: openHomeTower },
+  { name: 'the cards view', open: openHomeCards },
   { name: 'a profile', open: openHomeProfile },
 ];
 
@@ -31,7 +32,7 @@ async function openPage(page: Page, { path, heading }: { path: string; heading: 
 }
 
 async function openHomeProfile(page: Page): Promise<void> {
-  await openHomeTree(page);
+  await openHomeTower(page);
   await page.getByRole('link', { name: 'Profile' }).click();
   await expect(page.getByRole('heading', { level: 1, name: HOME_PERSON_NAME })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Children' })).toBeVisible();

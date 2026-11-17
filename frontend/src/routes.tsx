@@ -15,6 +15,7 @@ export function createAppRoutes(): RouteObject[] {
           children: [
             { index: true, lazy: { Component: async () => (await import('./features/home/HomePage')).HomePage } },
             { path: 'tree/:personId', lazy: { Component: async () => (await import('./features/chart/ChartPage')).ChartPage } },
+            { path: 'tower/:personId', lazy: { Component: async () => (await import('./features/tower/TowerPage')).TowerPage } },
             { path: 'people', lazy: { Component: async () => (await import('./features/people/PeopleListPage')).PeopleListPage } },
             { path: 'people/new', lazy: { Component: async () => (await import('./features/person-form/NewPersonPage')).NewPersonPage } },
             { path: 'people/:personId', lazy: { Component: async () => (await import('./features/person/PersonProfilePage')).PersonProfilePage } },

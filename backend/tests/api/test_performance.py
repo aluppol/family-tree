@@ -8,6 +8,7 @@ from rest_framework.test import APIClient
 PEOPLE = 5000
 IMPORT_SECONDS_LIMIT = 30
 CHART_SECONDS_LIMIT = 1
+GRAPH_SECONDS_LIMIT = 1
 
 untraced_only = pytest.mark.skipif(
     sys.gettrace() is not None, reason="Timings are meaningless while a tracer such as coverage is running."
@@ -41,6 +42,18 @@ def test_the_chart_of_five_thousand_people_opens_within_a_second(administrator: 
     administrator.get(f"/api/people/{focus}/chart/")
     chart_seconds = time.perf_counter() - started
     assert chart_seconds < CHART_SECONDS_LIMIT, f"chart {chart_seconds:.2f} s"
+
+
+@untraced_only
+def test_the_whole_tree_of_five_thousand_people_loads_within_a_second(administrator: APIClient) -> None:
+    _import_ahnentafel(administrator)
+    started = time.perf_counter()
+    response = administrator.get("/api/workspace/graph/")
+    graph_seconds = time.perf_counter() - started
+    body = response.json()
+    sizes = [len(body["people"]), len(body["parent_links"]), len(body["partnerships"])]
+    assert sizes == [PEOPLE, 2 * _families(PEOPLE), _families(PEOPLE)]
+    assert graph_seconds < GRAPH_SECONDS_LIMIT, f"graph {graph_seconds:.2f} s"
 
 
 def _import_ahnentafel(client: APIClient) -> int:
@@ -77,3 +90,7 @@ def _has_parents(number: int, people: int) -> bool:
 
 def _people_in_the_first_ones_ancestry(people: int) -> int:
     return sum(1 for number in range(1, people + 1) if number == 1 or _has_parents(number // 2, people))
+
+
+def _families(people: int) -> int:
+    return sum(1 for number in range(1, people + 1) if _has_parents(number, people))

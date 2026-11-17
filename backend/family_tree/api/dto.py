@@ -34,6 +34,7 @@ from family_tree.domain.read_models import (
     PeopleQuery,
     PersonDossier,
     PersonSummary,
+    TreeGraph,
 )
 from family_tree.domain.relationships import (
     ParentLink,
@@ -188,6 +189,12 @@ class PeoplePageSerializer(serializers.Serializer[PeoplePage]):
 
 class FamilyChartSerializer(serializers.Serializer[FamilyChart]):
     focus_id = serializers.IntegerField()
+    people = PersonSummarySerializer(many=True)
+    parent_links = ParentLinkSerializer(many=True)
+    partnerships = PartnershipSerializer(many=True)
+
+
+class TreeGraphSerializer(serializers.Serializer[TreeGraph]):
     people = PersonSummarySerializer(many=True)
     parent_links = ParentLinkSerializer(many=True)
     partnerships = PartnershipSerializer(many=True)

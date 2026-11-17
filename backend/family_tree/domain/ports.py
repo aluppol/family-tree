@@ -8,7 +8,14 @@ from family_tree.domain.interchange import InterchangeDocument, TreeSnapshot
 from family_tree.domain.members import InactivityPeriod, MemberActivity
 from family_tree.domain.people import Person, PersonProfile
 from family_tree.domain.photos import Photo
-from family_tree.domain.read_models import ChartScope, FamilyChart, PeoplePage, PeopleQuery, PersonSummary
+from family_tree.domain.read_models import (
+    ChartScope,
+    FamilyChart,
+    PeoplePage,
+    PeopleQuery,
+    PersonSummary,
+    TreeGraph,
+)
 from family_tree.domain.relationships import ParentLink, Partnership, PartnershipTerms
 from family_tree.domain.workspaces import FamilyTree, Principal, WorkspaceOwner
 
@@ -126,6 +133,8 @@ class KinshipGraph(Protocol):
     def is_ancestor(self, tree_id: TreeId, ancestor_id: PersonId, descendant_id: PersonId) -> bool: ...
 
     def chart(self, tree_id: TreeId, scope: ChartScope) -> FamilyChart: ...
+
+    def whole_tree(self, tree_id: TreeId) -> TreeGraph: ...
 
     def parent_candidates(self, tree_id: TreeId, child_id: PersonId, text: str) -> list[PersonSummary]: ...
 

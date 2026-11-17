@@ -75,6 +75,13 @@ class FamilyChart:
     partnerships: tuple[Partnership, ...]
 
 
+@dataclass(frozen=True, slots=True, kw_only=True)
+class TreeGraph:
+    people: tuple[PersonSummary, ...]
+    parent_links: tuple[ParentLink, ...]
+    partnerships: tuple[Partnership, ...]
+
+
 def _require_within(field: str, number: int, lowest: int, highest: int) -> None:
     if not lowest <= number <= highest:
         message = f"Must be between {lowest} and {highest}."

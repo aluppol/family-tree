@@ -13,12 +13,13 @@ from family_tree.api.views.people import (
     PersonView,
 )
 from family_tree.api.views.photos import PersonPhotoView
-from family_tree.api.views.workspace import HomePersonView, ViewerView, WorkspaceView
+from family_tree.api.views.workspace import HomePersonView, ViewerView, WorkspaceGraphView, WorkspaceView
 
 urlpatterns = [
     path("me/", ViewerView.as_view(), name="viewer"),
     path("workspace/", WorkspaceView.as_view(), name="workspace"),
     path("workspace/home-person/", HomePersonView.as_view(), name="home-person"),
+    path("workspace/graph/", WorkspaceGraphView.as_view(), name="workspace-graph"),
     path("people/", PeopleView.as_view(), name="people"),
     path("people/<int:person_id>/", PersonView.as_view(), name="person"),
     path("people/<int:person_id>/chart/", PersonChartView.as_view(), name="person-chart"),

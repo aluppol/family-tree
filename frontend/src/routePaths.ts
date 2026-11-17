@@ -7,6 +7,10 @@ export function treePath(personId: number): string {
   return `/tree/${String(personId)}`;
 }
 
+export function towerPath(personId: number): string {
+  return `/tower/${String(personId)}`;
+}
+
 export function profilePath(personId: number): string {
   return `/people/${String(personId)}`;
 }

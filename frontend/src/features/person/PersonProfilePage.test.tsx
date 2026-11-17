@@ -25,7 +25,7 @@ test('the profile shows the facts, the biography with its line breaks and the ac
   expect(within(screen.getByRole('region', { name: 'Biography' })).getByText(/Naturalist/).textContent).toBe('Naturalist.\nAuthor of On the Origin of Species.');
   expect(screen.getByRole('img', { name: 'Charles Robert Darwin' })).toHaveAttribute('src', '/api/people/1/photo/');
   expect(screen.getByRole('link', { name: 'Edit' })).toHaveAttribute('href', '/people/1/edit');
-  expect(screen.getByRole('link', { name: 'Show in tree' })).toHaveAttribute('href', '/tree/1');
+  expect(screen.getByRole('link', { name: 'Show in tree' })).toHaveAttribute('href', '/tower/1');
 });
 
 test('the profile lists parents, spouses and children with links to their profiles', async () => {

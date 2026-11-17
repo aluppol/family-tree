@@ -2,7 +2,7 @@ import { type ReactElement, useState } from 'react';
 import { useNavigate } from 'react-router';
 import type { Person } from '../../api/types';
 import { Button, ButtonLink, ConfirmDialog, Icon, InlineError } from '../../design/components';
-import { PEOPLE_PATH, editProfilePath, treePath } from '../../routePaths';
+import { PEOPLE_PATH, editProfilePath, towerPath } from '../../routePaths';
 import { fullName } from '../people/personName';
 import { useSetHomePerson, useWorkspace } from '../workspace/workspaceQueries';
 import { lifeSpanOf } from './lifeSpan';
@@ -22,7 +22,7 @@ export function ProfileHeader({ person }: { person: Person }): ReactElement {
           <Icon name="edit" />
           Edit
         </ButtonLink>
-        <ButtonLink to={treePath(person.id)}>
+        <ButtonLink to={towerPath(person.id)}>
           <Icon name="tree" />
           Show in tree
         </ButtonLink>

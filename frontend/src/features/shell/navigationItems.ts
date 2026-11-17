@@ -13,7 +13,7 @@ export const NAVIGATION_ITEMS: readonly NavigationItem[] = [
     label: 'Tree',
     path: HOME_PATH,
     icon: 'tree',
-    isActiveAt: (pathname) => pathname === HOME_PATH || pathname.startsWith('/tree/'),
+    isActiveAt: (pathname) => pathname === HOME_PATH || pathname.startsWith('/tree/') || pathname.startsWith('/tower/'),
   },
   {
     label: 'People',

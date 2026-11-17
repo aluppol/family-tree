@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import type { ImportReport, ImportResult } from '../../api/types';
 import { Banner, Button, ButtonLink, FileButton, Icon, InlineError, LoadingState } from '../../design/components';
-import { HOME_PATH, treePath } from '../../routePaths';
+import { HOME_PATH, towerPath } from '../../routePaths';
 import { countOf } from './countOf';
 import { ImportReportView } from './ImportReportView';
 import styles from './Transfer.module.scss';
@@ -77,7 +77,7 @@ function DoneStep({ result, onStartOver }: { result: ImportResult; onStartOver: 
         </p>
       </Banner>
       <div className={styles.stepActions}>
-        <ButtonLink to={result.home_person_id === null ? HOME_PATH : treePath(result.home_person_id)} variant="primary">
+        <ButtonLink to={result.home_person_id === null ? HOME_PATH : towerPath(result.home_person_id)} variant="primary">
           <Icon name="tree" />
           Show the tree
         </ButtonLink>

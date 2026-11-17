@@ -1,5 +1,5 @@
 import { type Page, expect, test } from '@playwright/test';
-import { HOME_PERSON_NAME, deleteOpenProfile, familyTreeOf, openHomeTree, personInTree } from './support/familyTree';
+import { HOME_PERSON_NAME, deleteOpenProfile, familyTreeOf, openHomeCards, personInTree } from './support/familyTree';
 import { watchPageProblems } from './support/pageProblems';
 
 const PARENT_IN_TREE = 'Robert Waring Darwin';
@@ -8,7 +8,7 @@ const NEW_SURNAME = `Visitor${String(Date.now())}`;
 
 test('a visitor explores the demo tree, edits a profile, adds a relative and cleans up', async ({ page }) => {
   const problems = watchPageProblems(page);
-  await test.step('the home page opens the demo tree on Charles Darwin', () => openHomeTree(page));
+  await test.step('the home page opens the time tower on Charles Darwin, and the switch opens the cards', () => openHomeCards(page));
   await test.step('a person in the tree opens their profile', () => openProfileFromTree(page));
   await test.step('the profile is edited and saved', () => editAndSaveProfile(page));
   await test.step('a new person gets Charles Darwin as a parent', () => createPersonWithHomePersonAsParent(page));

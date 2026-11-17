@@ -41,6 +41,7 @@ function workspaceHandlers(backend: FakeFamilyBackend): HttpHandler[] {
   return [
     http.get('/api/me/', () => HttpResponse.json(GUEST_VIEWER)),
     http.get('/api/workspace/', () => HttpResponse.json(backend.workspace())),
+    http.get('/api/workspace/graph/', () => HttpResponse.json(backend.treeGraph())),
     http.put<never, { person_id: number | null }>('/api/workspace/home-person/', async ({ request }) => {
       const { person_id: personId } = await request.json();
       return HttpResponse.json(backend.setHomePerson(personId));

@@ -2,10 +2,24 @@ import { type Locator, type Page, expect } from '@playwright/test';
 
 export const HOME_PERSON_NAME = 'Charles Robert Darwin';
 
-export async function openHomeTree(page: Page): Promise<void> {
+export const TOWER_TIMEOUT = 20_000;
+
+export async function openHomeTower(page: Page): Promise<void> {
   await page.goto('/');
-  await page.waitForURL(/\/tree\/\d+$/);
+  await page.waitForURL(/\/tower\/\d+$/);
+  await expect(page.getByRole('heading', { level: 1, name: HOME_PERSON_NAME })).toBeVisible({ timeout: TOWER_TIMEOUT });
+  await expect(page.getByRole('img', { name: /^Time tower/ })).toBeVisible({ timeout: TOWER_TIMEOUT });
+}
+
+export async function openHomeCards(page: Page): Promise<void> {
+  await openHomeTower(page);
+  await switchToCards(page);
   await expect(page.getByRole('heading', { level: 1, name: HOME_PERSON_NAME })).toBeVisible();
+}
+
+export async function switchToCards(page: Page): Promise<void> {
+  await page.getByRole('navigation', { name: 'Tree view' }).getByRole('link', { name: 'Cards' }).click();
+  await page.waitForURL(/\/tree\/\d+$/);
 }
 
 export function familyTreeOf(page: Page, focusName: string): Locator {

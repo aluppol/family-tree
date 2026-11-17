@@ -13,6 +13,7 @@ import type {
   Person,
   PersonProfile,
   PersonSummary,
+  TreeGraph,
   Workspace,
 } from '../api/types';
 import type { FamilySeed, StoredPerson } from './fixtures';
@@ -57,6 +58,14 @@ export class FakeFamilyBackend {
     const matches = [...this.people.values()].filter((person) => matchesSearch(person, search)).sort(bySurnameThenGivenNames);
     const nextOffset = offset + limit < matches.length ? offset + limit : null;
     return { count: matches.length, next_offset: nextOffset, results: matches.slice(offset, offset + limit).map(summaryOf) };
+  }
+
+  treeGraph(): TreeGraph {
+    return {
+      people: [...this.people.values()].map(summaryOf),
+      parent_links: [...this.parentLinks.values()],
+      partnerships: [...this.partnerships.values()],
+    };
   }
 
   chart(personId: number): FamilyChart | undefined {

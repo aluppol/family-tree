@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 import { Link } from 'react-router';
 import { Banner, ButtonLink, Icon, LoadingState, PageContainer, PageHeader } from '../../design/components';
 import { profilePath, treePath } from '../../routePaths';
+import { ViewSwitch } from '../tree-views/ViewSwitch';
 import styles from './ChartPage.module.scss';
 import { ChartView } from './ChartView';
 import type { HourglassLayout } from './layout/types';
@@ -24,7 +25,12 @@ export function ChartPageView({ personId, focusName, layout, onNavigate }: Chart
       <PageHeader
         title={focusName ?? FAMILY_TREE}
         description={focusName === undefined ? undefined : FAMILY_TREE}
-        actions={<ProfileLink personId={personId} />}
+        actions={
+          <>
+            <ViewSwitch personId={personId} current="cards" />
+            <ProfileLink personId={personId} />
+          </>
+        }
       />
       {layout === undefined ? (
         <LoadingState label="Loading the family tree…" />
