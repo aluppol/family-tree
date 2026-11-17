@@ -46,16 +46,22 @@
 
 .workspace {
   --sheet-peek: 4.75rem;
+  --panel-width: 22rem;
 
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 22rem;
+  grid-template-columns: minmax(0, 1fr) var(--panel-width);
   height: calc(100dvh - var(--tower-top, 8rem));
   min-height: 28rem;
   border-top: 1px solid var(--color-border);
+  transition: grid-template-columns var(--duration-slide) ease-out;
+
+  &[data-details='hidden'] {
+    grid-template-columns: minmax(0, 1fr) 0px;
+  }
 
   @include media.medium-down {
-    grid-template-columns: minmax(0, 1fr) 19rem;
+    --panel-width: 19rem;
   }
 
   @include media.narrow {
@@ -106,40 +112,63 @@
   }
 }
 
-.key {
-  max-width: min(19rem, 100%);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--color-surface) 94%, transparent);
-  box-shadow: var(--shadow-raised);
-  font-size: var(--font-size-sm);
-}
-
-.keyToggle {
+.overlayButton {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
   min-height: 2.5rem;
   padding: var(--space-2) var(--space-3);
-  border: 0;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  background: transparent;
+  background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+  box-shadow: var(--shadow-raised);
   color: var(--color-text);
   font: inherit;
+  font-size: var(--font-size-sm);
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
+  touch-action: manipulation;
+
+  &:hover {
+    background: var(--color-surface-muted);
+  }
+}
+
+.key {
+  position: relative;
+  font-size: var(--font-size-sm);
 }
 
 .keyList {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 0;
   display: grid;
   gap: var(--space-2);
+  width: max-content;
+  max-width: min(19rem, calc(100vw - 2 * var(--space-4)));
   margin: 0;
-  padding: 0 var(--space-3) var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+  box-shadow: var(--shadow-raised);
   list-style: none;
   color: var(--color-text);
+  transition:
+    transform var(--duration-slide) ease-out,
+    opacity var(--duration-slide) ease-out,
+    visibility 0s;
 
-  &[hidden] {
-    display: none;
+  .key[data-open='false'] & {
+    transform: translateX(calc(-100% - var(--space-5)));
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      transform var(--duration-slide) ease-out,
+      opacity var(--duration-slide) ease-out,
+      visibility 0s var(--duration-slide);
   }
 
   li {
@@ -307,10 +336,23 @@
 }
 
 .panel {
-  overflow-y: auto;
-  padding: var(--space-5);
+  min-width: 0;
+  overflow: hidden;
   border-left: 1px solid var(--color-border);
   background: var(--color-surface);
+  transition: visibility 0s;
+
+  .workspace[data-details='hidden'] & {
+    visibility: hidden;
+    transition: visibility 0s var(--duration-slide);
+  }
+}
+
+.panelBody {
+  width: calc(var(--panel-width) - 1px);
+  height: 100%;
+  overflow-y: auto;
+  padding: var(--space-5);
 }
 
 .personPanel {

@@ -1,4 +1,4 @@
-import { type ReactElement, useId, useState } from 'react';
+import { type ReactElement, useId } from 'react';
 import { Icon } from '../../design/components';
 import type { TowerAxis, TowerLegend } from './layout/towerTypes';
 import { ToneSwatch, toneName } from './ToneSwatch';
@@ -9,20 +9,20 @@ export interface TowerKeyProps {
   axis: TowerAxis;
   legend: TowerLegend;
   hasMarriages: boolean;
-  isCompact: boolean;
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
-export function TowerKey({ axis, legend, hasMarriages, isCompact }: TowerKeyProps): ReactElement {
-  const [isOpen, setOpen] = useState(!isCompact);
+export function TowerKey({ axis, legend, hasMarriages, isOpen, onToggle }: TowerKeyProps): ReactElement {
   const listId = useId();
-  const axisName = axis === 'years' ? 'Height: year of birth' : 'Rings: generations';
   return (
-    <section className={styles.key} aria-label="Key">
-      <button type="button" className={styles.keyToggle} aria-expanded={isOpen} aria-controls={listId} onClick={() => { setOpen(!isOpen); }}>
+    <section className={styles.key} aria-label="Key" data-open={isOpen}>
+      <button type="button" className={styles.overlayButton} aria-expanded={isOpen} aria-controls={listId} onClick={onToggle}>
         <Icon name="info" />
-        {isCompact ? 'Key' : axisName}
+        Key
+        <Icon name={isOpen ? 'chevronLeft' : 'chevronRight'} />
       </button>
-      <ul id={listId} className={styles.keyList} hidden={!isOpen}>
+      <ul id={listId} className={styles.keyList} inert={!isOpen}>
         <li>{axis === 'years' ? 'Height is the year of birth; rings mark decades, the oldest at the bottom.' : 'Each ring is one generation, the oldest at the bottom.'}</li>
         {legend.lines.map((line) => (
           <li key={line.lineIndex}>

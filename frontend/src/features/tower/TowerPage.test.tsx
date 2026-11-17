@@ -7,6 +7,7 @@ import { mockServer, setUpMockServer } from '../../test/mockServer';
 import { type RenderedApp, renderApp } from '../../test/renderApp';
 import type { SceneCallbacks, SceneFocus } from './scene/sceneTypes';
 import { NARROW_SCREEN, TOUCH_SCREEN } from './TowerPage';
+import { DEFAULT_TOWER_PANELS, rememberTowerPanels } from './towerPanels';
 import { GESTURE_HINT_KEY } from './useGestureHint';
 
 const fakeScene = vi.hoisted(() => ({
@@ -40,6 +41,7 @@ beforeEach(() => {
   fakeScene.canDraw = true;
   vi.clearAllMocks();
   window.localStorage.setItem(GESTURE_HINT_KEY, 'yes');
+  rememberTowerPanels(DEFAULT_TOWER_PANELS);
 });
 
 afterEach(() => {
@@ -48,7 +50,7 @@ afterEach(() => {
 });
 
 test('the tower opens on the person in the address with the switch, the key and the relatives', async () => {
-  await openTower();
+  const { user } = await openTower();
   expect(document.title).toBe(`Time tower of ${CHARLES} · Family Tree`);
   const switcher = screen.getByRole('navigation', { name: 'Tree view' });
   expect(within(switcher).getAllByRole('link').map((link) => link.textContent)).toEqual(['Time tower', 'Cards']);
@@ -56,7 +58,11 @@ test('the tower opens on the person in the address with the switch, the key and 
   expect(within(switcher).getByRole('link', { name: 'Time tower' })).toHaveAttribute('aria-current', 'page');
   expect(screen.getByRole('navigation', { name: 'Main' }).querySelector('[aria-current="page"]')).toHaveTextContent('Tree');
   const key = screen.getByRole('region', { name: 'Key' });
-  expect(within(key).getByRole('button', { name: 'Height: year of birth' })).toHaveAttribute('aria-expanded', 'true');
+  const keyButton = within(key).getByRole('button', { name: 'Key' });
+  expect(keyButton).toHaveAttribute('aria-expanded', 'false');
+  await user.click(keyButton);
+  expect(keyButton).toHaveAttribute('aria-expanded', 'true');
+  expect(within(key).getByText('Height is the year of birth; rings mark decades, the oldest at the bottom.')).toBeInTheDocument();
   expect(within(key).getByText('Line of Robert Darwin')).toBeInTheDocument();
   expect(within(key).getByText('Married into the family')).toBeInTheDocument();
   const panel = screen.getByRole('complementary', { name: 'Selected person' });
@@ -64,6 +70,28 @@ test('the tower opens on the person in the address with the switch, the key and 
   expect(within(panel).getByText('1809–1882 · Generation 2')).toBeInTheDocument();
   expect(within(within(panel).getByRole('region', { name: 'Children' })).getByRole('button', { name: /William Erasmus Darwin/ })).toBeInTheDocument();
   expect(fakeScene.showFocus).toHaveBeenLastCalledWith(expect.objectContaining({ focusId: DARWIN_IDS.charles }));
+});
+
+test('on a wide screen the key and the details slide away and back, and the choice stays while the tab is open', async () => {
+  const { user, router } = await openTower();
+  const key = screen.getByRole('region', { name: 'Key' });
+  expect(key).toHaveAttribute('data-open', 'false');
+  expect(within(key).getByRole('list', { hidden: true })).toHaveAttribute('inert');
+  await user.click(within(key).getByRole('button', { name: 'Key' }));
+  expect(key).toHaveAttribute('data-open', 'true');
+  expect(within(key).getByRole('list')).not.toHaveAttribute('inert');
+  const panel = screen.getByRole('complementary', { name: 'Selected person' });
+  const hide = screen.getByRole('button', { name: 'Hide details' });
+  expect(hide).toHaveAttribute('aria-controls', panel.id);
+  expect(hide).toHaveAttribute('aria-expanded', 'true');
+  await user.click(hide);
+  expect(panel).toHaveAttribute('inert');
+  expect(screen.getByRole('button', { name: 'Show details' })).toHaveAttribute('aria-expanded', 'false');
+  await leaveTowerAndReturn(router);
+  expect(screen.getByRole('button', { name: 'Key' })).toHaveAttribute('aria-expanded', 'true');
+  await user.click(screen.getByRole('button', { name: 'Show details' }));
+  expect(screen.getByRole('complementary', { name: 'Selected person', hidden: true })).not.toHaveAttribute('inert');
+  expect(screen.getByRole('button', { name: 'Hide details' })).toHaveAttribute('aria-expanded', 'true');
 });
 
 test('a person tapped in the tower becomes the selection and Back returns to the one before', async () => {
@@ -157,6 +185,7 @@ test('on a phone the selected person sits in a bottom sheet that opens with a ta
   const { user } = await openTower();
   expect(screen.getByText('Drag to turn · Pinch to zoom · Tap a ball to open a person')).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: 'Rotate' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Hide details' })).not.toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Key' })).toHaveAttribute('aria-expanded', 'false');
   expect(within(screen.getByRole('region', { name: 'Time tower' })).getByRole('navigation', { name: 'Tree view' })).toBeInTheDocument();
   const handle = screen.getByRole('button', { name: /Show details/ });
@@ -208,6 +237,15 @@ async function openTower(path = '/tower/1', name = CHARLES): Promise<RenderedApp
     expect(fakeScene.showFocus).toHaveBeenCalled();
   });
   return rendered;
+}
+
+async function leaveTowerAndReturn(router: RenderedApp['router']): Promise<void> {
+  await act(() => router.navigate('/people/1'));
+  await waitFor(() => {
+    expect(screen.queryByRole('region', { name: 'Time tower' })).not.toBeInTheDocument();
+  });
+  await act(() => router.navigate('/tower/1'));
+  await screen.findByRole('region', { name: 'Time tower' });
 }
 
 function lastFocus(): SceneFocus {

@@ -102,6 +102,7 @@
   --radius-round: 999px;
   --content-width: 72rem;
   --transition-fast: 120ms ease-out;
+  --duration-slide: 220ms;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -117,5 +118,6 @@
 @media (prefers-reduced-motion: reduce) {
   :root {
     --transition-fast: 0s;
+    --duration-slide: 0s;
   }
 }

@@ -1,5 +1,5 @@
 import { type ReactElement, type RefObject, useRef, useState } from 'react';
-import { Button } from '../../design/components';
+import { Button, Icon } from '../../design/components';
 import { treePath } from '../../routePaths';
 import { fullName } from '../people/personName';
 import { ViewSwitch } from '../tree-views/ViewSwitch';
@@ -12,6 +12,7 @@ import { TowerCanvas } from './TowerCanvas';
 import { TowerKey } from './TowerKey';
 import styles from './TowerPage.module.scss';
 import { TowerSearch } from './TowerSearch';
+import { type TowerPanels, toggleTowerDetails, toggleTowerKey, useTowerPanels } from './towerPanels';
 import { TowerToolbar } from './TowerToolbar';
 import { lifeYearsText, shortName } from './towerText';
 import type { GestureHint } from './useGestureHint';
@@ -46,10 +47,12 @@ type SearchMode = 'person' | 'relation';
 
 const PHONE_INSETS: ViewInsets = { top: 64, bottom: 148 };
 const WIDE_INSETS: ViewInsets = { top: 0, bottom: 92 };
+const DETAILS_PANEL_ID = 'tower-selected-person';
 
 export function TowerView(props: TowerViewProps): ReactElement {
   const workspaceRef = useRef<HTMLDivElement>(null);
   const [searchMode, setSearchMode] = useState<SearchMode | null>(null);
+  const panels = useTowerPanels();
   useViewportFill(workspaceRef);
   return (
     <div className={styles.page}>
@@ -64,15 +67,16 @@ export function TowerView(props: TowerViewProps): ReactElement {
           <ViewSwitch personId={props.node.person.id} current="tower" />
         </header>
       )}
-      <div ref={workspaceRef} className={styles.workspace}>
-        <TowerStage {...props} searchMode={searchMode} onSearchModeChange={setSearchMode} />
-        <SelectedPerson {...props} onAskRelation={() => { setSearchMode('relation'); }} />
+      <div ref={workspaceRef} className={styles.workspace} data-details={props.display.isNarrow ? undefined : detailsStateOf(panels)}>
+        <TowerStage {...props} panels={panels} searchMode={searchMode} onSearchModeChange={setSearchMode} />
+        <SelectedPerson {...props} isDetailsOpen={panels.isDetailsOpen} onAskRelation={() => { setSearchMode('relation'); }} />
       </div>
     </div>
   );
 }
 
 interface StageProps extends TowerViewProps {
+  panels: TowerPanels;
   searchMode: SearchMode | null;
   onSearchModeChange: (mode: SearchMode | null) => void;
 }
@@ -96,14 +100,29 @@ function TowerStage(props: StageProps): ReactElement {
         onPick={explorer.select}
         onInteract={handleInteract}
       />
-      <div className={styles.overlayTop}>
-        <TowerKey axis={layout.axis} legend={layout.legend} hasMarriages={layout.marriages.length > 0} isCompact={display.isNarrow} />
-        {display.isNarrow && <ViewSwitch personId={props.node.person.id} current="tower" />}
-      </div>
+      <StageOverlay {...props} />
       {searchMode !== null && <StageSearch {...props} searchMode={searchMode} onClose={() => { onSearchModeChange(null); }} />}
       {hint.isVisible && <GestureHintCard isTouch={display.isTouch} onDismiss={hint.dismiss} />}
       <StageToolbar {...props} />
     </section>
+  );
+}
+
+function StageOverlay({ layout, node, display, panels }: StageProps): ReactElement {
+  return (
+    <div className={styles.overlayTop}>
+      <TowerKey axis={layout.axis} legend={layout.legend} hasMarriages={layout.marriages.length > 0} isOpen={panels.isKeyOpen} onToggle={toggleTowerKey} />
+      {display.isNarrow ? <ViewSwitch personId={node.person.id} current="tower" /> : <DetailsToggle isOpen={panels.isDetailsOpen} />}
+    </div>
+  );
+}
+
+function DetailsToggle({ isOpen }: { isOpen: boolean }): ReactElement {
+  return (
+    <button type="button" className={styles.overlayButton} aria-expanded={isOpen} aria-controls={DETAILS_PANEL_ID} onClick={toggleTowerDetails}>
+      <Icon name={isOpen ? 'chevronRight' : 'chevronLeft'} />
+      {isOpen ? 'Hide details' : 'Show details'}
+    </button>
   );
 }
 
@@ -148,15 +167,17 @@ function GestureHintCard({ isTouch, onDismiss }: { isTouch: boolean; onDismiss: 
   );
 }
 
-function SelectedPerson(props: TowerViewProps & { onAskRelation: () => void }): ReactElement {
+function SelectedPerson(props: TowerViewProps & { isDetailsOpen: boolean; onAskRelation: () => void }): ReactElement {
   const { node, relatives, explorer, layout, display } = props;
   const [isSheetExpanded, setSheetExpanded] = useState(false);
   const lineHeads = new Map(layout.legend.lines.map((line) => [line.lineIndex, line.head]));
   const panelProps = { node, relatives, lineHeads, relation: explorer.relation, onSelect: explorer.select, onAskRelation: props.onAskRelation, onClearRelation: explorer.clearRelation };
   if (!display.isNarrow) {
     return (
-      <aside className={styles.panel} aria-label="Selected person">
-        <PersonPanel {...panelProps} />
+      <aside id={DETAILS_PANEL_ID} className={styles.panel} aria-label="Selected person" inert={!props.isDetailsOpen}>
+        <div className={styles.panelBody}>
+          <PersonPanel {...panelProps} />
+        </div>
       </aside>
     );
   }
@@ -165,4 +186,8 @@ function SelectedPerson(props: TowerViewProps & { onAskRelation: () => void }): 
       <PersonDetails {...panelProps} />
     </BottomSheet>
   );
+}
+
+function detailsStateOf(panels: TowerPanels): 'shown' | 'hidden' {
+  return panels.isDetailsOpen ? 'shown' : 'hidden';
 }

@@ -70,6 +70,13 @@ test('with the bottom of the screen covered, the view centres on the part that s
   expect(callbacks.onPick).toHaveBeenCalledWith(PETAR);
 });
 
+test('a change of size draws the tower at once, so it does not blink while a side panel slides', () => {
+  const { scene, renderer } = mountScene({ isReducedMotion: true });
+  vi.mocked(renderer.render).mockClear();
+  scene.setInsets({ top: 0, bottom: 120 });
+  expect(renderer.render).toHaveBeenCalledTimes(1);
+});
+
 test('a scene in a box without size waits without failing', () => {
   const { host, scene } = mountScene({ isReducedMotion: true });
   host.getBoundingClientRect = () => ({ ...SCREEN.toJSON(), x: 0, y: 0, top: 0, left: 0, right: 0, bottom: 0, width: 0, height: 0, toJSON: () => ({}) }) as DOMRect;

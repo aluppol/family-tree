@@ -92,7 +92,7 @@ class TowerSceneController implements TowerScene {
     this.resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(this.resize);
     this.mount();
     this.bindEvents();
-    this.resize();
+    this.fitToHost();
     this.applyPose(presetPose('overview', this.extent, this.viewport()));
     this.refreshColors();
   }
@@ -195,13 +195,24 @@ class TowerSceneController implements TowerScene {
   }
 
   private readonly resize = (): void => {
+    this.fitToHost();
+    this.drawNow();
+  };
+
+  private fitToHost(): void {
     const { width, height } = this.host.getBoundingClientRect();
     this.screen = { width, height };
     this.renderer.setSize(width, height, false);
     this.labelRenderer.setSize(width, height);
     this.fitViewWindow(width, height);
-    this.requestFrame();
-  };
+  }
+
+  private drawNow(): void {
+    if (this.frameRequest !== null) {
+      window.cancelAnimationFrame(this.frameRequest);
+    }
+    this.renderFrame(performance.now());
+  }
 
   private fitViewWindow(width: number, height: number): void {
     if (width <= 0 || height <= 0) {
