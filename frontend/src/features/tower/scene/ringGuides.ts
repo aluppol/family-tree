@@ -27,7 +27,7 @@ export class RingGuides {
   }
 
   screenLabels(): ScreenLabel[] {
-    return this.labels.map((label, position) => ({ key: `ring-${String(position)}`, element: label.element, position: label.position, isFocus: false }));
+    return this.labels.map((label, position) => ({ key: `ring-${String(position)}`, element: label.element, position: label.position, kind: 'compact' }));
   }
 
   paint(palette: ScenePalette): void {

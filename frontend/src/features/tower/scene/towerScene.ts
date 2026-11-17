@@ -102,7 +102,7 @@ class TowerSceneController implements TowerScene {
     this.world.people.paint(this.palette, focus);
     this.world.edges.paint(this.palette, focus);
     this.world.labels.show(focus);
-    this.world.labels.showHover(this.hoveredId, focus);
+    this.world.labels.showHover(this.hoveredId);
     this.world.path.show(this.pointsOf(focus.pathIds), this.palette);
     this.requestFrame();
   }
@@ -273,7 +273,7 @@ class TowerSceneController implements TowerScene {
     }
     this.hoveredId = personId;
     this.renderer.domElement.style.cursor = personId === null ? 'grab' : 'pointer';
-    this.world.labels.showHover(personId, this.focus);
+    this.world.labels.showHover(personId);
     this.requestFrame();
   }
 

@@ -4,56 +4,66 @@ import { classNames } from '../../../design/classNames';
 import type { TowerNode } from '../layout/towerTypes';
 import { shortName } from '../towerText';
 import styles from '../TowerScene.module.scss';
-import type { ScreenLabel } from './labelDeclutter';
+import type { LabelKind, ScreenLabel } from './labelDeclutter';
 import { SPHERE_RADIUS } from './peopleMeshes';
 import type { SceneFocus } from './sceneTypes';
 
 const LABEL_LIFT = SPHERE_RADIUS * 2.2;
 
+const KIND_CLASSES: Record<LabelKind, string | undefined> = {
+  focus: styles.focusLabel,
+  regular: undefined,
+  compact: styles.compactLabel,
+};
+
+const KIND_PRIORITY: Record<LabelKind, number> = { focus: 0, regular: 1, compact: 2 };
+
+interface ShownLabel {
+  readonly label: CSS2DObject;
+  readonly kind: LabelKind;
+}
+
 export class NameLabels {
   readonly group = new Group();
   private readonly nodes: ReadonlyMap<number, TowerNode>;
-  private readonly shown = new Map<number, CSS2DObject>();
-  private focusId: number | null = null;
-  private hover: { readonly personId: number; readonly label: CSS2DObject } | null = null;
+  private shown = new Map<number, ShownLabel>();
+  private hover: CSS2DObject | null = null;
 
   constructor(nodes: ReadonlyMap<number, TowerNode>) {
     this.nodes = nodes;
   }
 
   show(focus: SceneFocus): void {
-    this.focusId = focus.focusId;
-    for (const [personId, label] of this.shown) {
-      if (!focus.labelledIds.has(personId) && personId !== focus.focusId) {
+    const wanted = [focus.focusId, ...[...focus.labelledIds].filter((personId) => personId !== focus.focusId)];
+    const isWanted = new Set(wanted);
+    for (const [personId, { label }] of this.shown) {
+      if (!isWanted.has(personId)) {
         this.group.remove(label);
-        this.shown.delete(personId);
       }
     }
-    for (const personId of [focus.focusId, ...focus.labelledIds]) {
-      const label = this.shown.get(personId) ?? this.added(personId);
-      label.element.className = classNames(styles.label, personId === focus.focusId && styles.focusLabel, focus.pathIds.includes(personId) && styles.pathLabel);
+    this.shown = new Map(wanted.map((personId) => [personId, this.labelled(personId, kindOf(personId, focus))]));
+    for (const [personId, { label, kind }] of this.shown) {
+      label.element.className = classNames(styles.label, KIND_CLASSES[kind], focus.pathIds.includes(personId) && styles.pathLabel);
     }
   }
 
-  showHover(personId: number | null, focus: SceneFocus | null): void {
+  showHover(personId: number | null): void {
     if (this.hover !== null) {
-      this.group.remove(this.hover.label);
+      this.group.remove(this.hover);
       this.hover = null;
     }
-    if (personId !== null && focus?.labelledIds.has(personId) !== true && personId !== focus?.focusId) {
-      const label = this.labelFor(personId);
-      label.element.className = classNames(styles.label, styles.hoverLabel);
-      this.hover = { personId, label };
-      this.group.add(label);
+    if (personId !== null && !this.shown.has(personId)) {
+      this.hover = this.labelFor(personId);
+      this.hover.element.className = classNames(styles.label, styles.hoverLabel);
+      this.group.add(this.hover);
     }
   }
 
   screenLabels(): ScreenLabel[] {
-    const focusLabel = this.focusId === null ? undefined : this.shown.get(this.focusId);
-    const first = focusLabel === undefined ? [] : [screenLabelOf('focus', focusLabel, true)];
-    const hover = this.hover === null ? [] : [screenLabelOf('hover', this.hover.label, false)];
-    const rest = [...this.shown].filter(([personId]) => personId !== this.focusId).map(([personId, label]) => screenLabelOf(`person-${String(personId)}`, label, false));
-    return [...first, ...hover, ...rest];
+    const ordered = [...this.shown].sort(([, first], [, second]) => KIND_PRIORITY[first.kind] - KIND_PRIORITY[second.kind]);
+    const people = ordered.map(([personId, { label, kind }]): ScreenLabel => ({ key: `person-${String(personId)}`, element: label.element, position: label.position, kind }));
+    const hover: ScreenLabel[] = this.hover === null ? [] : [{ key: 'hover', element: this.hover.element, position: this.hover.position, kind: 'regular' }];
+    return [...people.slice(0, 1), ...hover, ...people.slice(1)];
   }
 
   dispose(): void {
@@ -61,11 +71,14 @@ export class NameLabels {
     this.shown.clear();
   }
 
-  private added(personId: number): CSS2DObject {
+  private labelled(personId: number, kind: LabelKind): ShownLabel {
+    const existing = this.shown.get(personId);
+    if (existing !== undefined) {
+      return { label: existing.label, kind };
+    }
     const label = this.labelFor(personId);
-    this.shown.set(personId, label);
     this.group.add(label);
-    return label;
+    return { label, kind };
   }
 
   private labelFor(personId: number): CSS2DObject {
@@ -80,6 +93,9 @@ export class NameLabels {
   }
 }
 
-function screenLabelOf(key: string, label: CSS2DObject, isFocus: boolean): ScreenLabel {
-  return { key, element: label.element, position: label.position, isFocus };
+function kindOf(personId: number, focus: SceneFocus): LabelKind {
+  if (personId === focus.focusId) {
+    return 'focus';
+  }
+  return focus.highlightedIds.has(personId) ? 'regular' : 'compact';
 }

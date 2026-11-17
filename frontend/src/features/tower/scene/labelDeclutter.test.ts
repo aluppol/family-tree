@@ -13,10 +13,11 @@ test('labels behind the camera are hidden and do not block others', () => {
   expect([...visibleLabelKeys([box('behind', [100, 100], false), box('front', [100, 100])])]).toEqual(['front']);
 });
 
-test('the label size grows with the name and the focus label is larger', () => {
-  const plain = estimatedLabelSize('Ana Petrović', false);
-  const focus = estimatedLabelSize('Ana Petrović', true);
-  expect(estimatedLabelSize('Ana', false).width).toBeLessThan(plain.width);
-  expect(focus.width).toBeGreaterThan(plain.width);
-  expect(focus.height).toBeGreaterThan(plain.height);
+test('the label size grows with the name, the focus label is the largest and a compact one the smallest', () => {
+  const plain = estimatedLabelSize('Ana Petrović', 'regular');
+  const focus = estimatedLabelSize('Ana Petrović', 'focus');
+  const compact = estimatedLabelSize('Ana Petrović', 'compact');
+  expect(estimatedLabelSize('Ana', 'regular').width).toBeLessThan(plain.width);
+  expect([focus.width > plain.width, focus.height > plain.height]).toEqual([true, true]);
+  expect([compact.width < plain.width, compact.height < plain.height]).toEqual([true, true]);
 });

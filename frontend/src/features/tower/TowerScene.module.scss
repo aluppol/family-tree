@@ -24,6 +24,18 @@
   font-size: 0.875rem;
 }
 
+.compactLabel {
+  padding: 0 0.25rem;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  font-size: 0.6875rem;
+  text-shadow:
+    0 0 3px var(--color-canvas),
+    0 0 2px var(--color-canvas),
+    0 0 1px var(--color-canvas);
+}
+
 .pathLabel {
   border-color: var(--color-tower-gold);
 }

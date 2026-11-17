@@ -9,11 +9,13 @@ export interface LabelBox {
   readonly isInView: boolean;
 }
 
+export type LabelKind = 'focus' | 'regular' | 'compact';
+
 export interface ScreenLabel {
   readonly key: string;
   readonly element: HTMLElement;
   readonly position: Vector3;
-  readonly isFocus: boolean;
+  readonly kind: LabelKind;
 }
 
 export interface ScreenSize {
@@ -21,18 +23,23 @@ export interface ScreenSize {
   readonly height: number;
 }
 
-const CHARACTER_WIDTH = 7.2;
-const FOCUS_CHARACTER_WIDTH = 8.4;
-const LABEL_PADDING = 20;
-const LABEL_HEIGHT = 22;
-const FOCUS_LABEL_HEIGHT = 26;
+interface LabelMetrics {
+  readonly characterWidth: number;
+  readonly padding: number;
+  readonly height: number;
+}
+
+const LABEL_METRICS: Record<LabelKind, LabelMetrics> = {
+  focus: { characterWidth: 8.4, padding: 20, height: 26 },
+  regular: { characterWidth: 7.2, padding: 20, height: 22 },
+  compact: { characterWidth: 6.2, padding: 8, height: 16 },
+};
+
 const BREATHING_ROOM = 2;
 
-export function estimatedLabelSize(text: string, isFocus: boolean): { width: number; height: number } {
-  return {
-    width: text.length * (isFocus ? FOCUS_CHARACTER_WIDTH : CHARACTER_WIDTH) + LABEL_PADDING,
-    height: isFocus ? FOCUS_LABEL_HEIGHT : LABEL_HEIGHT,
-  };
+export function estimatedLabelSize(text: string, kind: LabelKind): { width: number; height: number } {
+  const metrics = LABEL_METRICS[kind];
+  return { width: text.length * metrics.characterWidth + metrics.padding, height: metrics.height };
 }
 
 export function visibleLabelKeys(boxes: readonly LabelBox[]): ReadonlySet<string> {
@@ -47,9 +54,9 @@ export function visibleLabelKeys(boxes: readonly LabelBox[]): ReadonlySet<string
 
 export function hideCrowdedLabels(labels: readonly ScreenLabel[], camera: Camera, screen: ScreenSize): void {
   const projected = new Vector3();
-  const boxes = labels.map(({ key, element, position, isFocus }): LabelBox => {
+  const boxes = labels.map(({ key, element, position, kind }): LabelBox => {
     projected.copy(position).project(camera);
-    const size = estimatedLabelSize(element.textContent, isFocus);
+    const size = estimatedLabelSize(element.textContent, kind);
     return { key, ...size, x: ((projected.x + 1) / 2) * screen.width, y: ((1 - projected.y) / 2) * screen.height, isInView: projected.z >= -1 && projected.z <= 1 };
   });
   const visible = visibleLabelKeys(boxes);

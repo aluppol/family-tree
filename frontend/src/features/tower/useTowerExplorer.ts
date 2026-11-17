@@ -47,7 +47,7 @@ const NO_PATH: readonly number[] = [];
 export function useTowerExplorer(graph: TowerGraph, personId: number): TowerExplorer {
   const history = useSelectionHistory(personId);
   const relationState = useRelationState(graph, personId);
-  const [isAllNames, setAllNames] = useState(false);
+  const [isAllNames, setAllNames] = useState(true);
   const toggleAllNames = useCallback(() => {
     setAllNames((isShown) => !isShown);
   }, []);

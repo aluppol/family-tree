@@ -11,8 +11,8 @@ export interface ViewSwitchProps {
 }
 
 const VIEWS = [
-  { kind: 'cards', label: 'Cards', pathOf: treePath },
   { kind: 'tower', label: 'Time tower', pathOf: towerPath },
+  { kind: 'cards', label: 'Cards', pathOf: treePath },
 ] as const;
 
 export function ViewSwitch({ personId, current }: ViewSwitchProps): ReactElement {

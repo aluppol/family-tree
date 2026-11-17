@@ -51,6 +51,7 @@ test('the tower opens on the person in the address with the switch, the key and 
   await openTower();
   expect(document.title).toBe(`Time tower of ${CHARLES} · Family Tree`);
   const switcher = screen.getByRole('navigation', { name: 'Tree view' });
+  expect(within(switcher).getAllByRole('link').map((link) => link.textContent)).toEqual(['Time tower', 'Cards']);
   expect(within(switcher).getByRole('link', { name: 'Cards' })).toHaveAttribute('href', '/tree/1');
   expect(within(switcher).getByRole('link', { name: 'Time tower' })).toHaveAttribute('aria-current', 'page');
   expect(screen.getByRole('navigation', { name: 'Main' }).querySelector('[aria-current="page"]')).toHaveTextContent('Tree');
@@ -110,18 +111,25 @@ test('the relationship path is listed in the panel and drawn in the tower until 
   expect(lastFocus().pathIds).toEqual([]);
 });
 
-test('the camera presets, all names and rotation reach the tower', async () => {
+test('the camera presets and rotation reach the tower', async () => {
   const { user } = await openTower();
   for (const name of ['Overview', 'Side', 'Top']) {
     await user.click(screen.getByRole('button', { name }));
   }
   expect(fakeScene.showPreset.mock.calls).toEqual([['overview'], ['side'], ['top']]);
-  await user.click(screen.getByRole('button', { name: 'All names' }));
-  expect(screen.getByRole('button', { name: 'All names' })).toHaveAttribute('aria-pressed', 'true');
-  expect(lastFocus().labelledIds.size).toBe(5);
   expect(fakeScene.setRotating).toHaveBeenLastCalledWith(true);
   await user.click(screen.getByRole('button', { name: 'Rotate' }));
   expect(fakeScene.setRotating).toHaveBeenLastCalledWith(false);
+});
+
+test('everyone is named at first, and the names button leaves only the selected person and the close family', async () => {
+  const { user } = await openTower('/tower/5', 'William Erasmus Darwin');
+  const names = screen.getByRole('button', { name: 'All names' });
+  expect(names).toHaveAttribute('aria-pressed', 'true');
+  expect(lastFocus().labelledIds.size).toBe(5);
+  await user.click(names);
+  expect(names).toHaveAttribute('aria-pressed', 'false');
+  expect([...lastFocus().labelledIds]).toEqual([DARWIN_IDS.william, DARWIN_IDS.charles, DARWIN_IDS.emma]);
 });
 
 test('the gesture hint shows on the first visit and is remembered once dismissed', async () => {
@@ -193,9 +201,9 @@ test('the cards page offers the way back to the time tower', async () => {
   expect(within(switcher).getByRole('link', { name: 'Cards' })).toHaveAttribute('aria-current', 'page');
 });
 
-async function openTower(path = '/tower/1'): Promise<RenderedApp> {
+async function openTower(path = '/tower/1', name = CHARLES): Promise<RenderedApp> {
   const rendered = renderApp(path);
-  await screen.findByRole('heading', { level: 1, name: CHARLES });
+  await screen.findByRole('heading', { level: 1, name });
   await waitFor(() => {
     expect(fakeScene.showFocus).toHaveBeenCalled();
   });
