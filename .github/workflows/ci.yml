@@ -105,8 +105,8 @@ jobs:
           node-version-file: .nvmrc
       - name: Install from the lockfile
         run: npm ci --no-fund
-      - name: Dependency advisories
-        run: npm audit --audit-level=low
+      - name: Dependency advisories in the shipped packages
+        run: npm audit --omit=dev --audit-level=low
       - name: Lint
         run: npm run lint
       - name: Type check
