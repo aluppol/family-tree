@@ -156,6 +156,7 @@ test('on a phone the selected person sits in a bottom sheet that opens with a ta
   await user.click(handle);
   expect(handle).toHaveAttribute('aria-expanded', 'true');
   expect(screen.getByRole('region', { name: 'Parents' })).toBeInTheDocument();
+  expect(screen.getAllByText(CHARLES)).toHaveLength(2);
   swipe(handle, 100);
   expect(handle).toHaveAttribute('aria-expanded', 'false');
   swipe(handle, -100);

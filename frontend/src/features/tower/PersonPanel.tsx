@@ -26,14 +26,23 @@ export interface PersonPanelProps {
   onClearRelation: () => void;
 }
 
-export function PersonPanel({ node, relatives, lineHeads, relation, onSelect, onAskRelation, onClearRelation }: PersonPanelProps): ReactElement {
-  const { person } = node;
+export function PersonPanel(props: PersonPanelProps): ReactElement {
+  const { person } = props.node;
   return (
     <div className={styles.personPanel}>
       <h2 className={styles.personName}>{fullName(person)}</h2>
       <p className={styles.personFacts}>
-        {lifeYearsText(person)} · Generation {node.generation + 1}
+        {lifeYearsText(person)} · Generation {props.node.generation + 1}
       </p>
+      <PersonDetails {...props} />
+    </div>
+  );
+}
+
+export function PersonDetails({ node, relatives, lineHeads, relation, onSelect, onAskRelation, onClearRelation }: PersonPanelProps): ReactElement {
+  const { person } = node;
+  return (
+    <div className={styles.personPanel}>
       <PersonNotes node={node} lineHead={lineHeadOf(node.tone, lineHeads)} />
       <div className={styles.personActions}>
         <ButtonLink to={profilePath(person.id)} size="small">

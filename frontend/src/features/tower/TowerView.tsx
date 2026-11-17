@@ -6,7 +6,7 @@ import { ViewSwitch } from '../tree-views/ViewSwitch';
 import { BottomSheet } from './BottomSheet';
 import type { TowerGraph } from './layout/towerGraph';
 import type { TowerLayout, TowerNode } from './layout/towerTypes';
-import { PersonPanel, type Relatives } from './PersonPanel';
+import { PersonDetails, PersonPanel, type Relatives } from './PersonPanel';
 import type { TowerScene, ViewInsets } from './scene/sceneTypes';
 import { TowerCanvas } from './TowerCanvas';
 import { TowerKey } from './TowerKey';
@@ -152,17 +152,17 @@ function SelectedPerson(props: TowerViewProps & { onAskRelation: () => void }): 
   const { node, relatives, explorer, layout, display } = props;
   const [isSheetExpanded, setSheetExpanded] = useState(false);
   const lineHeads = new Map(layout.legend.lines.map((line) => [line.lineIndex, line.head]));
-  const panel = <PersonPanel node={node} relatives={relatives} lineHeads={lineHeads} relation={explorer.relation} onSelect={explorer.select} onAskRelation={props.onAskRelation} onClearRelation={explorer.clearRelation} />;
+  const panelProps = { node, relatives, lineHeads, relation: explorer.relation, onSelect: explorer.select, onAskRelation: props.onAskRelation, onClearRelation: explorer.clearRelation };
   if (!display.isNarrow) {
     return (
       <aside className={styles.panel} aria-label="Selected person">
-        {panel}
+        <PersonPanel {...panelProps} />
       </aside>
     );
   }
   return (
     <BottomSheet title={fullName(node.person)} summary={`${lifeYearsText(node.person)} · Generation ${String(node.generation + 1)}`} isExpanded={isSheetExpanded} onExpandedChange={setSheetExpanded}>
-      {panel}
+      <PersonDetails {...panelProps} />
     </BottomSheet>
   );
 }
