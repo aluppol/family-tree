@@ -12,7 +12,7 @@ from family_tree.domain.enums import OwnerKind
 from tests.api.builders import add_person, guest, people_count
 from tests.conftest import ClientFactory
 
-DEMO_PEOPLE = 65
+DEMO_PEOPLE = 114
 A_YEAR_AND_A_DAY = timedelta(days=366)
 
 

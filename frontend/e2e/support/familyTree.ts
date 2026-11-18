@@ -1,6 +1,6 @@
 import { type Locator, type Page, expect } from '@playwright/test';
 
-export const HOME_PERSON_NAME = 'Charles Robert Darwin';
+export const HOME_PERSON_NAME = 'Nicholas Alexandrovich Romanov';
 
 export const TOWER_TIMEOUT = 20_000;
 

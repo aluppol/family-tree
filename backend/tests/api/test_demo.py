@@ -7,7 +7,7 @@ from rest_framework.test import APIClient
 from tests.api.builders import add_person, guest
 from tests.conftest import ClientFactory
 
-DEMO_PEOPLE = 65
+DEMO_PEOPLE = 114
 
 
 def test_a_guest_gets_a_sandbox_with_the_demo_family(client_for: ClientFactory) -> None:
@@ -15,7 +15,8 @@ def test_a_guest_gets_a_sandbox_with_the_demo_family(client_for: ClientFactory) 
     workspace = visitor.get("/api/workspace/").json()
     home = visitor.get(f"/api/people/{workspace['home_person_id']}/").json()
     assert (workspace["is_sandbox"], workspace["people_count"]) == (True, DEMO_PEOPLE)
-    assert (home["given_names"], home["surname"], len(home["children"])) == ("Charles Robert", "Darwin", 10)
+    home_facts = (home["given_names"], home["surname"], len(home["children"]))
+    assert home_facts == ("Nicholas Alexandrovich", "Romanov", 5)
     assert visitor.get("/api/me/").json()["is_guest"] is True
 
 

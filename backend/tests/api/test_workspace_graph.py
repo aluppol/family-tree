@@ -23,9 +23,9 @@ from tests.identity import access_token_claims, signed_token
 
 GRAPH = "/api/workspace/graph/"
 PARTS = ("people", "parent_links", "partnerships")
-DEMO_PEOPLE = 65
-DEMO_PARENT_LINKS = 92
-DEMO_MARRIAGES = 22
+DEMO_PEOPLE = 114
+DEMO_PARENT_LINKS = 145
+DEMO_MARRIAGES = 40
 PHOTO_BYTES = 1024
 
 
@@ -124,7 +124,8 @@ def test_an_empty_tree_is_an_empty_graph(member: APIClient) -> None:
 def test_a_guest_sees_the_whole_demo_family(client_for: ClientFactory, member: APIClient) -> None:
     build_households(member)
     visitor = guest(client_for, "visit-1")
-    body, listed = graph(visitor), visitor.get("/api/people/", {"limit": 100}).json()["results"]
+    pages = [visitor.get("/api/people/", {"limit": 100, "offset": offset}).json() for offset in (0, 100)]
+    body, listed = graph(visitor), [person for page in pages for person in page["results"]]
     assert [len(body[part]) for part in PARTS] == [DEMO_PEOPLE, DEMO_PARENT_LINKS, DEMO_MARRIAGES]
     assert body["people"] == sorted(listed, key=itemgetter("id"))
 

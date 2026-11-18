@@ -2,13 +2,13 @@ import { type Locator, type Page, expect, test } from '@playwright/test';
 import { HOME_PERSON_NAME, openHomeTower, switchToCards } from './support/familyTree';
 import { watchPageProblems } from './support/pageProblems';
 
-const SPOUSE_NAME = 'Emma Wedgwood';
-const SON_NAME = 'William Erasmus Darwin';
+const SPOUSE_NAME = 'Alexandra Feodorovna of Hesse and by Rhine';
+const SON_NAME = 'Alexei Nikolaevich Romanov';
 const KEY_NOTE = 'Height is the year of birth; rings mark decades, the oldest at the bottom.';
 
 test('the time tower draws the family in 3D, finds people and keeps the person across views', async ({ page }) => {
   const problems = watchPageProblems(page);
-  await test.step('the home page opens the time tower on Charles Darwin', () => openHomeTower(page));
+  await test.step('the home page opens the time tower on Nicholas II', () => openHomeTower(page));
   await test.step('the selected person shows their relatives', () => expectRelatives(page));
   await test.step('the details panel and the key slide away and come back', () => hideAndShowSides(page));
   await test.step('the search flies to the spouse and Back returns', () => searchAndReturn(page));
@@ -48,7 +48,7 @@ async function widthOf(element: Locator): Promise<number> {
 
 async function searchAndReturn(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Search' }).click();
-  await page.getByRole('combobox', { name: 'Find a person' }).fill('emma wedg');
+  await page.getByRole('combobox', { name: 'Find a person' }).fill('alexandra feodorovna hesse');
   await page.getByRole('option', { name: new RegExp(SPOUSE_NAME) }).first().click();
   await expect(page.getByRole('heading', { level: 1, name: SPOUSE_NAME })).toBeVisible();
   await page.getByRole('button', { name: 'Back' }).click();
@@ -57,7 +57,7 @@ async function searchAndReturn(page: Page): Promise<void> {
 
 async function showRelationshipToSon(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Relationship to…' }).click();
-  await page.getByRole('combobox', { name: /^Relationship of/ }).fill('william erasmus');
+  await page.getByRole('combobox', { name: /^Relationship of/ }).fill('alexei nikolaevich');
   await page.getByRole('option', { name: new RegExp(SON_NAME) }).first().click();
   const path = page.getByRole('region', { name: `How ${HOME_PERSON_NAME} is related to ${SON_NAME}` });
   await expect(path.getByRole('button', { name: /^Son/ })).toBeVisible();

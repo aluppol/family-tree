@@ -3,7 +3,7 @@ from pathlib import Path
 from family_tree.domain.interchange import InterchangeDocument
 from family_tree.domain.ports import InterchangeReader
 
-DEMO_FAMILY_FILE = Path(__file__).with_name("darwin_wedgwood.ged")
+DEMO_FAMILY_FILE = Path(__file__).with_name("russian_rulers.ged")
 
 
 class BundledDemoFamily:

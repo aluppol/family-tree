@@ -7,15 +7,15 @@ A genealogy application for keeping a large extended family straight — React a
 
 Most of us know almost nothing about our great-great-grandparents. Family Tree keeps who they were — names, dates that are often only "about 1765", places, a short story and a portrait — and draws the lines between generations: parents (birth, adoptive, foster), partners and marriages over time, and a pan-and-zoom chart of ancestors and descendants. Files move in and out as GEDCOM, the format every genealogy program speaks.
 
-![The Darwin–Wedgwood family in the chart view](docs/screenshots/chart.png)
+![Nicholas II and his family in the cards view](docs/screenshots/chart.png)
 
 | A profile with relatives | Dark theme | On a phone |
 |---|---|---|
-| ![Charles Darwin's profile with parents and partners](docs/screenshots/profile.png) | ![The chart in the dark theme](docs/screenshots/chart-dark.png) | ![A profile at 390 px wide](docs/screenshots/mobile.png) |
+| ![Nicholas II's profile with his parents, wife and children](docs/screenshots/profile.png) | ![The cards view in the dark theme](docs/screenshots/chart-dark.png) | ![A profile at 390 px wide](docs/screenshots/mobile.png) |
 
 **Live demo:** https://familytree.luppol.com — choose **Continue as guest** on the luppol.com sign-in page for your own copy of the demo family, reset every night. To run it on your machine instead, see Quick start below.
 
-The demo family is real: Charles Darwin married his first cousin Emma Wedgwood, and his sister Caroline married Emma's brother, so Josiah Wedgwood I is an ancestor of their children twice over. Every date is checked against published sources ([docs/demo-family-sources.md](docs/demo-family-sources.md)).
+The demo family is real: the rulers of Russia, 114 people. The Moscow Rurikids from Ivan I Kalita and the Romanovs from Andrei Kobyla meet at the marriage of Ivan IV to Anastasia Romanovna in 1547 and run down to Nicholas II, the last Emperor, and his children. Every date is checked against published sources ([docs/demo-family-sources.md](docs/demo-family-sources.md)).
 
 ## Features
 
@@ -44,7 +44,7 @@ cp .env.example .env
 docker compose up --build
 ```
 
-Open http://localhost:8080. A stand-in gateway signs you in as a local guest, who gets a private copy of the Darwin–Wedgwood family.
+Open http://localhost:8080. A stand-in gateway signs you in as a local guest, who gets a private copy of the demo family.
 
 Without Docker you need Python 3.13, Node 24 (see `.nvmrc`) and a PostgreSQL 16+ database:
 
