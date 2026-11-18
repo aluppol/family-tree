@@ -3,7 +3,15 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from family_tree.api.errors import api_not_found
 from family_tree.api.views.gedcom import GedcomExportView, GedcomImportView, GedcomPreviewView
-from family_tree.api.views.kinship import ParentLinksView, ParentLinkView, PartnershipsView, PartnershipView
+from family_tree.api.views.kinship import (
+    ParentLinksView,
+    ParentLinkView,
+    PartnershipsView,
+    PartnershipView,
+    PersonChildrenView,
+    PersonParentsView,
+    PersonSpousesView,
+)
 from family_tree.api.views.people import (
     ChildCandidatesView,
     ParentCandidatesView,
@@ -24,6 +32,9 @@ urlpatterns = [
     path("people/<int:person_id>/", PersonView.as_view(), name="person"),
     path("people/<int:person_id>/chart/", PersonChartView.as_view(), name="person-chart"),
     path("people/<int:person_id>/photo/", PersonPhotoView.as_view(), name="person-photo"),
+    path("people/<int:person_id>/parents/", PersonParentsView.as_view(), name="person-parents"),
+    path("people/<int:person_id>/children/", PersonChildrenView.as_view(), name="person-children"),
+    path("people/<int:person_id>/spouses/", PersonSpousesView.as_view(), name="person-spouses"),
     path(
         "people/<int:person_id>/parent-candidates/", ParentCandidatesView.as_view(), name="parent-candidates"
     ),

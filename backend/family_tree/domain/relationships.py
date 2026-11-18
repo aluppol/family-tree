@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from family_tree.domain.dates import GenealogicalDate
 from family_tree.domain.enums import ParentLinkKind, PartnershipEndReason, PartnershipKind
 from family_tree.domain.identifiers import ParentLinkId, PartnershipId, PersonId, TreeId
-from family_tree.domain.people import LifeEvent
+from family_tree.domain.people import LifeEvent, PersonProfile
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -51,4 +51,16 @@ class ParentLinkDraft:
 class PartnershipDraft:
     first_partner_id: PersonId
     second_partner_id: PersonId
+    terms: PartnershipTerms
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class NewPersonLinkDraft:
+    profile: PersonProfile
+    kind: ParentLinkKind
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class NewPersonPartnershipDraft:
+    profile: PersonProfile
     terms: PartnershipTerms

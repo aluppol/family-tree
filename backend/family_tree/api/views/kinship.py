@@ -5,17 +5,22 @@ from rest_framework.response import Response
 
 from family_tree.api.authentication import principal_of
 from family_tree.api.dto import (
+    NewPersonLinkInputSerializer,
+    NewPersonPartnershipInputSerializer,
     ParentLinkInputSerializer,
     ParentLinkKindInputSerializer,
     ParentLinkSerializer,
     PartnershipInputSerializer,
     PartnershipSerializer,
     PartnershipTermsInputSerializer,
+    PersonSerializer,
     validated,
 )
 from family_tree.api.views.base import WorkspaceApiView
 from family_tree.dependencies import container
-from family_tree.domain.identifiers import ParentLinkId, PartnershipId
+from family_tree.domain.identifiers import ParentLinkId, PartnershipId, PersonId
+from family_tree.domain.people import Person
+from family_tree.domain.workspaces import Principal
 
 
 class ParentLinksView(WorkspaceApiView):
@@ -69,3 +74,47 @@ class PartnershipView(WorkspaceApiView):
     def delete(self, request: Request, partnership_id: int) -> Response:
         container().kinship.remove_partnership(principal_of(request), PartnershipId(partnership_id))
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class PersonParentsView(WorkspaceApiView):
+    @extend_schema(
+        request=NewPersonLinkInputSerializer,
+        responses={201: PersonSerializer},
+        summary="Add a new person as a parent",
+    )
+    def post(self, request: Request, person_id: int) -> Response:
+        principal = principal_of(request)
+        draft = validated(NewPersonLinkInputSerializer, request.data)
+        parent = container().kinship.add_new_parent(principal, PersonId(person_id), draft)
+        return _created_person_response(principal, parent)
+
+
+class PersonChildrenView(WorkspaceApiView):
+    @extend_schema(
+        request=NewPersonLinkInputSerializer,
+        responses={201: PersonSerializer},
+        summary="Add a new person as a child",
+    )
+    def post(self, request: Request, person_id: int) -> Response:
+        principal = principal_of(request)
+        draft = validated(NewPersonLinkInputSerializer, request.data)
+        child = container().kinship.add_new_child(principal, PersonId(person_id), draft)
+        return _created_person_response(principal, child)
+
+
+class PersonSpousesView(WorkspaceApiView):
+    @extend_schema(
+        request=NewPersonPartnershipInputSerializer,
+        responses={201: PersonSerializer},
+        summary="Add a new person as a spouse",
+    )
+    def post(self, request: Request, person_id: int) -> Response:
+        principal = principal_of(request)
+        draft = validated(NewPersonPartnershipInputSerializer, request.data)
+        spouse = container().kinship.add_new_partner(principal, PersonId(person_id), draft)
+        return _created_person_response(principal, spouse)
+
+
+def _created_person_response(principal: Principal, person: Person) -> Response:
+    dossier = container().people.dossier(principal, person.id)
+    return Response(PersonSerializer(dossier).data, status=status.HTTP_201_CREATED)

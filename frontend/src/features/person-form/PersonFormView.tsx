@@ -1,5 +1,4 @@
 import type { ReactElement, SubmitEvent } from 'react';
-import type { Sex } from '../../api/types';
 import {
   Button,
   ButtonLink,
@@ -9,21 +8,14 @@ import {
   PageContainer,
   PageHeader,
   SelectField,
-  type SelectOption,
   TextArea,
   TextField,
 } from '../../design/components';
 import { GenealogicalDateField } from '../dates/GenealogicalDateField';
 import styles from './PersonForm.module.scss';
 import type { PersonDraft, PersonFormErrors } from './personDraft';
+import { SEX_OPTIONS } from './sexOptions';
 import type { DraftFieldChange } from './usePersonForm';
-
-const SEX_OPTIONS: readonly SelectOption<Sex>[] = [
-  { value: 'female', label: 'Female' },
-  { value: 'male', label: 'Male' },
-  { value: 'other', label: 'Other' },
-  { value: 'unknown', label: 'Unknown' },
-];
 
 export interface PersonFormViewProps {
   heading: string;

@@ -1,4 +1,11 @@
-import { fetchChildCandidates, fetchParentCandidates, fetchPartnerCandidates } from '../../api/kinship';
+import {
+  type NewPersonLinkRequest,
+  createNewChild,
+  createNewParent,
+  fetchChildCandidates,
+  fetchParentCandidates,
+  fetchPartnerCandidates,
+} from '../../api/kinship';
 import type { ParentLinkInput, ParentLinkKind, ParentRelation, Person } from '../../api/types';
 import type { SelectOption } from '../../design/components';
 import type { CandidateSource } from './kinshipQueries';
@@ -15,6 +22,8 @@ export interface ParentLinkRelation extends CandidateSource {
   emptyText: string;
   relativesOf: (person: Person) => ParentRelation[];
   linkInput: (request: ParentLinkRequest) => ParentLinkInput;
+  createNewRelative: (request: NewPersonLinkRequest) => Promise<Person>;
+  oneWordSurname: (person: Person) => string;
 }
 
 export const PARENTS: ParentLinkRelation = {
@@ -25,6 +34,8 @@ export const PARENTS: ParentLinkRelation = {
   emptyText: 'No parents recorded yet.',
   relativesOf: (person) => person.parents,
   linkInput: ({ personId, relativeId, kind }) => ({ parent_id: relativeId, child_id: personId, kind }),
+  createNewRelative: createNewParent,
+  oneWordSurname: () => '',
 };
 
 export const CHILDREN: ParentLinkRelation = {
@@ -35,6 +46,8 @@ export const CHILDREN: ParentLinkRelation = {
   emptyText: 'No children recorded yet.',
   relativesOf: (person) => person.children,
   linkInput: ({ personId, relativeId, kind }) => ({ parent_id: personId, child_id: relativeId, kind }),
+  createNewRelative: createNewChild,
+  oneWordSurname: (person) => person.surname,
 };
 
 export const PARTNERS: CandidateSource = {

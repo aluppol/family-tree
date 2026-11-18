@@ -37,6 +37,8 @@ from family_tree.domain.read_models import (
     TreeGraph,
 )
 from family_tree.domain.relationships import (
+    NewPersonLinkDraft,
+    NewPersonPartnershipDraft,
     ParentLink,
     ParentLinkDraft,
     Partnership,
@@ -274,6 +276,22 @@ class PartnershipTermsInputSerializer(serializers.Serializer[PartnershipTerms]):
     def validate(self, attrs: dict[str, Any]) -> PartnershipTerms:
         terms: PartnershipTerms = attrs["terms"]
         return terms
+
+
+class NewPersonLinkInputSerializer(serializers.Serializer[NewPersonLinkDraft]):
+    person = PersonProfileSerializer()
+    kind = serializers.ChoiceField(choices=choices_of(ParentLinkKind))
+
+    def validate(self, attrs: dict[str, Any]) -> NewPersonLinkDraft:
+        return NewPersonLinkDraft(profile=attrs["person"], kind=ParentLinkKind(attrs["kind"]))
+
+
+class NewPersonPartnershipInputSerializer(serializers.Serializer[NewPersonPartnershipDraft]):
+    person = PersonProfileSerializer()
+    terms = PartnershipTermsSerializer()
+
+    def validate(self, attrs: dict[str, Any]) -> NewPersonPartnershipDraft:
+        return NewPersonPartnershipDraft(profile=attrs["person"], terms=attrs["terms"])
 
 
 @dataclass(frozen=True, slots=True)

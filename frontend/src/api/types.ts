@@ -115,6 +115,16 @@ export interface Partnership {
   terms: PartnershipTerms;
 }
 
+export interface NewPersonLinkInput {
+  person: PersonProfile;
+  kind: ParentLinkKind;
+}
+
+export interface NewPersonPartnershipInput {
+  person: PersonProfile;
+  terms: PartnershipTerms;
+}
+
 export interface FamilyChart {
   focus_id: number;
   people: PersonSummary[];

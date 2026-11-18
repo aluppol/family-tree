@@ -1,7 +1,9 @@
 import { screen, waitFor, within } from '@testing-library/react';
+import { http } from 'msw';
 import { expect, test, vi } from 'vitest';
-import { DARWIN_IDS, exactDate } from '../../test/fixtures';
-import { fakeBackend, setUpMockServer } from '../../test/mockServer';
+import { DARWIN_IDS, exactDate, namedProfile } from '../../test/fixtures';
+import { apiErrorResponse } from '../../test/handlers';
+import { fakeBackend, mockServer, recordChangeRequests, setUpMockServer } from '../../test/mockServer';
 import { renderApp } from '../../test/renderApp';
 
 setUpMockServer();
@@ -39,7 +41,7 @@ test('a spouse must be chosen and an impossible date is refused before sending',
   const dialog = screen.getByRole('dialog');
   await user.type(within(within(dialog).getByRole('group', { name: 'Wedding date' })).getByRole('textbox', { name: 'Year' }), '0');
   await user.click(within(dialog).getByRole('button', { name: 'Add spouse' }));
-  expect(within(dialog).getByRole('combobox', { name: 'Spouse' })).toHaveAccessibleDescription('Choose a spouse from the suggestions.');
+  expect(within(dialog).getByRole('combobox', { name: 'Spouse' })).toHaveAccessibleDescription('Type a name or choose a spouse from the suggestions.');
   expect(within(dialog).getByText('Year must be a whole number from 1 to 9999.')).toBeInTheDocument();
   expect(createPartnership).not.toHaveBeenCalled();
 });
@@ -67,4 +69,45 @@ test('removing a marriage asks for confirmation', async () => {
 test('each spouse is called husband or wife by sex', async () => {
   renderApp(`/people/${String(DARWIN_IDS.charles)}`);
   expect(within(await findSpouses()).getByText('Wife')).toBeInTheDocument();
+});
+
+test('a new spouse is added from a typed name with the wedding in one request', async () => {
+  const changeRequests = recordChangeRequests();
+  const addNewSpouse = vi.spyOn(fakeBackend, 'addNewSpouse');
+  const { user } = renderApp(`/people/${String(DARWIN_IDS.robert)}`);
+  const spouses = await findSpouses();
+  await user.click(within(spouses).getByRole('button', { name: 'Add spouse' }));
+  const dialog = screen.getByRole('dialog', { name: 'Add a spouse of Robert Waring Darwin' });
+  await user.type(within(dialog).getByRole('combobox', { name: 'Spouse' }), 'Mary');
+  await user.click(await within(dialog).findByRole('option', { name: 'Add “Mary” as a new person' }));
+  expect(within(dialog).getByRole('textbox', { name: 'Given names' })).toHaveValue('Mary');
+  expect(within(dialog).getByRole('textbox', { name: 'Surname' })).toHaveValue('');
+  await user.type(within(dialog).getByRole('textbox', { name: 'Surname' }), 'Howard');
+  await user.type(within(within(dialog).getByRole('group', { name: 'Wedding date' })).getByRole('textbox', { name: 'Year' }), '1796');
+  await user.click(within(dialog).getByRole('button', { name: 'Add spouse' }));
+  await waitFor(() => {
+    expect(changeRequests).toEqual([`POST /api/people/${String(DARWIN_IDS.robert)}/spouses/`]);
+  });
+  const terms = { kind: 'marriage', start: { date: exactDate(1796), place: '' }, end: null };
+  expect(addNewSpouse).toHaveBeenCalledWith(DARWIN_IDS.robert, { person: namedProfile('Mary', 'Howard'), terms });
+  expect(await within(spouses).findByRole('link', { name: 'Mary Howard' })).toBeInTheDocument();
+});
+
+test('a new spouse waits for a possible wedding date and shows a refusal from the server', async () => {
+  mockServer.use(http.post('/api/people/:personId/spouses/', () => apiErrorResponse(400, { code: 'workspace.limit_reached', message: 'The demo sandbox holds at most 300 people.' })));
+  const changeRequests = recordChangeRequests();
+  const { user } = renderApp(`/people/${String(DARWIN_IDS.robert)}`);
+  await user.click(within(await findSpouses()).getByRole('button', { name: 'Add spouse' }));
+  const dialog = screen.getByRole('dialog');
+  await user.type(within(dialog).getByRole('combobox', { name: 'Spouse' }), 'Mary Howard');
+  await user.click(within(dialog).getByRole('button', { name: 'Add spouse' }));
+  const year = within(within(dialog).getByRole('group', { name: 'Wedding date' })).getByRole('textbox', { name: 'Year' });
+  await user.type(year, '0');
+  await user.click(within(dialog).getByRole('button', { name: 'Add spouse' }));
+  expect(within(dialog).getByText('Year must be a whole number from 1 to 9999.')).toBeInTheDocument();
+  expect(changeRequests).toEqual([]);
+  await user.clear(year);
+  await user.click(within(dialog).getByRole('button', { name: 'Add spouse' }));
+  expect(await within(dialog).findByRole('alert')).toHaveTextContent('The demo sandbox holds at most 300 people.');
+  expect(changeRequests).toEqual([`POST /api/people/${String(DARWIN_IDS.robert)}/spouses/`]);
 });

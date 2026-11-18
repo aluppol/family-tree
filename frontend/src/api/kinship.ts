@@ -1,10 +1,31 @@
 import { deleteResource, getJson, sendJson } from './client';
-import type { ParentLink, ParentLinkInput, ParentLinkKind, Partnership, PartnershipInput, PartnershipTerms, PersonSummary } from './types';
+import type {
+  NewPersonLinkInput,
+  NewPersonPartnershipInput,
+  ParentLink,
+  ParentLinkInput,
+  ParentLinkKind,
+  Partnership,
+  PartnershipInput,
+  PartnershipTerms,
+  Person,
+  PersonSummary,
+} from './types';
 
 export interface CandidateSearch {
   personId: number;
   search: string;
 }
+
+export interface NewRelativeRequest {
+  personId: number;
+}
+
+export type NewPersonLinkRequest = NewRelativeRequest & NewPersonLinkInput;
+
+export type NewPersonPartnershipRequest = NewRelativeRequest & NewPersonPartnershipInput;
+
+type NewRelativeList = 'parents' | 'children' | 'spouses';
 
 export interface ParentLinkKindChange {
   linkId: number;
@@ -52,8 +73,24 @@ export function removePartnership(partnershipId: number): Promise<void> {
   return deleteResource(partnershipPath(partnershipId));
 }
 
+export function createNewParent({ personId, ...input }: NewPersonLinkRequest): Promise<Person> {
+  return sendJson<Person>('POST', newRelativesPath(personId, 'parents'), input);
+}
+
+export function createNewChild({ personId, ...input }: NewPersonLinkRequest): Promise<Person> {
+  return sendJson<Person>('POST', newRelativesPath(personId, 'children'), input);
+}
+
+export function createNewSpouse({ personId, ...input }: NewPersonPartnershipRequest): Promise<Person> {
+  return sendJson<Person>('POST', newRelativesPath(personId, 'spouses'), input);
+}
+
 function candidatesPath(personId: number, candidateList: string): string {
   return `/api/people/${String(personId)}/${candidateList}/`;
+}
+
+function newRelativesPath(personId: number, relatives: NewRelativeList): string {
+  return `/api/people/${String(personId)}/${relatives}/`;
 }
 
 function parentLinkPath(linkId: number): string {

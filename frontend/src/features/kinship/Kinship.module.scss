@@ -79,3 +79,22 @@
 .dialogText {
   margin: 0;
 }
+
+.newPersonMark {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-accent-strong);
+}
+
+.newRelative {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.backToSearch {
+  justify-self: start;
+}

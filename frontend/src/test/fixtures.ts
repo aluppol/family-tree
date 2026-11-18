@@ -41,6 +41,10 @@ export function storedPerson({ id, givenNames, surname, sex = 'unknown' }: Perso
   };
 }
 
+export function namedProfile(givenNames: string, surname: string, sex: Sex = 'unknown'): PersonProfile {
+  return { given_names: givenNames, surname, sex, birth: { date: null, place: '' }, death: null, biography: '' };
+}
+
 export function emptyFamily(): FamilySeed {
   return { people: [], parentLinks: [], partnerships: [], homePersonId: null, isSandbox: false };
 }

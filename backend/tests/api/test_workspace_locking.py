@@ -77,6 +77,21 @@ EVERY_CHANGE: dict[str, Callable[[Sandbox], Any]] = {
     "remove a partnership": lambda sandbox: sandbox.visitor.delete(
         f"/api/partnerships/{sandbox.partnership_id}/"
     ),
+    "add a new parent": lambda sandbox: sandbox.visitor.post(
+        f"/api/people/{sandbox.second}/parents/",
+        {"person": profile_payload("Parent"), "kind": "birth"},
+        format="json",
+    ),
+    "add a new child": lambda sandbox: sandbox.visitor.post(
+        f"/api/people/{sandbox.first}/children/",
+        {"person": profile_payload("Child"), "kind": "birth"},
+        format="json",
+    ),
+    "add a new spouse": lambda sandbox: sandbox.visitor.post(
+        f"/api/people/{sandbox.first}/spouses/",
+        {"person": profile_payload("Spouse"), "terms": marriage_terms()},
+        format="json",
+    ),
     "replace a photo": lambda sandbox: sandbox.visitor.put(
         f"/api/people/{sandbox.first}/photo/", random_jpeg(SMALL_PHOTO_BYTES), content_type="image/jpeg"
     ),

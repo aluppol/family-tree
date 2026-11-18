@@ -1,5 +1,16 @@
 import { type HttpHandler, HttpResponse, http } from 'msw';
-import type { ApiErrorBody, ImportReport, ImportResult, ParentLinkInput, ParentLinkKind, PartnershipInput, PartnershipTerms, PersonProfile } from '../api/types';
+import type {
+  ApiErrorBody,
+  ImportReport,
+  ImportResult,
+  NewPersonLinkInput,
+  NewPersonPartnershipInput,
+  ParentLinkInput,
+  ParentLinkKind,
+  PartnershipInput,
+  PartnershipTerms,
+  PersonProfile,
+} from '../api/types';
 import type { CandidateRelation, FakeFamilyBackend } from './fakeBackend';
 import { GUEST_VIEWER } from './fixtures';
 
@@ -29,6 +40,7 @@ export function familyHandlers(backend: FakeFamilyBackend): HttpHandler[] {
     ...photoHandlers(backend),
     ...parentLinkHandlers(backend),
     ...partnershipHandlers(backend),
+    ...newRelativeHandlers(backend),
     ...gedcomHandlers(backend),
   ];
 }
@@ -103,6 +115,20 @@ function partnershipHandlers(backend: FakeFamilyBackend): HttpHandler[] {
   ];
 }
 
+function newRelativeHandlers(backend: FakeFamilyBackend): HttpHandler[] {
+  return [
+    http.post<PersonParams, NewPersonLinkInput>('/api/people/:personId/parents/', async ({ params, request }) =>
+      created(backend.addNewParent(Number(params.personId), await request.json())),
+    ),
+    http.post<PersonParams, NewPersonLinkInput>('/api/people/:personId/children/', async ({ params, request }) =>
+      created(backend.addNewChild(Number(params.personId), await request.json())),
+    ),
+    http.post<PersonParams, NewPersonPartnershipInput>('/api/people/:personId/spouses/', async ({ params, request }) =>
+      created(backend.addNewSpouse(Number(params.personId), await request.json())),
+    ),
+  ];
+}
+
 function gedcomHandlers(backend: FakeFamilyBackend): HttpHandler[] {
   return [
     http.post('/api/gedcom/preview/', () => HttpResponse.json(SAMPLE_IMPORT_REPORT)),
@@ -122,6 +148,10 @@ function importedProfile(givenNames: string, surname: string): PersonProfile {
 
 function found<Body extends object>(body: Body | undefined): HttpResponse<Body | ApiErrorBody> {
   return body === undefined ? apiErrorResponse(404, NOT_FOUND) : HttpResponse.json(body);
+}
+
+function created<Body extends object>(body: Body | undefined): HttpResponse<Body | ApiErrorBody> {
+  return body === undefined ? apiErrorResponse(404, NOT_FOUND) : HttpResponse.json(body, { status: 201 });
 }
 
 function deleted(existed: boolean): HttpResponse<null | ApiErrorBody> {

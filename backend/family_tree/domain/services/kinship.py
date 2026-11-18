@@ -6,7 +6,9 @@ from family_tree.domain.kinship_rules import (
     ParentLinkProposal,
     ensure_parent_link_allowed,
     ensure_partnership_allowed,
+    ensure_profile_plausible,
 )
+from family_tree.domain.people import Person, PersonProfile
 from family_tree.domain.ports import (
     KinshipGraph,
     ParentLinkRepository,
@@ -16,6 +18,8 @@ from family_tree.domain.ports import (
 )
 from family_tree.domain.read_models import PersonSummary
 from family_tree.domain.relationships import (
+    NewPersonLinkDraft,
+    NewPersonPartnershipDraft,
     ParentLink,
     ParentLinkDraft,
     Partnership,
@@ -109,6 +113,42 @@ class KinshipService:
             self._partnerships.delete(tree.id, partnership_id)
             self._unit_of_work.commit()
 
+    def add_new_parent(self, principal: Principal, child_id: PersonId, draft: NewPersonLinkDraft) -> Person:
+        tree = self._workspaces.tree_of(principal)
+        with self._unit_of_work:
+            self._workspaces.lock(tree)
+            parent = self._add_relative_of(tree.id, child_id, draft.profile)
+            link = ParentLinkDraft(parent_id=parent.id, child_id=child_id, kind=draft.kind)
+            self._add_allowed_parent_link(tree.id, link)
+            self._workspaces.ensure_within_allowance(principal, tree)
+            self._unit_of_work.commit()
+        return parent
+
+    def add_new_child(self, principal: Principal, parent_id: PersonId, draft: NewPersonLinkDraft) -> Person:
+        tree = self._workspaces.tree_of(principal)
+        with self._unit_of_work:
+            self._workspaces.lock(tree)
+            child = self._add_relative_of(tree.id, parent_id, draft.profile)
+            link = ParentLinkDraft(parent_id=parent_id, child_id=child.id, kind=draft.kind)
+            self._add_allowed_parent_link(tree.id, link)
+            self._workspaces.ensure_within_allowance(principal, tree)
+            self._unit_of_work.commit()
+        return child
+
+    def add_new_partner(
+        self, principal: Principal, person_id: PersonId, draft: NewPersonPartnershipDraft
+    ) -> Person:
+        tree = self._workspaces.tree_of(principal)
+        with self._unit_of_work:
+            self._workspaces.lock(tree)
+            partner = self._add_relative_of(tree.id, person_id, draft.profile)
+            partner_ids = (person_id, partner.id)
+            ensure_partnership_allowed(partner_ids, draft.terms)
+            self._partnerships.add(tree.id, partner_ids, draft.terms)
+            self._workspaces.ensure_within_allowance(principal, tree)
+            self._unit_of_work.commit()
+        return partner
+
     def parent_candidates(self, principal: Principal, child_id: PersonId, text: str) -> list[PersonSummary]:
         tree_id = self._workspaces.tree_of(principal).id
         self._people.get(tree_id, child_id)
@@ -123,6 +163,15 @@ class KinshipService:
         tree_id = self._workspaces.tree_of(principal).id
         self._people.get(tree_id, person_id)
         return self._graph.partner_candidates(tree_id, person_id, text)
+
+    def _add_relative_of(self, tree_id: TreeId, person_id: PersonId, profile: PersonProfile) -> Person:
+        self._people.get(tree_id, person_id)
+        ensure_profile_plausible(profile)
+        return self._people.add(tree_id, profile)
+
+    def _add_allowed_parent_link(self, tree_id: TreeId, draft: ParentLinkDraft) -> None:
+        ensure_parent_link_allowed(self._new_link_proposal(tree_id, draft))
+        self._parent_links.add(tree_id, draft.parent_id, draft.child_id, draft.kind)
 
     def _new_link_proposal(self, tree_id: TreeId, draft: ParentLinkDraft) -> ParentLinkProposal:
         parent = self._people.get(tree_id, draft.parent_id)

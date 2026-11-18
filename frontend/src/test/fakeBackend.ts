@@ -1,6 +1,8 @@
 import type { PeoplePageRequest } from '../api/people';
 import type {
   FamilyChart,
+  NewPersonLinkInput,
+  NewPersonPartnershipInput,
   ParentLink,
   ParentLinkInput,
   ParentLinkKind,
@@ -165,6 +167,33 @@ export class FakeFamilyBackend {
 
   removePartnership(partnershipId: number): boolean {
     return this.partnerships.delete(partnershipId);
+  }
+
+  addNewParent(childId: number, { person, kind }: NewPersonLinkInput): Person | undefined {
+    return this.addNewRelative(childId, person, (parentId) => {
+      this.createParentLink({ parent_id: parentId, child_id: childId, kind });
+    });
+  }
+
+  addNewChild(parentId: number, { person, kind }: NewPersonLinkInput): Person | undefined {
+    return this.addNewRelative(parentId, person, (childId) => {
+      this.createParentLink({ parent_id: parentId, child_id: childId, kind });
+    });
+  }
+
+  addNewSpouse(personId: number, { person, terms }: NewPersonPartnershipInput): Person | undefined {
+    return this.addNewRelative(personId, person, (spouseId) => {
+      this.createPartnership({ first_partner_id: personId, second_partner_id: spouseId, terms });
+    });
+  }
+
+  private addNewRelative(personId: number, profile: PersonProfile, linkTo: (relativeId: number) => void): Person | undefined {
+    if (!this.people.has(personId)) {
+      return undefined;
+    }
+    const relative = this.createPerson(profile);
+    linkTo(relative.id);
+    return this.person(relative.id);
   }
 
   private nextId(): number {

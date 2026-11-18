@@ -31,6 +31,26 @@ test('on a phone the pages fit the screen without sideways scrolling', async ({ 
   }
 });
 
+test('on a phone the new-person form stacks inside the dialog without sideways scrolling', async ({ page }) => {
+  await page.goto('/people');
+  await page.getByRole('list', { name: 'People in your tree' }).getByRole('link').first().click();
+  await page.waitForURL(/\/people\/\d+$/);
+  await page.getByRole('region', { name: 'Children' }).getByRole('button', { name: 'Add child' }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('combobox', { name: 'Person' }).fill('Phone Tester');
+  const suggestions = dialog.getByRole('listbox', { name: 'Person' }).getByRole('option');
+  await expect(suggestions).toHaveCount(1);
+  await suggestions.click();
+  const givenNames = await dialog.getByRole('textbox', { name: 'Given names' }).boundingBox();
+  const surname = await dialog.getByRole('textbox', { name: 'Surname' }).boundingBox();
+  expect((givenNames?.y ?? 0) + (givenNames?.height ?? 0)).toBeLessThanOrEqual(surname?.y ?? 0);
+  expect(await dialog.evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(0);
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+  await dialog.getByRole('button', { name: 'Cancel' }).click();
+  await expect(dialog).toBeHidden();
+});
+
 test('on a phone the time tower fills the screen and the selected person opens from the bottom sheet', async ({ page }) => {
   await page.goto('/');
   await page.waitForURL(/\/tower\/\d+$/);
