@@ -1,4 +1,5 @@
 import { expect, test } from 'vitest';
+import { ENGLISH } from '../../test/translators';
 import type { Sex } from '../../api/types';
 import { type Relation, peopleOnPath, relationPath, relationWord } from './relationPath';
 import { namesOf, personIdOf, towerGraphOf } from './testing/towerScript';
@@ -46,5 +47,5 @@ const WORD_CASES: { relation: Relation; sex: Sex; expected: string }[] = [
 ];
 
 test.each(WORD_CASES)('a $sex $relation is called $expected', ({ relation, sex, expected }) => {
-  expect(relationWord(relation, sex)).toBe(expected);
+  expect(relationWord(ENGLISH, relation, sex)).toBe(expected);
 });

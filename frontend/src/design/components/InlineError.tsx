@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
 import { errorKindOf, errorMessageOf } from '../../api/errorKind';
+import { useT } from '../../i18n/languageContext';
 import { Icon } from './Icon';
 import styles from './InlineError.module.scss';
 
@@ -8,6 +9,7 @@ export interface InlineErrorProps {
 }
 
 export function InlineError({ error }: InlineErrorProps): ReactElement | null {
+  const t = useT();
   if (error === null || error === undefined) {
     return null;
   }
@@ -16,8 +18,8 @@ export function InlineError({ error }: InlineErrorProps): ReactElement | null {
     <p role="alert" className={styles.inlineError}>
       <Icon name="alert" />
       <span>
-        {hasSessionEnded ? 'Your session has ended. ' : errorMessageOf(error)}
-        {hasSessionEnded && <a href="/">Sign in again</a>}
+        {hasSessionEnded ? `${t('states.sessionEndedInline')} ` : errorMessageOf(error, t)}
+        {hasSessionEnded && <a href="/">{t('states.signInAgain')}</a>}
       </span>
     </p>
   );

@@ -1,4 +1,5 @@
 import { type ReactElement, useId } from 'react';
+import { useT } from '../../i18n/languageContext';
 import styles from './Field.module.scss';
 
 export interface FieldTexts {
@@ -30,13 +31,14 @@ export interface FieldLabelProps {
 }
 
 export function FieldLabel({ htmlFor, label, isOptional = false }: FieldLabelProps): ReactElement {
+  const t = useT();
   return (
     <label htmlFor={htmlFor} className={styles.label}>
       {label}
       {isOptional && (
         <>
           {' '}
-          <span className={styles.optional}>(optional)</span>
+          <span className={styles.optional}>{t('common.optional')}</span>
         </>
       )}
     </label>

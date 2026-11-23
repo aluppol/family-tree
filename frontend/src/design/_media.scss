@@ -1,5 +1,12 @@
+$compact-max: 30rem;
 $narrow-max: 40rem;
 $medium-max: 64rem;
+
+@mixin compact {
+  @media (max-width: $compact-max) {
+    @content;
+  }
+}
 
 @mixin narrow {
   @media (max-width: $narrow-max) {

@@ -1,4 +1,5 @@
 import { type ReactElement, type ReactNode, type SyntheticEvent, useId } from 'react';
+import { useT } from '../../i18n/languageContext';
 import { IconButton } from './Button';
 import styles from './Dialog.module.scss';
 import { Icon } from './Icon';
@@ -23,6 +24,7 @@ export function DialogActions({ children }: DialogActionsProps): ReactElement {
 }
 
 function OpenDialog({ title, onClose, children }: Omit<DialogProps, 'isOpen'>): ReactElement {
+  const t = useT();
   const titleId = useId();
   function handleCancel(event: SyntheticEvent<HTMLDialogElement>): void {
     event.preventDefault();
@@ -34,7 +36,7 @@ function OpenDialog({ title, onClose, children }: Omit<DialogProps, 'isOpen'>): 
         {title}
       </h2>
       <div className={styles.body}>{children}</div>
-      <IconButton className={styles.close} label="Close" icon={<Icon name="close" />} variant="ghost" onClick={onClose} />
+      <IconButton className={styles.close} label={t('common.close')} icon={<Icon name="close" />} variant="ghost" onClick={onClose} />
     </dialog>
   );
 }

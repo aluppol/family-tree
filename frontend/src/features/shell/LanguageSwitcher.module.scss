@@ -1,0 +1,51 @@
+@use '../../design/media';
+
+.switcher {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-1);
+
+  @include media.medium-down {
+    gap: 0;
+  }
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+
+  &:hover {
+    background: var(--color-surface-muted);
+  }
+
+  &[aria-current='true'] {
+    background: var(--color-accent-soft);
+    box-shadow: inset 0 0 0 2px var(--color-accent);
+  }
+
+  @include media.medium-down {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+
+.flag {
+  display: block;
+  width: 1.75rem;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px var(--color-border-strong);
+}

@@ -85,7 +85,7 @@ function decadeRings(placement: Placement): TowerRing[] {
   return decades.map((decade) => ({
     y: (decade - start) * YEAR_HEIGHT,
     radius,
-    label: decade % LABELLED_YEARS === 0 ? String(decade) : null,
+    label: decade % LABELLED_YEARS === 0 ? { kind: 'decade', year: decade } : null,
     isMajor: decade % LABELLED_YEARS === 0,
   }));
 }
@@ -95,7 +95,7 @@ function generationRings(placement: Placement): TowerRing[] {
   return Array.from({ length: deepest + 1 }, (_, generation) => ({
     y: generation * GENERATION_HEIGHT,
     radius: widestSpotIn(placement, generation) + RING_MARGIN,
-    label: `Generation ${String(generation + 1)}`,
+    label: { kind: 'generation', number: generation + 1 },
     isMajor: true,
   }));
 }

@@ -1,6 +1,7 @@
 import type { UseMutationResult } from '@tanstack/react-query';
 import { type ReactElement, useState } from 'react';
 import type { ImportReport, ImportResult } from '../../api/types';
+import { useT } from '../../i18n/languageContext';
 import { useDocumentTitle } from '../shell/useDocumentTitle';
 import { useWorkspace } from '../workspace/workspaceQueries';
 import type { ImportStep } from './ImportStepView';
@@ -8,7 +9,8 @@ import { useImportGedcom, usePreviewImport } from './transferMutations';
 import { TransferView } from './TransferView';
 
 export function TransferPage(): ReactElement {
-  useDocumentTitle('Import & export');
+  const t = useT();
+  useDocumentTitle(t('transfer.title'));
   const [file, setFile] = useState<File | null>(null);
   const preview = usePreviewImport();
   const importFile = useImportGedcom();

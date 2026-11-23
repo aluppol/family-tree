@@ -1,6 +1,8 @@
 import { type ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 import type { PersonSummary } from '../../api/types';
 import { type ComboboxOption, Icon, IconButton, SearchCombobox } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
+import type { Translate } from '../../i18n/translate';
 import { formatLifeYears } from '../dates/format';
 import { fullName } from '../people/personName';
 import { useEscapeKey } from '../shell/useEscapeKey';
@@ -17,9 +19,10 @@ export interface TowerSearchProps {
 const RESULT_LIMIT = 8;
 
 export function TowerSearch({ people, label, onChoose, onClose }: TowerSearchProps): ReactElement {
+  const t = useT();
   const [query, setQuery] = useState('');
   const panelRef = useRef<HTMLDivElement>(null);
-  const options = useMemo(() => searchPeople(people, query, RESULT_LIMIT).map(optionOf), [people, query]);
+  const options = useMemo(() => searchPeople(t, { people, query, limit: RESULT_LIMIT }).map((person) => optionOf(t, person)), [t, people, query]);
   useEscapeKey({ isActive: true, onEscape: onClose });
   useEffect(() => {
     panelRef.current?.querySelector('input')?.focus();
@@ -34,15 +37,15 @@ export function TowerSearch({ people, label, onChoose, onClose }: TowerSearchPro
         onSelect={(option) => {
           onChoose(Number(option.id));
         }}
-        placeholder="Type a name"
-        emptyMessage={query.trim() === '' ? 'Start typing a name' : 'No one with that name'}
+        placeholder={t('tower.searchPlaceholder')}
+        emptyMessage={query.trim() === '' ? t('tower.startTyping') : t('tower.noOneNamed')}
       />
-      <IconButton label="Close search" icon={<Icon name="close" />} variant="ghost" onClick={onClose} />
+      <IconButton label={t('tower.closeSearch')} icon={<Icon name="close" />} variant="ghost" onClick={onClose} />
     </div>
   );
 }
 
-function optionOf(person: PersonSummary): ComboboxOption {
-  const lifeYears = formatLifeYears(person);
-  return { id: person.id, label: fullName(person), description: lifeYears === '' ? undefined : lifeYears };
+function optionOf(t: Translate, person: PersonSummary): ComboboxOption {
+  const lifeYears = formatLifeYears(t, person);
+  return { id: person.id, label: fullName(t, person), description: lifeYears === '' ? undefined : lifeYears };
 }

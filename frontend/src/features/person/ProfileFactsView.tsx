@@ -1,26 +1,21 @@
 import type { ReactElement, ReactNode } from 'react';
-import type { LifeEvent, Person, Sex } from '../../api/types';
+import type { LifeEvent, Person } from '../../api/types';
 import { CardSection } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
 import { formatGenealogicalDate } from '../dates/format';
 import styles from './Profile.module.scss';
 
-const SEX_LABELS: Record<Sex, string> = {
-  female: 'Female',
-  male: 'Male',
-  other: 'Other',
-  unknown: 'Unknown',
-};
-
 export function LifeFactsView({ person }: { person: Person }): ReactElement {
+  const t = useT();
   return (
-    <CardSection title="Life">
+    <CardSection title={t('profile.lifeSection')}>
       <dl className={styles.facts}>
-        <Fact term="Sex">{SEX_LABELS[person.sex]}</Fact>
-        <Fact term="Born">
+        <Fact term={t('profile.sex')}>{t(`sex.${person.sex}`)}</Fact>
+        <Fact term={t('profile.born')}>
           <LifeEventText event={person.birth} />
         </Fact>
         {person.death !== null && (
-          <Fact term="Died">
+          <Fact term={t('profile.died')}>
             <LifeEventText event={person.death} />
           </Fact>
         )}
@@ -30,9 +25,10 @@ export function LifeFactsView({ person }: { person: Person }): ReactElement {
 }
 
 export function BiographyView({ biography }: { biography: string }): ReactElement {
+  const t = useT();
   return (
-    <CardSection title="Biography">
-      {biography === '' ? <p className={styles.muted}>No biography written yet.</p> : <p className={styles.biography}>{biography}</p>}
+    <CardSection title={t('profile.biographySection')}>
+      {biography === '' ? <p className={styles.muted}>{t('profile.noBiography')}</p> : <p className={styles.biography}>{biography}</p>}
     </CardSection>
   );
 }
@@ -47,12 +43,13 @@ function Fact({ term, children }: { term: string; children: ReactNode }): ReactE
 }
 
 function LifeEventText({ event }: { event: LifeEvent }): ReactElement {
+  const t = useT();
   if (event.date === null && event.place === '') {
-    return <span className={styles.muted}>Unknown</span>;
+    return <span className={styles.muted}>{t('common.unknown')}</span>;
   }
   return (
     <>
-      {event.date !== null && <span className={styles.factLine}>{formatGenealogicalDate(event.date)}</span>}
+      {event.date !== null && <span className={styles.factLine}>{formatGenealogicalDate(t, event.date)}</span>}
       {event.place !== '' && <span className={styles.factLine}>{event.place}</span>}
     </>
   );

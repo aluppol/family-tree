@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react';
 import { Link } from 'react-router';
 import { Banner, ButtonLink, Icon, LoadingState, PageContainer, PageHeader } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
 import { profilePath, treePath } from '../../routePaths';
 import { ViewSwitch } from '../tree-views/ViewSwitch';
 import styles from './ChartPage.module.scss';
@@ -17,14 +18,13 @@ export interface ChartPageViewProps {
 
 const CHART_LINKS: ChartLinks = { profile: profilePath, tree: treePath };
 
-const FAMILY_TREE = 'Family tree';
-
 export function ChartPageView({ personId, focusName, layout, onNavigate }: ChartPageViewProps): ReactElement {
+  const t = useT();
   return (
     <PageContainer>
       <PageHeader
-        title={focusName ?? FAMILY_TREE}
-        description={focusName === undefined ? undefined : FAMILY_TREE}
+        title={focusName ?? t('chart.title')}
+        description={focusName === undefined ? undefined : t('chart.title')}
         actions={
           <>
             <ViewSwitch personId={personId} current="cards" />
@@ -33,11 +33,11 @@ export function ChartPageView({ personId, focusName, layout, onNavigate }: Chart
         }
       />
       {layout === undefined ? (
-        <LoadingState label="Loading the family tree…" />
+        <LoadingState label={t('chart.loading')} />
       ) : (
         <>
           {layout.nodes.length === 1 && <LonePersonHint personId={personId} />}
-          <ChartView layout={layout} label={focusName === undefined ? FAMILY_TREE : `Family tree of ${focusName}`} links={CHART_LINKS} onNavigate={onNavigate} />
+          <ChartView layout={layout} label={focusName === undefined ? t('chart.title') : t('chart.titleOf', { name: focusName })} links={CHART_LINKS} onNavigate={onNavigate} />
         </>
       )}
     </PageContainer>
@@ -45,19 +45,21 @@ export function ChartPageView({ personId, focusName, layout, onNavigate }: Chart
 }
 
 function ProfileLink({ personId }: { personId: number }): ReactElement {
+  const t = useT();
   return (
     <ButtonLink to={profilePath(personId)}>
       <Icon name="person" />
-      Profile
+      {t('common.profile')}
     </ButtonLink>
   );
 }
 
 function LonePersonHint({ personId }: { personId: number }): ReactElement {
+  const t = useT();
   return (
     <div className={styles.hint}>
       <Banner>
-        No relatives to show yet. <Link to={profilePath(personId)}>Add parents or children from the profile page</Link>.
+        {t('chart.lonePerson')} <Link to={profilePath(personId)}>{t('chart.lonePersonLink')}</Link>.
       </Banner>
     </div>
   );

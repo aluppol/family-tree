@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
 import { Icon, type IconName } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
 import type { CameraPreset } from './scene/sceneTypes';
 import styles from './TowerPage.module.scss';
 
@@ -26,15 +27,16 @@ interface ToolButtonProps {
 
 export function TowerToolbar(props: TowerToolbarProps): ReactElement {
   const { onPreset } = props;
+  const t = useT();
   return (
-    <div role="group" aria-label="Tower controls" className={styles.toolbar}>
-      <ToolButton icon="search" label="Search" isPressed={props.isSearchOpen} onClick={props.onSearch} />
-      <ToolButton icon="cube" label="Overview" onClick={() => { onPreset('overview'); }} />
-      <ToolButton icon="layers" label="Side" onClick={() => { onPreset('side'); }} />
-      <ToolButton icon="rings" label="Top" onClick={() => { onPreset('top'); }} />
-      <ToolButton icon="chevronLeft" label="Back" isDisabled={!props.canGoBack} onClick={props.onBack} />
-      <ToolButton icon="label" label="All names" isPressed={props.isAllNames} onClick={props.onToggleNames} />
-      {!props.isNarrow && <ToolButton icon="rotate" label="Rotate" isPressed={props.isRotating} onClick={props.onToggleRotation} />}
+    <div role="group" aria-label={t('tower.controls')} className={styles.toolbar}>
+      <ToolButton icon="search" label={t('tower.search')} isPressed={props.isSearchOpen} onClick={props.onSearch} />
+      <ToolButton icon="cube" label={t('tower.overview')} onClick={() => { onPreset('overview'); }} />
+      <ToolButton icon="layers" label={t('tower.side')} onClick={() => { onPreset('side'); }} />
+      <ToolButton icon="rings" label={t('tower.top')} onClick={() => { onPreset('top'); }} />
+      <ToolButton icon="chevronLeft" label={t('tower.back')} isDisabled={!props.canGoBack} onClick={props.onBack} />
+      <ToolButton icon="label" label={t('tower.allNames')} isPressed={props.isAllNames} onClick={props.onToggleNames} />
+      {!props.isNarrow && <ToolButton icon="rotate" label={t('tower.rotate')} isPressed={props.isRotating} onClick={props.onToggleRotation} />}
     </div>
   );
 }

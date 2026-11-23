@@ -1,8 +1,10 @@
 import type { ReactElement, RefObject } from 'react';
 import { Link } from 'react-router';
 import { Button, Icon } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
 import { HOME_PATH } from '../../routePaths';
 import { BrandMark } from './BrandMark';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import { NAVIGATION_ITEMS } from './navigationItems';
 import styles from './Shell.module.scss';
 
@@ -22,35 +24,38 @@ export interface SiteHeaderProps {
 }
 
 export function SiteHeader({ viewerName, menu, menuButtonRef }: SiteHeaderProps): ReactElement {
+  const t = useT();
   return (
     <header className={styles.header}>
       <div className={styles.headerBar}>
         <Link to={HOME_PATH} className={styles.brand} onClick={menu.onNavigate}>
           <BrandMark />
-          <span>Family Tree</span>
+          <span className={styles.brandName}>{t('app.name')}</span>
         </Link>
         <Button ref={menuButtonRef} variant="ghost" className={styles.menuButton} aria-expanded={menu.isOpen} aria-controls={MENU_ID} onClick={menu.onToggle}>
           <Icon name={menu.isOpen ? 'close' : 'menu'} />
-          Menu
+          {t('shell.menu')}
         </Button>
         <div id={MENU_ID} className={styles.menu} data-open={menu.isOpen}>
           <MainNavigation pathname={menu.pathname} onNavigate={menu.onNavigate} />
           <AccountLinks viewerName={viewerName} />
         </div>
+        <LanguageSwitcher />
       </div>
     </header>
   );
 }
 
 function MainNavigation({ pathname, onNavigate }: Pick<MenuState, 'pathname' | 'onNavigate'>): ReactElement {
+  const t = useT();
   return (
-    <nav aria-label="Main">
+    <nav aria-label={t('shell.mainNavigation')}>
       <ul className={styles.navigationList}>
         {NAVIGATION_ITEMS.map((navigationItem) => (
           <li key={navigationItem.path}>
             <Link to={navigationItem.path} className={styles.navigationLink} aria-current={navigationItem.isActiveAt(pathname) ? 'page' : undefined} onClick={onNavigate}>
               <Icon name={navigationItem.icon} />
-              {navigationItem.label}
+              {t(navigationItem.labelKey)}
             </Link>
           </li>
         ))}
@@ -60,6 +65,7 @@ function MainNavigation({ pathname, onNavigate }: Pick<MenuState, 'pathname' | '
 }
 
 function AccountLinks({ viewerName }: { viewerName: string | null }): ReactElement {
+  const t = useT();
   return (
     <div className={styles.account}>
       {viewerName !== null && (
@@ -70,7 +76,7 @@ function AccountLinks({ viewerName }: { viewerName: string | null }): ReactEleme
       )}
       <a href="/oauth2/sign_out" className={styles.signOut}>
         <Icon name="signOut" />
-        Sign out
+        {t('shell.signOut')}
       </a>
     </div>
   );

@@ -97,12 +97,12 @@ test('editing a person starts from the stored profile and saves the changes', as
 test('server validation errors appear on the matching fields and in an alert', async () => {
   mockServer.use(
     http.put('/api/people/:personId/', () =>
-      apiErrorResponse(400, { code: 'profile.born_after_child', message: 'Emma Wedgwood cannot be born after her child.', fields: { 'birth.date': ['Born after the child William.'] } }),
+      apiErrorResponse(400, { code: 'profile.born_after_child', message: "This birth date is after a child's birth.", fields: { 'birth.date': ['Born after the child William.'] } }),
     ),
   );
   const { user } = renderApp(`/people/${String(DARWIN_IDS.emma)}/edit`);
   await user.click(await screen.findByRole('button', { name: 'Save changes' }));
-  expect(await screen.findByRole('alert')).toHaveTextContent('Emma Wedgwood cannot be born after her child.');
+  expect(await screen.findByRole('alert')).toHaveTextContent("This birth date is after a child's birth.");
   expect(within(screen.getByRole('group', { name: 'Date of birth' })).getByRole('textbox', { name: 'Year' })).toHaveAccessibleDescription('Born after the child William.');
 });
 

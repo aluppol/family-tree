@@ -1,11 +1,12 @@
 import { type ReactElement, type SubmitEvent, useState } from 'react';
 import type { ParentLinkKind, Person } from '../../api/types';
 import { Dialog, DialogFormActions, InlineError, SelectField } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
 import { fullName } from '../people/personName';
 import styles from './Kinship.module.scss';
 import { useCreateNewRelative, useCreateParentLink } from './kinshipQueries';
 import { RelativeChoiceFields } from './RelativeChoiceFields';
-import { PARENT_LINK_KIND_OPTIONS, type ParentLinkRelation } from './relations';
+import { type ParentLinkRelation, parentLinkKindOptions } from './relations';
 import { useRelativeChoice } from './useRelativeChoice';
 
 export interface AddParentLinkDialogProps {
@@ -15,6 +16,7 @@ export interface AddParentLinkDialogProps {
 }
 
 export function AddParentLinkDialog({ person, relation, onClose }: AddParentLinkDialogProps): ReactElement {
+  const t = useT();
   const choice = useRelativeChoice(relation, person.id, relation.oneWordSurname(person));
   const [kind, setKind] = useState<ParentLinkKind>('birth');
   const createLink = useCreateParentLink();
@@ -30,12 +32,12 @@ export function AddParentLinkDialog({ person, relation, onClose }: AddParentLink
     }
   }
   return (
-    <Dialog isOpen title={`Add a ${relation.relativeNoun} of ${fullName(person)}`} onClose={onClose}>
+    <Dialog isOpen title={t(`kinship.${relation.section}.dialogTitle`, { name: fullName(t, person) })} onClose={onClose}>
       <form className={styles.dialogForm} noValidate onSubmit={handleSubmit}>
-        <RelativeChoiceFields choice={choice} label="Person" relativeNoun={relation.relativeNoun} />
-        <SelectField label="Relationship" options={PARENT_LINK_KIND_OPTIONS} value={kind} onValueChange={setKind} />
+        <RelativeChoiceFields choice={choice} label={t('kinship.personLabel')} choiceMissingText={t(`kinship.${relation.section}.choiceMissing`)} />
+        <SelectField label={t('kinship.relationshipLabel')} options={parentLinkKindOptions(t)} value={kind} onValueChange={setKind} />
         <InlineError error={choice.newRelative === null ? createLink.error : createRelative.error} />
-        <DialogFormActions submitLabel={`Add ${relation.relativeNoun}`} pendingLabel="Adding…" isPending={isPending} onCancel={onClose} />
+        <DialogFormActions submitLabel={t(`kinship.${relation.section}.add`)} pendingLabel={t('common.adding')} isPending={isPending} onCancel={onClose} />
       </form>
     </Dialog>
   );

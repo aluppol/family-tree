@@ -18,12 +18,12 @@ const fakeScene = vi.hoisted(() => ({
   showPreset: vi.fn<(preset: string) => void>(),
   setRotating: vi.fn<(isRotating: boolean) => void>(),
   setInsets: vi.fn(),
+  setTexts: vi.fn(),
   refreshColors: vi.fn(),
   dispose: vi.fn(),
 }));
 
 vi.mock('./scene/towerScene', () => ({
-  SCENE_LABEL: 'Time tower scene',
   isWebGLAvailable: () => fakeScene.canDraw,
   createTowerScene: (_host: HTMLElement, options: { callbacks: SceneCallbacks }) => {
     fakeScene.callbacks = options.callbacks;

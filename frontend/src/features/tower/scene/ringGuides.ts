@@ -1,6 +1,6 @@
 import { BufferGeometry, EllipseCurve, Group, LineBasicMaterial, LineLoop, Vector3 } from 'three';
 import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
-import type { TowerRing } from '../layout/towerTypes';
+import type { RingLabel, TowerRing } from '../layout/towerTypes';
 import styles from '../TowerScene.module.scss';
 import type { ScreenLabel } from './labelDeclutter';
 import type { ScenePalette } from './sceneColors';
@@ -15,19 +15,32 @@ interface RingLoop {
   readonly line: LineLoop<BufferGeometry, LineBasicMaterial>;
 }
 
+interface RingCaption {
+  readonly label: RingLabel;
+  readonly object: CSS2DObject;
+}
+
+export type RingLabelText = (label: RingLabel) => string;
+
 export class RingGuides {
   readonly group = new Group();
   private readonly loops: readonly RingLoop[];
-  private readonly labels: readonly CSS2DObject[];
+  private readonly captions: readonly RingCaption[];
 
-  constructor(rings: readonly TowerRing[]) {
+  constructor(rings: readonly TowerRing[], labelText: RingLabelText) {
     this.loops = rings.map((ring) => ({ ring, line: loopOf(ring) }));
-    this.labels = rings.flatMap((ring) => (ring.label === null ? [] : [ringLabel(ring, ring.label)]));
-    this.group.add(...this.loops.map((loop) => loop.line), ...this.labels);
+    this.captions = rings.flatMap((ring) => (ring.label === null ? [] : [{ label: ring.label, object: ringLabel(ring, labelText(ring.label)) }]));
+    this.group.add(...this.loops.map((loop) => loop.line), ...this.captions.map((caption) => caption.object));
   }
 
   screenLabels(): ScreenLabel[] {
-    return this.labels.map((label, position) => ({ key: `ring-${String(position)}`, element: label.element, position: label.position, kind: 'compact' }));
+    return this.captions.map(({ object }, position) => ({ key: `ring-${String(position)}`, element: object.element, position: object.position, kind: 'compact' }));
+  }
+
+  relabel(labelText: RingLabelText): void {
+    for (const { label, object } of this.captions) {
+      object.element.textContent = labelText(label);
+    }
   }
 
   paint(palette: ScenePalette): void {

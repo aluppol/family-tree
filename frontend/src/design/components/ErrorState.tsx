@@ -1,5 +1,7 @@
 import type { ReactElement } from 'react';
 import { type ErrorKind, errorKindOf, errorMessageOf } from '../../api/errorKind';
+import type { TextKey } from '../../i18n/catalogue';
+import { useT } from '../../i18n/languageContext';
 import { Button } from './Button';
 import { ButtonAnchor } from './ButtonLink';
 import { type StateTitleLevel, StateTitle } from './EmptyState';
@@ -12,46 +14,46 @@ export interface ErrorStateProps {
   titleLevel?: StateTitleLevel;
 }
 
-const ERROR_TITLES: Record<ErrorKind, string> = {
-  'session-ended': 'Your session has ended',
-  forbidden: 'You do not have access',
-  'not-found': 'Not found',
-  unavailable: 'Cannot reach the server',
-  rejected: 'Something went wrong',
-  unexpected: 'Something went wrong',
+const ERROR_TITLES: Record<ErrorKind, TextKey> = {
+  'session-ended': 'states.sessionEndedTitle',
+  forbidden: 'states.forbiddenTitle',
+  'not-found': 'states.notFoundTitle',
+  unavailable: 'states.unavailableTitle',
+  rejected: 'states.failedTitle',
+  unexpected: 'states.failedTitle',
 };
 
-const SESSION_ENDED_MESSAGE = 'For your security you were signed out. Sign in again to keep working on your tree.';
-
 export function ErrorState({ error, onRetry, titleLevel = 2 }: ErrorStateProps): ReactElement {
+  const t = useT();
   const kind = errorKindOf(error);
   return (
     <section role="alert" className={styles.state}>
       <span className={styles.dangerEmblem}>
         <Icon name="alert" />
       </span>
-      <StateTitle level={titleLevel}>{ERROR_TITLES[kind]}</StateTitle>
-      <p className={styles.message}>{kind === 'session-ended' ? SESSION_ENDED_MESSAGE : errorMessageOf(error)}</p>
+      <StateTitle level={titleLevel}>{t(ERROR_TITLES[kind])}</StateTitle>
+      <p className={styles.message}>{kind === 'session-ended' ? t('states.sessionEndedMessage') : errorMessageOf(error, t)}</p>
       <ErrorRecovery kind={kind} onRetry={onRetry} />
     </section>
   );
 }
 
 function ErrorRecovery({ kind, onRetry }: { kind: ErrorKind; onRetry?: () => void }): ReactElement | null {
+  const t = useT();
   if (kind === 'session-ended') {
     return (
       <ButtonAnchor href="/" variant="primary">
-        Sign in again
+        {t('states.signInAgain')}
       </ButtonAnchor>
     );
   }
   if (kind === 'not-found') {
-    return <ButtonAnchor href="/">Go to your family tree</ButtonAnchor>;
+    return <ButtonAnchor href="/">{t('states.goToTree')}</ButtonAnchor>;
   }
   const canRetry = (kind === 'unavailable' || kind === 'unexpected') && onRetry !== undefined;
   return canRetry ? (
     <Button variant="primary" onClick={onRetry}>
-      Try again
+      {t('states.tryAgain')}
     </Button>
   ) : null;
 }

@@ -1,6 +1,8 @@
 import { type ReactElement, useState } from 'react';
 import type { ParentRelation, Person } from '../../api/types';
 import { ConfirmDialog } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
+import type { Translate } from '../../i18n/translate';
 import { fullName } from '../people/personName';
 import { AddParentLinkDialog } from './AddParentLinkDialog';
 import { ChangeParentLinkKindDialog } from './ChangeParentLinkKindDialog';
@@ -18,18 +20,19 @@ export interface ParentLinksPanelProps {
 }
 
 export function ParentLinksPanel({ person, relation }: ParentLinksPanelProps): ReactElement {
+  const t = useT();
   const [dialog, setDialog] = useState<LinkDialog>(NO_DIALOG);
-  const entries = relation.relativesOf(person).map((relative) => relativeEntry(relative, setDialog));
+  const entries = relation.relativesOf(person).map((relative) => relativeEntry(t, relative, setDialog));
   function handleClose(): void {
     setDialog(NO_DIALOG);
   }
   return (
     <>
       <RelativesView
-        title={relation.title}
-        addLabel={`Add ${relation.relativeNoun}`}
-        emptyText={relation.emptyText}
-        editLabel="Change"
+        title={t(`kinship.${relation.section}.title`)}
+        addLabel={t(`kinship.${relation.section}.add`)}
+        emptyText={t(`kinship.${relation.section}.empty`)}
+        editLabel={t('common.change')}
         entries={entries}
         onAdd={() => { setDialog({ type: 'adding' }); }}
       />
@@ -40,11 +43,11 @@ export function ParentLinksPanel({ person, relation }: ParentLinksPanelProps): R
   );
 }
 
-function relativeEntry(relative: ParentRelation, openDialog: (dialog: LinkDialog) => void): RelativeEntry {
+function relativeEntry(t: Translate, relative: ParentRelation, openDialog: (dialog: LinkDialog) => void): RelativeEntry {
   return {
     key: relative.link_id,
     person: relative.person,
-    badge: relative.kind === 'birth' ? undefined : parentLinkKindLabel(relative.kind),
+    badge: relative.kind === 'birth' ? undefined : parentLinkKindLabel(t, relative.kind),
     onEdit: () => {
       openDialog({ type: 'changing', relative });
     },
@@ -62,16 +65,15 @@ interface RemoveParentLinkDialogProps {
 }
 
 function RemoveParentLinkDialog({ person, relation, relative, onClose }: RemoveParentLinkDialogProps): ReactElement {
+  const t = useT();
   const removeLink = useRemoveParentLink();
-  const relativeName = fullName(relative.person);
+  const relativeName = fullName(t, relative.person);
   function handleConfirm(): void {
     removeLink.mutate({ linkId: relative.link_id, personIds: [person.id, relative.person.id] }, { onSuccess: onClose });
   }
   return (
-    <ConfirmDialog isOpen title={`Remove ${relativeName} as ${relation.relativeNoun}?`} confirmLabel="Remove link" onConfirm={handleConfirm} onCancel={onClose} isPending={removeLink.isPending} error={removeLink.error}>
-      <p>
-        Only the link between {fullName(person)} and {relativeName} is removed. Both people stay in your tree.
-      </p>
+    <ConfirmDialog isOpen title={t(`kinship.${relation.section}.removeTitle`, { relative: relativeName })} confirmLabel={t('kinship.removeLink')} onConfirm={handleConfirm} onCancel={onClose} isPending={removeLink.isPending} error={removeLink.error}>
+      <p>{t('kinship.linkRemovalMessage', { person: fullName(t, person), relative: relativeName })}</p>
     </ConfirmDialog>
   );
 }

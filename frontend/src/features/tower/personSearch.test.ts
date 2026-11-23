@@ -1,4 +1,5 @@
 import { expect, test } from 'vitest';
+import { ENGLISH } from '../../test/translators';
 import { personSummary } from '../chart/testing/familyScript';
 import { foldForSearch, searchPeople } from './personSearch';
 
@@ -19,11 +20,11 @@ const SEARCH_CASES = [
 ];
 
 test.each(SEARCH_CASES)('$id', ({ query, expected }) => {
-  expect(searchPeople(PEOPLE, query, 10).map((person) => person.id)).toEqual(expected);
+  expect(searchPeople(ENGLISH, { people: PEOPLE, query, limit: 10 }).map((person) => person.id)).toEqual(expected);
 });
 
 test('the result list is cut at the limit', () => {
-  expect(searchPeople(PEOPLE, 'r', 2)).toHaveLength(2);
+  expect(searchPeople(ENGLISH, { people: PEOPLE, query: 'r', limit: 2 })).toHaveLength(2);
 });
 
 test('folding removes marks and special letters and lowers the case', () => {

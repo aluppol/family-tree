@@ -104,7 +104,7 @@ test('every generation gets its own ring and nobody overlaps on it', () => {
   const people = familyOfThrees();
   const layout = layoutTower(towerGraphOf(people));
   const nodes = [...layout.nodes.values()];
-  expect(layout.rings.map((ring) => ring.label)).toEqual(['Generation 1', 'Generation 2', 'Generation 3', 'Generation 4']);
+  expect(layout.rings.map((ring) => ring.label)).toEqual([1, 2, 3, 4].map((number) => ({ kind: 'generation', number })));
   expect(nodes.every((node) => node.position.y === node.generation * GENERATION_HEIGHT)).toBe(true);
   expect(closestNeighbourDistance(nodes)).toBeGreaterThan(SPHERE_GAP * 0.85);
 });
@@ -112,7 +112,7 @@ test('every generation gets its own ring and nobody overlaps on it', () => {
 test('the years axis draws a ring every decade and labels every fifty years', () => {
   const layout = layoutTower(towerGraphOf({ people: [['Anna', 'female', 1803], ['Boris', 'male', 1862]], parents: [['Anna', 'Boris']] }));
   expect(layout.rings.map((ring) => Math.round(ring.y * 1000) / 1000)).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
-  expect(layout.rings.filter((ring) => ring.isMajor).map((ring) => ring.label)).toEqual(['1800', '1850']);
+  expect(layout.rings.filter((ring) => ring.isMajor).map((ring) => ring.label)).toEqual([1800, 1850].map((year) => ({ kind: 'decade', year })));
 });
 
 test('a large dated family lays out quickly with everyone apart', () => {

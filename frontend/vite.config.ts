@@ -44,7 +44,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
-    include: ['src/**/*.test.{ts,tsx}'],
+    include: ['src/**/*.test.{ts,tsx}', 'eslint/**/*.test.js'],
     restoreMocks: true,
     coverage: {
       provider: 'v8',

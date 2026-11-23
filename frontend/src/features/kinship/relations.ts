@@ -8,6 +8,7 @@ import {
 } from '../../api/kinship';
 import type { ParentLinkInput, ParentLinkKind, ParentRelation, Person } from '../../api/types';
 import type { SelectOption } from '../../design/components';
+import type { Translate } from '../../i18n/translate';
 import type { CandidateSource } from './kinshipQueries';
 
 export interface ParentLinkRequest {
@@ -16,10 +17,10 @@ export interface ParentLinkRequest {
   kind: ParentLinkKind;
 }
 
+export type ParentLinkSection = 'parents' | 'children';
+
 export interface ParentLinkRelation extends CandidateSource {
-  title: string;
-  relativeNoun: string;
-  emptyText: string;
+  section: ParentLinkSection;
   relativesOf: (person: Person) => ParentRelation[];
   linkInput: (request: ParentLinkRequest) => ParentLinkInput;
   createNewRelative: (request: NewPersonLinkRequest) => Promise<Person>;
@@ -29,9 +30,7 @@ export interface ParentLinkRelation extends CandidateSource {
 export const PARENTS: ParentLinkRelation = {
   list: 'parents',
   fetchCandidates: fetchParentCandidates,
-  title: 'Parents',
-  relativeNoun: 'parent',
-  emptyText: 'No parents recorded yet.',
+  section: 'parents',
   relativesOf: (person) => person.parents,
   linkInput: ({ personId, relativeId, kind }) => ({ parent_id: relativeId, child_id: personId, kind }),
   createNewRelative: createNewParent,
@@ -41,9 +40,7 @@ export const PARENTS: ParentLinkRelation = {
 export const CHILDREN: ParentLinkRelation = {
   list: 'children',
   fetchCandidates: fetchChildCandidates,
-  title: 'Children',
-  relativeNoun: 'child',
-  emptyText: 'No children recorded yet.',
+  section: 'children',
   relativesOf: (person) => person.children,
   linkInput: ({ personId, relativeId, kind }) => ({ parent_id: personId, child_id: relativeId, kind }),
   createNewRelative: createNewChild,
@@ -55,13 +52,12 @@ export const PARTNERS: CandidateSource = {
   fetchCandidates: fetchPartnerCandidates,
 };
 
-export const PARENT_LINK_KIND_OPTIONS: readonly SelectOption<ParentLinkKind>[] = [
-  { value: 'birth', label: 'Birth' },
-  { value: 'adopted', label: 'Adopted' },
-  { value: 'foster', label: 'Foster' },
-  { value: 'other', label: 'Other' },
-];
+const PARENT_LINK_KINDS: readonly ParentLinkKind[] = ['birth', 'adopted', 'foster', 'other'];
 
-export function parentLinkKindLabel(kind: ParentLinkKind): string {
-  return PARENT_LINK_KIND_OPTIONS.find((option) => option.value === kind)?.label ?? kind;
+export function parentLinkKindOptions(t: Translate): SelectOption<ParentLinkKind>[] {
+  return PARENT_LINK_KINDS.map((kind) => ({ value: kind, label: parentLinkKindLabel(t, kind) }));
+}
+
+export function parentLinkKindLabel(t: Translate, kind: ParentLinkKind): string {
+  return t(`kinship.linkKinds.${kind}`);
 }

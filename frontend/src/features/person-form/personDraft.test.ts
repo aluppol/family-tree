@@ -1,4 +1,5 @@
 import { expect, test } from 'vitest';
+import { messageOf } from '../../i18n/message';
 import { ApiError } from '../../api/client';
 import type { PersonProfile } from '../../api/types';
 import { exactDate } from '../../test/fixtures';
@@ -41,9 +42,9 @@ test('every client-side problem is reported at once', () => {
   expect(profileFromDraft(draft)).toEqual({
     profile: null,
     errors: {
-      givenNames: 'Enter a given name or a surname.',
-      birthDate: 'Choose a month for this day.',
-      deathDate: 'Year must be a whole number from 1 to 9999.',
+      givenNames: messageOf('personForm.nameMissing'),
+      birthDate: messageOf('dates.problems.monthForDay'),
+      deathDate: messageOf('dates.problems.yearRange'),
     },
   });
 });

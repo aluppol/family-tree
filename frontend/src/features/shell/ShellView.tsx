@@ -1,5 +1,6 @@
 import type { ReactElement, ReactNode, RefObject } from 'react';
 import { Banner } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
 import styles from './Shell.module.scss';
 import { SiteFooter } from './SiteFooter';
 import { type MenuState, SiteHeader } from './SiteHeader';
@@ -17,11 +18,12 @@ export interface ShellViewProps {
 }
 
 export function ShellView({ viewerName, isSandbox, menu, menuButtonRef, mainRef, isNavigating, children }: ShellViewProps): ReactElement {
+  const t = useT();
   return (
     <div className={styles.shell}>
-      {isNavigating && <div className={styles.progress} role="progressbar" aria-label="Loading the page" />}
+      {isNavigating && <div className={styles.progress} role="progressbar" aria-label={t('shell.loadingPage')} />}
       <a href={`#${MAIN_CONTENT_ID}`} className={styles.skipLink}>
-        Skip to main content
+        {t('shell.skipToContent')}
       </a>
       <SiteHeader viewerName={viewerName} menu={menu} menuButtonRef={menuButtonRef} />
       {isSandbox && <SandboxBanner />}
@@ -34,9 +36,10 @@ export function ShellView({ viewerName, isSandbox, menu, menuButtonRef, mainRef,
 }
 
 function SandboxBanner(): ReactElement {
+  const t = useT();
   return (
     <div className={styles.sandbox}>
-      <Banner>Demo sandbox — changes are reset every night.</Banner>
+      <Banner>{t('shell.sandboxNotice')}</Banner>
     </div>
   );
 }

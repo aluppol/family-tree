@@ -1,4 +1,5 @@
 import type { Sex } from '../../api/types';
+import type { Translate } from '../../i18n/translate';
 import { type TowerGraph, childrenOf, parentsOf, spousesOf } from './layout/towerGraph';
 
 export type Relation = 'parent' | 'child' | 'spouse';
@@ -14,10 +15,12 @@ export interface RelationRequest {
   readonly toId: number;
 }
 
-const RELATION_WORDS: Record<Relation, Record<Sex, string>> = {
-  parent: { male: 'Father', female: 'Mother', other: 'Parent', unknown: 'Parent' },
-  child: { male: 'Son', female: 'Daughter', other: 'Child', unknown: 'Child' },
-  spouse: { male: 'Husband', female: 'Wife', other: 'Spouse', unknown: 'Spouse' },
+type RelationWord = 'father' | 'mother' | 'parent' | 'son' | 'daughter' | 'child' | 'husband' | 'wife' | 'spouse';
+
+const RELATION_WORDS: Record<Relation, Record<Sex, RelationWord>> = {
+  parent: { male: 'father', female: 'mother', other: 'parent', unknown: 'parent' },
+  child: { male: 'son', female: 'daughter', other: 'child', unknown: 'child' },
+  spouse: { male: 'husband', female: 'wife', other: 'spouse', unknown: 'spouse' },
 };
 
 export function relationPath(graph: TowerGraph, { fromId, toId }: RelationRequest): RelationStep[] | null {
@@ -35,8 +38,8 @@ export function relationPath(graph: TowerGraph, { fromId, toId }: RelationReques
   return arrivals.has(toId) ? stepsBackTo(arrivals, toId) : null;
 }
 
-export function relationWord(relation: Relation, sex: Sex): string {
-  return RELATION_WORDS[relation][sex];
+export function relationWord(t: Translate, relation: Relation, sex: Sex): string {
+  return t(`tower.relations.${RELATION_WORDS[relation][sex]}`);
 }
 
 export function peopleOnPath(steps: readonly RelationStep[]): number[] {

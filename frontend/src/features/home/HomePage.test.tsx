@@ -35,10 +35,10 @@ test('an empty tree invites to add the first person or import a file', async () 
 });
 
 test('an unreachable server can be retried from the home page', async () => {
-  mockServer.use(http.get('/api/workspace/', () => apiErrorResponse(503, { code: 'identity.unavailable', message: 'The sign-in service is unavailable.' })));
+  mockServer.use(http.get('/api/workspace/', () => apiErrorResponse(503, { code: 'identity.unavailable', message: 'The sign-in service cannot be reached.' })));
   const { router, user } = renderApp('/');
   expect(await screen.findByRole('heading', { level: 1, name: 'Cannot reach the server' })).toBeInTheDocument();
-  expect(screen.getByRole('alert')).toHaveTextContent('The sign-in service is unavailable.');
+  expect(screen.getByRole('alert')).toHaveTextContent('The sign-in service cannot be reached.');
   mockServer.resetHandlers();
   await user.click(screen.getByRole('button', { name: 'Try again' }));
   await waitFor(() => {

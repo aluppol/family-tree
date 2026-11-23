@@ -2,6 +2,7 @@ import { type ReactElement, type RefObject, useEffect, useRef } from 'react';
 import { Link } from 'react-router';
 import type { PersonSummary } from '../../api/types';
 import { Avatar, Badge, Button, CardSection, Icon } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
 import { profilePath } from '../../routePaths';
 import { formatLifeYears } from '../dates/format';
 import { fullName } from '../people/personName';
@@ -50,8 +51,9 @@ export function RelativesView({ title, addLabel, emptyText, editLabel, entries, 
 }
 
 function RelativeRow({ entry, editLabel }: { entry: RelativeEntry; editLabel: string }): ReactElement {
-  const name = fullName(entry.person);
-  const lifeYears = formatLifeYears(entry.person);
+  const t = useT();
+  const name = fullName(t, entry.person);
+  const lifeYears = formatLifeYears(t, entry.person);
   return (
     <li className={styles.relative}>
       <Avatar person={entry.person} size="small" />
@@ -71,6 +73,7 @@ function RelativeRow({ entry, editLabel }: { entry: RelativeEntry; editLabel: st
 }
 
 function RelativeActions({ name, editLabel, entry }: { name: string; editLabel: string; entry: RelativeEntry }): ReactElement {
+  const t = useT();
   return (
     <div className={styles.relativeActions}>
       <Button variant="ghost" size="small" onClick={entry.onEdit}>
@@ -78,7 +81,7 @@ function RelativeActions({ name, editLabel, entry }: { name: string; editLabel: 
         <span className="visually-hidden">{name}</span>
       </Button>
       <Button variant="ghost" size="small" onClick={entry.onRemove}>
-        Remove{' '}
+        {t('common.remove')}{' '}
         <span className="visually-hidden">{name}</span>
       </Button>
     </div>

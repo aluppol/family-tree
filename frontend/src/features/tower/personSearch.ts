@@ -1,7 +1,14 @@
 import type { PersonSummary } from '../../api/types';
+import type { Translate } from '../../i18n/translate';
 import { fullName } from '../people/personName';
 
 const FOLDED_LETTERS: Readonly<Record<string, string>> = { đ: 'd', ł: 'l', ø: 'o', æ: 'ae', œ: 'oe', ß: 'ss', ı: 'i' };
+
+export interface PeopleSearch {
+  readonly people: readonly PersonSummary[];
+  readonly query: string;
+  readonly limit: number;
+}
 
 interface SearchablePerson {
   readonly person: PersonSummary;
@@ -16,12 +23,12 @@ export function foldForSearch(text: string): string {
     .replace(/[đłøæœßı]/gu, (letter) => FOLDED_LETTERS[letter] ?? letter);
 }
 
-export function searchPeople(people: readonly PersonSummary[], query: string, limit: number): PersonSummary[] {
+export function searchPeople(t: Translate, { people, query, limit }: PeopleSearch): PersonSummary[] {
   const words = foldForSearch(query).split(/\s+/u).filter((word) => word !== '');
   if (words.length === 0) {
     return [];
   }
-  const searchable: SearchablePerson[] = people.map((person) => ({ person, name: foldForSearch(fullName(person)) }));
+  const searchable: SearchablePerson[] = people.map((person) => ({ person, name: foldForSearch(fullName(t, person)) }));
   return searchable
     .filter(({ name }) => words.every((word) => name.includes(word)))
     .sort((first, second) => rankOf(first, words) - rankOf(second, words) || first.name.localeCompare(second.name))

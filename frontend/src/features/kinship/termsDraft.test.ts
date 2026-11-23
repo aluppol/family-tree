@@ -1,6 +1,8 @@
 import { expect, test } from 'vitest';
 import type { PartnershipTerms } from '../../api/types';
+import { messageOf } from '../../i18n/message';
 import { exactDate } from '../../test/fixtures';
+import { ENGLISH } from '../../test/translators';
 import { EMPTY_TERMS_DRAFT, type TermsDraft, describeTerms, draftFromTerms, termsFromDraft } from './termsDraft';
 
 const ENDED_MARRIAGE: PartnershipTerms = {
@@ -16,7 +18,7 @@ test.each<[string, PartnershipTerms, string | undefined]>([
   ['an annulled marriage in a known place', { kind: 'marriage', start: { date: null, place: 'Paris' }, end: { reason: 'annulment', date: null } }, 'Married Paris · Annulled'],
   ['nothing known', { kind: 'marriage', start: { date: null, place: '' }, end: null }, undefined],
 ])('describes %s', (_description, terms, expected) => {
-  expect(describeTerms(terms)).toBe(expected);
+  expect(describeTerms(ENGLISH, terms)).toBe(expected);
 });
 
 test('stored terms survive a round trip through the editable draft', () => {
@@ -36,6 +38,6 @@ test('invalid start and end dates are both reported', () => {
   };
   expect(termsFromDraft(draft)).toEqual({
     terms: null,
-    errors: { startDate: 'Year must be a whole number from 1 to 9999.', endDate: 'Day must be from 1 to 28 for this month.' },
+    errors: { startDate: messageOf('dates.problems.yearRange'), endDate: messageOf('dates.problems.dayRange', { last: 28 }) },
   });
 });

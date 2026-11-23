@@ -79,7 +79,7 @@ test('a new photo is previewed, saved, and can be removed again', async () => {
 });
 
 test('a file that is not a readable photo is explained and the preview can be discarded', async () => {
-  vi.mocked(preparePhoto).mockRejectedValueOnce(new ClientRejection('This file is not a photo we can read.'));
+  vi.mocked(preparePhoto).mockRejectedValueOnce(new ClientRejection('photos.unreadable'));
   vi.mocked(preparePhoto).mockResolvedValueOnce({ photo: new Blob(['jpeg']), previewUrl: 'data:image/jpeg;base64,BBBB' });
   const { user } = renderApp(profileOf(DARWIN_IDS.emma));
   const fileInput = await screen.findByLabelText('Upload photo');

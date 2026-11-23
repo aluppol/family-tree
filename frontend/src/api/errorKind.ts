@@ -1,12 +1,20 @@
+import type { TextKey } from '../i18n/catalogue';
+import { isTextKey, type Translate } from '../i18n/translate';
 import { ApiError } from './client';
 
 export type ErrorKind = 'session-ended' | 'forbidden' | 'not-found' | 'unavailable' | 'rejected' | 'unexpected';
 
 export class ClientRejection extends Error {
   override readonly name = 'ClientRejection';
+  readonly messageKey: TextKey;
+
+  constructor(messageKey: TextKey) {
+    super(messageKey);
+    this.messageKey = messageKey;
+  }
 }
 
-const UNEXPECTED_MESSAGE = 'Something unexpected went wrong. Please try again.';
+const HTTP_STATUS_CODE = /^http\.\d+$/u;
 
 export function errorKindOf(error: unknown): ErrorKind {
   if (error instanceof ClientRejection) {
@@ -21,13 +29,24 @@ export function errorKindOf(error: unknown): ErrorKind {
   return clientErrorKind(error.status);
 }
 
-export function errorMessageOf(error: unknown): string {
-  return error instanceof ApiError || error instanceof ClientRejection ? error.message : UNEXPECTED_MESSAGE;
+export function errorMessageOf(error: unknown, t: Translate): string {
+  if (error instanceof ClientRejection) {
+    return t(error.messageKey);
+  }
+  return error instanceof ApiError ? serverMessageOf(error, t) : t('errors.unexpected');
 }
 
 export function isRetryable(error: unknown): boolean {
   const kind = errorKindOf(error);
   return kind === 'unavailable' || kind === 'unexpected';
+}
+
+function serverMessageOf(error: ApiError, t: Translate): string {
+  if (HTTP_STATUS_CODE.test(error.code)) {
+    return t('errors.httpStatus', { status: String(error.status) });
+  }
+  const key = `errors.${error.code}`;
+  return isTextKey(key) ? t(key, { message: error.message }) : error.message;
 }
 
 function clientErrorKind(status: number): ErrorKind {

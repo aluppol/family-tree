@@ -1,10 +1,11 @@
 import { type ReactElement, type SubmitEvent, useState } from 'react';
 import type { ParentLinkKind, ParentRelation, Person } from '../../api/types';
 import { Dialog, DialogFormActions, InlineError, SelectField } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
 import { fullName } from '../people/personName';
 import styles from './Kinship.module.scss';
 import { useChangeParentLinkKind } from './kinshipQueries';
-import { PARENT_LINK_KIND_OPTIONS, type ParentLinkRelation } from './relations';
+import { type ParentLinkRelation, parentLinkKindOptions } from './relations';
 
 export interface ChangeParentLinkKindDialogProps {
   person: Person;
@@ -14,6 +15,7 @@ export interface ChangeParentLinkKindDialogProps {
 }
 
 export function ChangeParentLinkKindDialog({ person, relation, relative, onClose }: ChangeParentLinkKindDialogProps): ReactElement {
+  const t = useT();
   const [kind, setKind] = useState<ParentLinkKind>(relative.kind);
   const changeKind = useChangeParentLinkKind();
   function handleSubmit(event: SubmitEvent<HTMLFormElement>): void {
@@ -23,14 +25,14 @@ export function ChangeParentLinkKindDialog({ person, relation, relative, onClose
     }
   }
   return (
-    <Dialog isOpen title="Change relationship" onClose={onClose}>
+    <Dialog isOpen title={t('kinship.changeTitle')} onClose={onClose}>
       <form className={styles.dialogForm} noValidate onSubmit={handleSubmit}>
         <p className={styles.dialogText}>
-          {fullName(relative.person)} is recorded as a {relation.relativeNoun} of {fullName(person)}.
+          {t(`kinship.${relation.section}.recordedAs`, { relative: fullName(t, relative.person), person: fullName(t, person) })}
         </p>
-        <SelectField label="Relationship" options={PARENT_LINK_KIND_OPTIONS} value={kind} onValueChange={setKind} />
+        <SelectField label={t('kinship.relationshipLabel')} options={parentLinkKindOptions(t)} value={kind} onValueChange={setKind} />
         <InlineError error={changeKind.error} />
-        <DialogFormActions submitLabel="Save" pendingLabel="Saving…" isPending={changeKind.isPending} onCancel={onClose} />
+        <DialogFormActions submitLabel={t('common.save')} pendingLabel={t('common.saving')} isPending={changeKind.isPending} onCancel={onClose} />
       </form>
     </Dialog>
   );

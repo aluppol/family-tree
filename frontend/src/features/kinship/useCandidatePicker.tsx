@@ -2,6 +2,8 @@ import { useState } from 'react';
 import type { PersonSummary } from '../../api/types';
 import { Avatar, type ComboboxOption, Icon } from '../../design/components';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
+import { useT } from '../../i18n/languageContext';
+import type { Translate } from '../../i18n/translate';
 import { formatLifeYears } from '../dates/format';
 import { fullName } from '../people/personName';
 import styles from './Kinship.module.scss';
@@ -33,6 +35,7 @@ export interface CandidatePicker {
 }
 
 export function useCandidatePicker(source: CandidateSource, personId: number, onChooseNewPerson: (typedName: string) => void): CandidatePicker {
+  const t = useT();
   const [query, setQuery] = useState('');
   const [selectedPerson, setSelectedPerson] = useState<PersonSummary | null>(null);
   const search = useDebouncedValue(query.trim(), SEARCH_DELAY_IN_MILLISECONDS);
@@ -52,26 +55,26 @@ export function useCandidatePicker(source: CandidateSource, personId: number, on
   return {
     query,
     onQueryChange: handleQueryChange,
-    options: [...(candidates.data ?? []).map(personOption), ...newPersonOptions(selectedPerson === null ? query.trim() : '')],
+    options: [...(candidates.data ?? []).map((person) => personOption(t, person)), ...newPersonOptions(t, selectedPerson === null ? query.trim() : '')],
     onSelect: handleSelect,
     isLoading: candidates.isFetching,
     selectedPerson,
   };
 }
 
-function personOption(person: PersonSummary): PersonOption {
-  const lifeYears = formatLifeYears(person);
+function personOption(t: Translate, person: PersonSummary): PersonOption {
+  const lifeYears = formatLifeYears(t, person);
   return {
     kind: 'person',
     id: person.id,
-    label: fullName(person),
+    label: fullName(t, person),
     description: lifeYears === '' ? undefined : lifeYears,
     leading: <Avatar person={person} size="small" />,
     person,
   };
 }
 
-function newPersonOptions(typedName: string): NewPersonOption[] {
+function newPersonOptions(t: Translate, typedName: string): NewPersonOption[] {
   if (typedName === '') {
     return [];
   }
@@ -80,5 +83,5 @@ function newPersonOptions(typedName: string): NewPersonOption[] {
       <Icon name="plus" />
     </span>
   );
-  return [{ kind: 'new-person', id: NEW_PERSON_OPTION_ID, label: `Add “${typedName}” as a new person`, leading, typedName }];
+  return [{ kind: 'new-person', id: NEW_PERSON_OPTION_ID, label: t('kinship.newPersonOption', { name: typedName }), leading, typedName }];
 }

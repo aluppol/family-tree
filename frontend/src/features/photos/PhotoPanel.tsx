@@ -1,6 +1,7 @@
 import { type ReactElement, useState } from 'react';
 import type { Person } from '../../api/types';
 import { ConfirmDialog } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
 import { fullName } from '../people/personName';
 import { useRemovePhoto, useUploadPhoto } from './photoMutations';
 import { PhotoView } from './PhotoView';
@@ -37,13 +38,14 @@ export function PhotoPanel({ person }: { person: Person }): ReactElement {
 }
 
 function RemovePhotoDialog({ person, onClose }: { person: Person; onClose: () => void }): ReactElement {
+  const t = useT();
   const removePhoto = useRemovePhoto();
   function handleConfirm(): void {
     removePhoto.mutate(person, { onSuccess: onClose });
   }
   return (
-    <ConfirmDialog isOpen title="Remove photo?" confirmLabel="Remove photo" onConfirm={handleConfirm} onCancel={onClose} isPending={removePhoto.isPending} error={removePhoto.error}>
-      <p>The photo of {fullName(person)} will be deleted.</p>
+    <ConfirmDialog isOpen title={t('photos.removeTitle')} confirmLabel={t('photos.remove')} onConfirm={handleConfirm} onCancel={onClose} isPending={removePhoto.isPending} error={removePhoto.error}>
+      <p>{t('photos.removalMessage', { name: fullName(t, person) })}</p>
     </ConfirmDialog>
   );
 }

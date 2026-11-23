@@ -1,6 +1,10 @@
 import { expect, test } from 'vitest';
 import type { DateQualifier, GenealogicalDate } from '../../api/types';
-import { type CalendarDraft, type DateDraft, type DateProblem, EMPTY_DATE_DRAFT, draftFromDate, parseDateDraft } from './dateDraft';
+import { messageText } from '../../i18n/message';
+import { ENGLISH } from '../../test/translators';
+import { type CalendarDraft, type DateDraft, type DateInputName, type DateParse, EMPTY_DATE_DRAFT, draftFromDate, parseDateDraft } from './dateDraft';
+
+type EnglishParse = { date: GenealogicalDate | null; problem: null } | { date: null; problem: { inputName: DateInputName; message: string } };
 
 function calendar(day: string, month: string, year: string): CalendarDraft {
   return { day, month, year };
@@ -10,8 +14,12 @@ function draftOf(qualifier: DateQualifier, value: CalendarDraft, until: Calendar
   return { qualifier, value, until };
 }
 
-function problem(inputName: DateProblem['inputName'], message: string): { date: null; problem: DateProblem } {
+function problem(inputName: DateInputName, message: string): EnglishParse {
   return { date: null, problem: { inputName, message } };
+}
+
+function inEnglish(parse: DateParse): EnglishParse {
+  return parse.problem === null ? parse : { date: null, problem: { inputName: parse.problem.inputName, message: messageText(ENGLISH, parse.problem.message) } };
 }
 
 function dated(date: GenealogicalDate): { date: GenealogicalDate; problem: null } {
@@ -20,7 +28,7 @@ function dated(date: GenealogicalDate): { date: GenealogicalDate; problem: null 
 
 const BLANK = calendar('', '', '');
 
-test.each<[string, DateDraft, ReturnType<typeof parseDateDraft>]>([
+test.each<[string, DateDraft, EnglishParse]>([
   ['a blank date means no date', EMPTY_DATE_DRAFT, { date: null, problem: null }],
   ['a blank date with a qualifier still means no date', draftOf('about', BLANK), { date: null, problem: null }],
   ['a year alone', draftOf('exact', calendar('', '', '1809')), dated({ qualifier: 'exact', value: { year: 1809, month: null, day: null }, until: null })],
@@ -45,7 +53,7 @@ test.each<[string, DateDraft, ReturnType<typeof parseDateDraft>]>([
   ['ranges compare only the precision both dates have', draftOf('between', calendar('', '5', '1760'), calendar('', '', '1760')), dated({ qualifier: 'between', value: { year: 1760, month: 5, day: null }, until: { year: 1760, month: null, day: null } })],
   ['the second date is ignored outside a range', draftOf('before', calendar('', '', '1790'), calendar('', '', '1700')), dated({ qualifier: 'before', value: { year: 1790, month: null, day: null }, until: null })],
 ])('%s', (_description, draft, expected) => {
-  expect(parseDateDraft(draft)).toEqual(expected);
+  expect(inEnglish(parseDateDraft(draft))).toEqual(expected);
 });
 
 test('a stored date becomes an editable draft and back', () => {

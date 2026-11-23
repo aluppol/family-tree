@@ -1,6 +1,7 @@
 import { type ReactElement, type SubmitEvent, useState } from 'react';
 import type { PartnerRelation } from '../../api/types';
 import { Dialog, DialogFormActions, InlineError } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
 import { fullName } from '../people/personName';
 import styles from './Kinship.module.scss';
 import { useChangePartnershipTerms } from './kinshipQueries';
@@ -13,6 +14,7 @@ export interface EditPartnershipDialogProps {
 }
 
 export function EditPartnershipDialog({ partnership, onClose }: EditPartnershipDialogProps): ReactElement {
+  const t = useT();
   const [draft, setDraft] = useState(() => draftFromTerms(partnership.terms));
   const [errors, setErrors] = useState<TermsErrors>({});
   const changeTerms = useChangePartnershipTerms();
@@ -25,11 +27,11 @@ export function EditPartnershipDialog({ partnership, onClose }: EditPartnershipD
     }
   }
   return (
-    <Dialog isOpen title={`Marriage with ${fullName(partnership.partner)}`} onClose={onClose}>
+    <Dialog isOpen title={t('kinship.spouses.editTitle', { name: fullName(t, partnership.partner) })} onClose={onClose}>
       <form className={styles.dialogForm} noValidate onSubmit={handleSubmit}>
         <PartnershipTermsFields draft={draft} errors={errors} onDraftChange={setDraft} />
         <InlineError error={changeTerms.error} />
-        <DialogFormActions submitLabel="Save" pendingLabel="Saving…" isPending={changeTerms.isPending} onCancel={onClose} />
+        <DialogFormActions submitLabel={t('common.save')} pendingLabel={t('common.saving')} isPending={changeTerms.isPending} onCancel={onClose} />
       </form>
     </Dialog>
   );

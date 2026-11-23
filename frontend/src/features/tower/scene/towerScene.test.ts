@@ -1,9 +1,11 @@
 import { fireEvent } from '@testing-library/react';
 import { afterEach, expect, test, vi } from 'vitest';
+import { ENGLISH, RUSSIAN } from '../../../test/translators';
 import { layoutTower } from '../layout/towerLayout';
 import { personIdOf, towerGraphOf } from '../testing/towerScript';
 import type { SceneFocus, SceneRenderer, TowerScene } from './sceneTypes';
-import { SCENE_LABEL, createTowerScene, isWebGLAvailable } from './towerScene';
+import { sceneTextsOf } from '../towerText';
+import { createTowerScene, isWebGLAvailable } from './towerScene';
 
 const GRAPH = towerGraphOf({
   people: [['Jovan', 'male', null], ['Petar', 'male', null], ['Marko', 'male', null], ['Ana', 'female', null], ['Mara', 'female', null]],
@@ -32,7 +34,7 @@ afterEach(() => {
 
 test('the scene mounts a described canvas with a label layer and removes both when disposed', () => {
   const { host, scene, renderer } = mountScene({ isReducedMotion: true });
-  expect(host.querySelector('canvas')).toHaveAttribute('aria-label', SCENE_LABEL);
+  expect(host.querySelector('canvas')).toHaveAttribute('aria-label', ENGLISH('tower.sceneDescription'));
   expect(host.children).toHaveLength(2);
   scene.dispose();
   expect(host.children).toHaveLength(0);
@@ -50,6 +52,18 @@ test('a focus labels the people it asks for and draws the frame again', async ()
   scene.showFocus(focusOn(PETAR, ['Ana'], ['Petar', 'Ana']));
   await nextFrame();
   expect(labelTexts(host).filter((text) => !text.startsWith('Generation'))).toEqual(['Petar', 'Ana']);
+});
+
+test('a new language relabels the canvas, the rings and the names without rebuilding the scene', async () => {
+  const { host, scene } = mountScene({ isReducedMotion: true });
+  scene.showFocus(focusOn(PETAR, ['Petar', 'Jovan']));
+  await nextFrame();
+  expect(allLabelTexts(host)).toEqual(expect.arrayContaining(['Generation 1', 'Generation 2', 'Petar', 'Jovan']));
+  scene.setTexts(sceneTextsOf(RUSSIAN));
+  await nextFrame();
+  expect(host.querySelector('canvas')).toHaveAttribute('aria-label', RUSSIAN('tower.sceneDescription'));
+  expect(allLabelTexts(host)).toEqual(expect.arrayContaining(['Поколение 1', 'Поколение 2', 'Petar', 'Jovan']));
+  expect(allLabelTexts(host).filter((text) => text.startsWith('Generation'))).toEqual([]);
 });
 
 test('a tap on a person picks them and a drag picks no one', () => {
@@ -131,7 +145,7 @@ function mountScene({ isReducedMotion }: { isReducedMotion: boolean }): MountedS
   canvas.getBoundingClientRect = () => SCREEN;
   const renderer: SceneRenderer = { domElement: canvas, setSize: vi.fn(), render: vi.fn(), dispose: vi.fn() };
   const callbacks = { onPick: vi.fn(), onInteract: vi.fn() };
-  const scene = createTowerScene(host, { layout: LAYOUT, callbacks, isReducedMotion, insets: { top: 0, bottom: 0 } }, () => renderer);
+  const scene = createTowerScene(host, { layout: LAYOUT, callbacks, isReducedMotion, insets: { top: 0, bottom: 0 }, texts: sceneTextsOf(ENGLISH) }, () => renderer);
   const result = { host, scene, renderer, callbacks };
   mounted.push(result);
   return result;
@@ -145,6 +159,10 @@ function focusOn(focusId: number, labelled: readonly string[], path: readonly st
 function press(target: HTMLElement, { from, to }: { from: readonly [number, number]; to: readonly [number, number] }): void {
   fireEvent.pointerDown(target, { clientX: from[0], clientY: from[1], pointerId: 1, isPrimary: true, button: 0, pointerType: 'mouse' });
   fireEvent.pointerUp(target, { clientX: to[0], clientY: to[1], pointerId: 1, isPrimary: true, button: 0, pointerType: 'mouse' });
+}
+
+function allLabelTexts(host: HTMLElement): string[] {
+  return [...host.querySelectorAll('canvas + div > div')].map((element) => element.textContent);
 }
 
 function labelTexts(host: HTMLElement): string[] {

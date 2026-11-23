@@ -1,5 +1,6 @@
 import { type ReactElement, type RefObject, useRef, useState } from 'react';
 import { Button, Icon } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
 import { treePath } from '../../routePaths';
 import { fullName } from '../people/personName';
 import { ViewSwitch } from '../tree-views/ViewSwitch';
@@ -14,7 +15,7 @@ import styles from './TowerPage.module.scss';
 import { TowerSearch } from './TowerSearch';
 import { type TowerPanels, toggleTowerDetails, toggleTowerKey, useTowerPanels } from './towerPanels';
 import { TowerToolbar } from './TowerToolbar';
-import { lifeYearsText, shortName } from './towerText';
+import { shortName, towerFactsText } from './towerText';
 import type { GestureHint } from './useGestureHint';
 import type { TowerExplorer } from './useTowerExplorer';
 import { useViewportFill } from './useViewportFill';
@@ -50,6 +51,7 @@ const WIDE_INSETS: ViewInsets = { top: 0, bottom: 92 };
 const DETAILS_PANEL_ID = 'tower-selected-person';
 
 export function TowerView(props: TowerViewProps): ReactElement {
+  const t = useT();
   const workspaceRef = useRef<HTMLDivElement>(null);
   const [searchMode, setSearchMode] = useState<SearchMode | null>(null);
   const panels = useTowerPanels();
@@ -57,12 +59,12 @@ export function TowerView(props: TowerViewProps): ReactElement {
   return (
     <div className={styles.page}>
       {props.display.isNarrow ? (
-        <h1 className="visually-hidden">{fullName(props.node.person)}</h1>
+        <h1 className="visually-hidden">{fullName(t, props.node.person)}</h1>
       ) : (
         <header className={styles.bar}>
           <div className={styles.titleBlock}>
-            <h1 className={styles.title}>{fullName(props.node.person)}</h1>
-            <p className={styles.subtitle}>Time tower</p>
+            <h1 className={styles.title}>{fullName(t, props.node.person)}</h1>
+            <p className={styles.subtitle}>{t('tower.name')}</p>
           </div>
           <ViewSwitch personId={props.node.person.id} current="tower" />
         </header>
@@ -83,12 +85,13 @@ interface StageProps extends TowerViewProps {
 
 function TowerStage(props: StageProps): ReactElement {
   const { layout, explorer, display, rotation, hint, sceneRef, searchMode, onSearchModeChange } = props;
+  const t = useT();
   function handleInteract(): void {
     hint.dismiss();
     rotation.stop();
   }
   return (
-    <section className={styles.stage} aria-label="Time tower">
+    <section className={styles.stage} aria-label={t('tower.name')}>
       <TowerCanvas
         layout={layout}
         focus={explorer.focus}
@@ -118,10 +121,11 @@ function StageOverlay({ layout, node, display, panels }: StageProps): ReactEleme
 }
 
 function DetailsToggle({ isOpen }: { isOpen: boolean }): ReactElement {
+  const t = useT();
   return (
     <button type="button" className={styles.overlayButton} aria-expanded={isOpen} aria-controls={DETAILS_PANEL_ID} onClick={toggleTowerDetails}>
       <Icon name={isOpen ? 'chevronRight' : 'chevronLeft'} />
-      {isOpen ? 'Hide details' : 'Show details'}
+      {isOpen ? t('tower.hideDetails') : t('tower.showDetails')}
     </button>
   );
 }
@@ -144,7 +148,8 @@ function StageToolbar({ explorer, display, rotation, sceneRef, searchMode, onSea
 }
 
 function StageSearch({ graph, node, explorer, searchMode, onClose }: StageProps & { searchMode: SearchMode; onClose: () => void }): ReactElement {
-  const label = searchMode === 'person' ? 'Find a person' : `Relationship of ${shortName(node.person)} to`;
+  const t = useT();
+  const label = searchMode === 'person' ? t('tower.findPerson') : t('tower.relationshipOf', { name: shortName(t, node.person) });
   function handleChoose(personId: number): void {
     if (searchMode === 'person') {
       explorer.select(personId);
@@ -157,11 +162,12 @@ function StageSearch({ graph, node, explorer, searchMode, onClose }: StageProps 
 }
 
 function GestureHintCard({ isTouch, onDismiss }: { isTouch: boolean; onDismiss: () => void }): ReactElement {
+  const t = useT();
   return (
     <div className={styles.hint}>
-      <p>{isTouch ? 'Drag to turn · Pinch to zoom · Tap a ball to open a person' : 'Drag to turn · Scroll to zoom · Click a ball to open a person'}</p>
+      <p>{isTouch ? t('tower.touchHint') : t('tower.pointerHint')}</p>
       <Button size="small" variant="ghost" onClick={onDismiss}>
-        Got it
+        {t('tower.gotIt')}
       </Button>
     </div>
   );
@@ -169,12 +175,13 @@ function GestureHintCard({ isTouch, onDismiss }: { isTouch: boolean; onDismiss: 
 
 function SelectedPerson(props: TowerViewProps & { isDetailsOpen: boolean; onAskRelation: () => void }): ReactElement {
   const { node, relatives, explorer, layout, display } = props;
+  const t = useT();
   const [isSheetExpanded, setSheetExpanded] = useState(false);
   const lineHeads = new Map(layout.legend.lines.map((line) => [line.lineIndex, line.head]));
   const panelProps = { node, relatives, lineHeads, relation: explorer.relation, onSelect: explorer.select, onAskRelation: props.onAskRelation, onClearRelation: explorer.clearRelation };
   if (!display.isNarrow) {
     return (
-      <aside id={DETAILS_PANEL_ID} className={styles.panel} aria-label="Selected person" inert={!props.isDetailsOpen}>
+      <aside id={DETAILS_PANEL_ID} className={styles.panel} aria-label={t('tower.selectedPerson')} inert={!props.isDetailsOpen}>
         <div className={styles.panelBody}>
           <PersonPanel {...panelProps} />
         </div>
@@ -182,7 +189,7 @@ function SelectedPerson(props: TowerViewProps & { isDetailsOpen: boolean; onAskR
     );
   }
   return (
-    <BottomSheet title={fullName(node.person)} summary={`${lifeYearsText(node.person)} · Generation ${String(node.generation + 1)}`} isExpanded={isSheetExpanded} onExpandedChange={setSheetExpanded}>
+    <BottomSheet title={fullName(t, node.person)} summary={towerFactsText(t, node.person, node.generation)} isExpanded={isSheetExpanded} onExpandedChange={setSheetExpanded}>
       <PersonDetails {...panelProps} />
     </BottomSheet>
   );

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { initialsOf } from '../../design/components';
+import { ENGLISH } from '../../test/translators';
 import { cardLines, nameLines, personLabel } from './cardText';
 import type { ChartNode } from './layout/types';
 import { personSummary, yearDate } from './testing/familyScript';
@@ -15,14 +16,14 @@ describe('nameLines', () => {
     [{ given_names: 'Hubert Blaine Wolfeschlegelsteinhausenbergerdorff', surname: '' }, ['Hubert Blaine', 'Wolfeschlegels…']],
     [{ given_names: ' ', surname: ' ' }, ['Unnamed person']],
   ])('writes %o as %o', (person, lines) => {
-    expect(nameLines(person)).toEqual(lines);
+    expect(nameLines(ENGLISH, person)).toEqual(lines);
   });
 });
 
 describe('cardLines', () => {
   it('adds the life years under the name', () => {
     const person = personSummary({ id: 1, given_names: 'Emma', surname: 'Wedgwood', birth_date: yearDate(1808), death_date: yearDate(1896), is_deceased: true });
-    expect(cardLines(person)).toEqual([
+    expect(cardLines(ENGLISH, person)).toEqual([
       { text: 'Emma', tone: 'name' },
       { text: 'Wedgwood', tone: 'name' },
       { text: '1808–1896', tone: 'years' },
@@ -30,7 +31,7 @@ describe('cardLines', () => {
   });
 
   it('leaves the years out when nothing is known about them', () => {
-    expect(cardLines(personSummary({ id: 1, given_names: 'Emma' }))).toEqual([{ text: 'Emma', tone: 'name' }]);
+    expect(cardLines(ENGLISH, personSummary({ id: 1, given_names: 'Emma' }))).toEqual([{ text: 'Emma', tone: 'name' }]);
   });
 });
 
@@ -53,6 +54,6 @@ describe('personLabel', () => {
     [{ ...node, isRepeat: true }, 'Emma Wedgwood, b. 1808, also shown elsewhere in this tree'],
     [{ ...node, person: { ...emma, birth_date: null } }, 'Emma Wedgwood'],
   ])('names %o for assistive technology', (labelled, label) => {
-    expect(personLabel(labelled)).toBe(label);
+    expect(personLabel(ENGLISH, labelled)).toBe(label);
   });
 });

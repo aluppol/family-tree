@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react';
 import { useNavigate } from 'react-router';
 import type { PersonProfile } from '../../api/types';
+import { useT } from '../../i18n/languageContext';
 import { PEOPLE_PATH, profilePath } from '../../routePaths';
 import { useCreatePerson } from '../person/personQueries';
 import { useDocumentTitle } from '../shell/useDocumentTitle';
@@ -9,7 +10,8 @@ import { PersonFormView } from './PersonFormView';
 import { usePersonForm } from './usePersonForm';
 
 export function NewPersonPage(): ReactElement {
-  useDocumentTitle('Add a person');
+  const t = useT();
+  useDocumentTitle(t('personForm.newHeading'));
   const navigate = useNavigate();
   const createPerson = useCreatePerson();
   function handleValidSubmit(profile: PersonProfile): void {
@@ -22,8 +24,8 @@ export function NewPersonPage(): ReactElement {
   const form = usePersonForm({ initialDraft: EMPTY_PERSON_DRAFT, serverError: createPerson.error, onValidSubmit: handleValidSubmit });
   return (
     <PersonFormView
-      heading="Add a person"
-      submitLabel="Add person"
+      heading={t('personForm.newHeading')}
+      submitLabel={t('personForm.addSubmit')}
       cancelPath={PEOPLE_PATH}
       isSubmitting={createPerson.isPending}
       serverError={createPerson.error}

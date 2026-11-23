@@ -1,6 +1,7 @@
 import { type ReactElement, useId } from 'react';
 import { Icon } from '../../design/components';
-import type { TowerAxis, TowerLegend } from './layout/towerTypes';
+import { useT } from '../../i18n/languageContext';
+import type { NodeTone, TowerAxis, TowerLegend } from './layout/towerTypes';
 import { ToneSwatch, toneName } from './ToneSwatch';
 import { REPEAT_MARK } from './towerText';
 import styles from './TowerPage.module.scss';
@@ -14,20 +15,21 @@ export interface TowerKeyProps {
 }
 
 export function TowerKey({ axis, legend, hasMarriages, isOpen, onToggle }: TowerKeyProps): ReactElement {
+  const t = useT();
   const listId = useId();
   return (
-    <section className={styles.key} aria-label="Key" data-open={isOpen}>
+    <section className={styles.key} aria-label={t('tower.key')} data-open={isOpen}>
       <button type="button" className={styles.overlayButton} aria-expanded={isOpen} aria-controls={listId} onClick={onToggle}>
         <Icon name="info" />
-        Key
+        {t('tower.key')}
         <Icon name={isOpen ? 'chevronLeft' : 'chevronRight'} />
       </button>
       <ul id={listId} className={styles.keyList} inert={!isOpen}>
-        <li>{axis === 'years' ? 'Height is the year of birth; rings mark decades, the oldest at the bottom.' : 'Each ring is one generation, the oldest at the bottom.'}</li>
+        <li>{axis === 'years' ? t('tower.yearsAxis') : t('tower.generationsAxis')}</li>
         {legend.lines.map((line) => (
           <li key={line.lineIndex}>
             <ToneSwatch tone={{ kind: 'line', lineIndex: line.lineIndex }} />
-            {toneName({ kind: 'line', lineIndex: line.lineIndex }, line.head)}
+            {toneName(t, { kind: 'line', lineIndex: line.lineIndex }, line.head)}
           </li>
         ))}
         <KeyExtras legend={legend} hasMarriages={hasMarriages} />
@@ -37,6 +39,7 @@ export function TowerKey({ axis, legend, hasMarriages, isOpen, onToggle }: Tower
 }
 
 function KeyExtras({ legend, hasMarriages }: { legend: TowerLegend; hasMarriages: boolean }): ReactElement {
+  const t = useT();
   return (
     <>
       {legend.hasTrunk && <ToneItem tone={{ kind: 'trunk' }} />}
@@ -45,25 +48,30 @@ function KeyExtras({ legend, hasMarriages }: { legend: TowerLegend; hasMarriages
       {hasMarriages && (
         <li>
           <span className={styles.goldSample} aria-hidden="true" />
-          Marriage, and the path you ask for
+          {t('tower.marriageAndPath')}
         </li>
       )}
       {legend.hasEstimatedYears && (
         <li>
           <ToneSwatch tone={{ kind: 'other' }} isHollow />
-          Birth year estimated
+          {t('tower.estimatedYear')}
         </li>
       )}
-      {legend.hasRepeats && <li>{REPEAT_MARK} Parents are related to each other</li>}
+      {legend.hasRepeats && (
+        <li>
+          {REPEAT_MARK} {t('tower.relatedParents')}
+        </li>
+      )}
     </>
   );
 }
 
-function ToneItem({ tone }: { tone: Parameters<typeof toneName>[0] }): ReactElement {
+function ToneItem({ tone }: { tone: NodeTone }): ReactElement {
+  const t = useT();
   return (
     <li>
       <ToneSwatch tone={tone} />
-      {toneName(tone, undefined)}
+      {toneName(t, tone, undefined)}
     </li>
   );
 }

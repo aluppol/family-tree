@@ -1,6 +1,8 @@
 import { type ReactElement, useState } from 'react';
 import type { PartnerRelation, Person, Sex } from '../../api/types';
 import { ConfirmDialog } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
+import type { Translate } from '../../i18n/translate';
 import { fullName } from '../people/personName';
 import { AddPartnershipDialog } from './AddPartnershipDialog';
 import { EditPartnershipDialog } from './EditPartnershipDialog';
@@ -12,21 +14,22 @@ type PartnershipDialog = { type: 'none' } | { type: 'adding' } | { type: 'editin
 
 const NO_DIALOG: PartnershipDialog = { type: 'none' };
 
-const SPOUSE_WORDS: Record<Sex, string> = { male: 'Husband', female: 'Wife', other: 'Spouse', unknown: 'Spouse' };
+const SPOUSE_WORDS: Record<Sex, 'husband' | 'wife' | 'spouse'> = { male: 'husband', female: 'wife', other: 'spouse', unknown: 'spouse' };
 
 export function PartnershipsPanel({ person }: { person: Person }): ReactElement {
+  const t = useT();
   const [dialog, setDialog] = useState<PartnershipDialog>(NO_DIALOG);
-  const entries = person.partnerships.map((partnership) => partnershipEntry(partnership, setDialog));
+  const entries = person.partnerships.map((partnership) => partnershipEntry(t, partnership, setDialog));
   function handleClose(): void {
     setDialog(NO_DIALOG);
   }
   return (
     <>
       <RelativesView
-        title="Spouses"
-        addLabel="Add spouse"
-        emptyText="No spouses recorded yet."
-        editLabel="Edit"
+        title={t('kinship.spouses.title')}
+        addLabel={t('kinship.spouses.add')}
+        emptyText={t('kinship.spouses.empty')}
+        editLabel={t('common.edit')}
         entries={entries}
         onAdd={() => { setDialog({ type: 'adding' }); }}
       />
@@ -37,12 +40,12 @@ export function PartnershipsPanel({ person }: { person: Person }): ReactElement 
   );
 }
 
-function partnershipEntry(partnership: PartnerRelation, openDialog: (dialog: PartnershipDialog) => void): RelativeEntry {
+function partnershipEntry(t: Translate, partnership: PartnerRelation, openDialog: (dialog: PartnershipDialog) => void): RelativeEntry {
   return {
     key: partnership.partnership_id,
     person: partnership.partner,
-    badge: SPOUSE_WORDS[partnership.partner.sex],
-    detail: describeTerms(partnership.terms),
+    badge: t(`kinship.spouses.${SPOUSE_WORDS[partnership.partner.sex]}`),
+    detail: describeTerms(t, partnership.terms),
     onEdit: () => {
       openDialog({ type: 'editing', partnership });
     },
@@ -59,16 +62,15 @@ interface RemovePartnershipDialogProps {
 }
 
 function RemovePartnershipDialog({ person, partnership, onClose }: RemovePartnershipDialogProps): ReactElement {
+  const t = useT();
   const removePartnership = useRemovePartnership();
-  const partnerName = fullName(partnership.partner);
+  const partnerName = fullName(t, partnership.partner);
   function handleConfirm(): void {
     removePartnership.mutate({ partnershipId: partnership.partnership_id, personIds: [person.id, partnership.partner.id] }, { onSuccess: onClose });
   }
   return (
-    <ConfirmDialog isOpen title={`Remove the marriage with ${partnerName}?`} confirmLabel="Remove marriage" onConfirm={handleConfirm} onCancel={onClose} isPending={removePartnership.isPending} error={removePartnership.error}>
-      <p>
-        Only the marriage between {fullName(person)} and {partnerName} is removed. Both people stay in your tree.
-      </p>
+    <ConfirmDialog isOpen title={t('kinship.spouses.removeTitle', { name: partnerName })} confirmLabel={t('kinship.spouses.removeConfirm')} onConfirm={handleConfirm} onCancel={onClose} isPending={removePartnership.isPending} error={removePartnership.error}>
+      <p>{t('kinship.spouses.removalMessage', { person: fullName(t, person), partner: partnerName })}</p>
     </ConfirmDialog>
   );
 }

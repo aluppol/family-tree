@@ -1,9 +1,9 @@
 import type { Sex } from '../../api/types';
 import type { SelectOption } from '../../design/components';
+import type { Translate } from '../../i18n/translate';
 
-export const SEX_OPTIONS: readonly SelectOption<Sex>[] = [
-  { value: 'female', label: 'Female' },
-  { value: 'male', label: 'Male' },
-  { value: 'other', label: 'Other' },
-  { value: 'unknown', label: 'Unknown' },
-];
+const SEXES: readonly Sex[] = ['female', 'male', 'other', 'unknown'];
+
+export function sexOptions(t: Translate): SelectOption<Sex>[] {
+  return SEXES.map((sex) => ({ value: sex, label: t(`sex.${sex}`) }));
+}

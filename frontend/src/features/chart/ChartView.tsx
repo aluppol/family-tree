@@ -1,4 +1,5 @@
 import { type ReactElement, useId, useRef } from 'react';
+import { useT } from '../../i18n/languageContext';
 import { CardClipPaths, useCardClipIds } from './CardClipPaths';
 import { ChartLegend } from './ChartLegend';
 import { ChartScene } from './ChartScene';
@@ -18,10 +19,8 @@ export interface ChartViewProps {
 
 const ORIGIN: Point = { x: 0, y: 0 };
 
-const INSTRUCTIONS =
-  'Drag to move around the tree. Scroll, pinch or use the zoom buttons to zoom. Tab moves from person to person; Enter opens their profile.';
-
 export function ChartView({ layout, label, links, onNavigate }: ChartViewProps): ReactElement {
+  const t = useT();
   const canvasRef = useRef<SVGSVGElement>(null);
   const sceneRef = useRef<SVGGElement>(null);
   const clipIds = useCardClipIds();
@@ -40,7 +39,7 @@ export function ChartView({ layout, label, links, onNavigate }: ChartViewProps):
         </svg>
       </div>
       <p id={instructionsId} className="visually-hidden">
-        {INSTRUCTIONS}
+        {t('chart.instructions')}
       </p>
       <ChartLegend />
     </div>

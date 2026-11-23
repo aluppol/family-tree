@@ -2,6 +2,8 @@ import type { ChangeEvent, ReactElement, SubmitEvent } from 'react';
 import { Link } from 'react-router';
 import type { PersonSummary } from '../../api/types';
 import { Avatar, Button, ButtonLink, EmptyState, ErrorState, Icon, LoadingState, PageContainer, PageHeader, TextField } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
+import type { Translate } from '../../i18n/translate';
 import { NEW_PERSON_PATH, TRANSFER_PATH, profilePath } from '../../routePaths';
 import { formatLifeYears } from '../dates/format';
 import styles from './PeopleList.module.scss';
@@ -27,15 +29,16 @@ export interface PeopleListViewProps {
 }
 
 export function PeopleListView({ searchText, onSearchTextChange, search, listing }: PeopleListViewProps): ReactElement {
+  const t = useT();
   function handleClearSearch(): void {
     onSearchTextChange('');
   }
   return (
     <PageContainer>
-      <PageHeader title="People" description="Everyone in your family tree, by surname." actions={<AddPersonLink />} />
+      <PageHeader title={t('people.title')} description={t('people.description')} actions={<AddPersonLink />} />
       <PeopleSearchForm text={searchText} onTextChange={onSearchTextChange} />
       <p className={styles.status} aria-live="polite">
-        {listingAnnouncement(listing, search)}
+        {listingAnnouncement(t, listing, search)}
       </p>
       <PeopleListingView search={search} listing={listing} onClearSearch={handleClearSearch} />
     </PageContainer>
@@ -43,15 +46,17 @@ export function PeopleListView({ searchText, onSearchTextChange, search, listing
 }
 
 function AddPersonLink(): ReactElement {
+  const t = useT();
   return (
     <ButtonLink to={NEW_PERSON_PATH} variant="primary">
       <Icon name="plus" />
-      Add person
+      {t('people.addPerson')}
     </ButtonLink>
   );
 }
 
 function PeopleSearchForm({ text, onTextChange }: { text: string; onTextChange: (text: string) => void }): ReactElement {
+  const t = useT();
   function handleChange(event: ChangeEvent<HTMLInputElement>): void {
     onTextChange(event.target.value);
   }
@@ -60,7 +65,7 @@ function PeopleSearchForm({ text, onTextChange }: { text: string; onTextChange: 
   }
   return (
     <form role="search" className={styles.search} onSubmit={handleSubmit}>
-      <TextField label="Search people" type="search" value={text} onChange={handleChange} placeholder="Given names or surname" autoComplete="off" />
+      <TextField label={t('people.searchLabel')} type="search" value={text} onChange={handleChange} placeholder={t('people.searchPlaceholder')} autoComplete="off" />
     </form>
   );
 }
@@ -72,9 +77,10 @@ interface PeopleListingViewProps {
 }
 
 function PeopleListingView({ search, listing, onClearSearch }: PeopleListingViewProps): ReactElement {
+  const t = useT();
   switch (listing.status) {
     case 'loading':
-      return <LoadingState label="Loading people…" />;
+      return <LoadingState label={t('people.loading')} />;
     case 'error':
       return <ErrorState error={listing.error} onRetry={listing.onRetry} />;
     case 'ready':
@@ -83,9 +89,10 @@ function PeopleListingView({ search, listing, onClearSearch }: PeopleListingView
 }
 
 function FoundPeopleView({ listing }: { listing: FoundPeople }): ReactElement {
+  const t = useT();
   return (
     <>
-      <ul className={styles.personGrid} aria-label="People in your tree" aria-busy={listing.isRefreshing}>
+      <ul className={styles.personGrid} aria-label={t('people.listLabel')} aria-busy={listing.isRefreshing}>
         {listing.people.map((person) => (
           <li key={person.id}>
             <PersonCardLink person={person} />
@@ -95,7 +102,7 @@ function FoundPeopleView({ listing }: { listing: FoundPeople }): ReactElement {
       {listing.hasMore && (
         <div className={styles.loadMore}>
           <Button onClick={listing.onLoadMore} aria-disabled={listing.isLoadingMore}>
-            {listing.isLoadingMore ? 'Loading more…' : 'Load more'}
+            {listing.isLoadingMore ? t('people.loadingMore') : t('people.loadMore')}
           </Button>
         </div>
       )}
@@ -104,12 +111,13 @@ function FoundPeopleView({ listing }: { listing: FoundPeople }): ReactElement {
 }
 
 function PersonCardLink({ person }: { person: PersonSummary }): ReactElement {
-  const lifeYears = formatLifeYears(person);
+  const t = useT();
+  const lifeYears = formatLifeYears(t, person);
   return (
     <Link to={profilePath(person.id)} className={styles.personCard}>
       <Avatar person={person} />
       <span className={styles.personText}>
-        <span className={styles.personName}>{fullName(person)}</span>{' '}
+        <span className={styles.personName}>{fullName(t, person)}</span>{' '}
         {lifeYears !== '' && <span className={styles.lifeYears}>{lifeYears}</span>}
       </span>
     </Link>
@@ -117,36 +125,38 @@ function PersonCardLink({ person }: { person: PersonSummary }): ReactElement {
 }
 
 function NoPeopleView({ search, onClearSearch }: { search: string; onClearSearch: () => void }): ReactElement {
+  const t = useT();
   if (search !== '') {
     return (
-      <EmptyState icon="search" title={`No one matches “${search}”`} actions={<Button onClick={onClearSearch}>Clear search</Button>}>
-        <p>Try a different spelling, or search by the surname alone.</p>
+      <EmptyState icon="search" title={t('people.noMatchTitle', { search })} actions={<Button onClick={onClearSearch}>{t('people.clearSearch')}</Button>}>
+        <p>{t('people.noMatchMessage')}</p>
       </EmptyState>
     );
   }
   return (
-    <EmptyState icon="people" title="No people yet" actions={<EmptyTreeActions />}>
-      <p>Add the first person by hand, or import a GEDCOM file from another genealogy program.</p>
+    <EmptyState icon="people" title={t('people.emptyTitle')} actions={<EmptyTreeActions />}>
+      <p>{t('people.emptyMessage')}</p>
     </EmptyState>
   );
 }
 
 function EmptyTreeActions(): ReactElement {
+  const t = useT();
   return (
     <>
       <AddPersonLink />
-      <ButtonLink to={TRANSFER_PATH}>Import a GEDCOM file</ButtonLink>
+      <ButtonLink to={TRANSFER_PATH}>{t('people.importGedcom')}</ButtonLink>
     </>
   );
 }
 
-function listingAnnouncement(listing: PeopleListing, search: string): string {
+function listingAnnouncement(t: Translate, listing: PeopleListing, search: string): string {
   if (listing.status !== 'ready') {
     return '';
   }
   if (listing.isRefreshing) {
-    return 'Searching…';
+    return t('common.searching');
   }
-  const shownCount = `${String(listing.people.length)} of ${String(listing.totalCount)}`;
-  return search === '' ? `Showing ${shownCount} people.` : `Showing ${shownCount} people matching “${search}”.`;
+  const counts = { shown: listing.people.length, count: listing.totalCount };
+  return search === '' ? t('people.showing', counts) : t('people.showingMatches', { ...counts, search });
 }

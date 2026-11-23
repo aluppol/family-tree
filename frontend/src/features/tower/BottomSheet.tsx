@@ -1,5 +1,6 @@
 import { type PointerEvent, type ReactElement, type ReactNode, useId, useRef } from 'react';
 import { Icon } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
 import styles from './TowerPage.module.scss';
 
 export interface BottomSheetProps {
@@ -19,6 +20,7 @@ interface SwipeHandlers {
 const SWIPE_DISTANCE = 30;
 
 export function BottomSheet({ title, summary, isExpanded, onExpandedChange, children }: BottomSheetProps): ReactElement {
+  const t = useT();
   const bodyId = useId();
   const swipe = useVerticalSwipe(onExpandedChange);
   function handleClick(): void {
@@ -27,13 +29,13 @@ export function BottomSheet({ title, summary, isExpanded, onExpandedChange, chil
     }
   }
   return (
-    <section className={styles.sheet} data-expanded={isExpanded} aria-label="Selected person">
+    <section className={styles.sheet} data-expanded={isExpanded} aria-label={t('tower.selectedPerson')}>
       <button type="button" className={styles.sheetHandle} aria-expanded={isExpanded} aria-controls={bodyId} onClick={handleClick} onPointerDown={swipe.onPointerDown} onPointerUp={swipe.onPointerUp}>
         <span className={styles.sheetGrip} aria-hidden="true" />
         <span className={styles.sheetTitle}>{title}</span>
         <span className={styles.sheetSummary}>{summary}</span>
         <span className={styles.sheetMore}>
-          {isExpanded ? 'Hide details' : 'Show details'}
+          {isExpanded ? t('tower.sheetHide') : t('tower.sheetShow')}
           <Icon name={isExpanded ? 'chevronDown' : 'chevronRight'} />
         </span>
       </button>

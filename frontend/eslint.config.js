@@ -3,6 +3,7 @@ import jsxA11y from 'eslint-plugin-jsx-a11y-x';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import noLiteralTextRule from './eslint/noLiteralText.js';
 
 const noCommentsRule = {
   meta: {
@@ -22,7 +23,7 @@ const noCommentsRule = {
   },
 };
 
-const codeRules = { rules: { 'no-comments': noCommentsRule } };
+const codeRules = { rules: { 'no-comments': noCommentsRule, 'no-literal-text': noLiteralTextRule } };
 
 export default tseslint.config(
   { ignores: ['dist', 'coverage', 'playwright-report', 'test-results', 'node_modules'] },
@@ -52,7 +53,13 @@ export default tseslint.config(
     },
   },
   {
+    files: ['src/**/*.tsx'],
+    ignores: ['src/**/*.test.tsx', 'src/test/**'],
+    rules: { 'code/no-literal-text': 'error' },
+  },
+  {
     files: ['**/*.js'],
     extends: [tseslint.configs.disableTypeChecked],
+    rules: { '@typescript-eslint/explicit-module-boundary-types': 'off' },
   },
 );

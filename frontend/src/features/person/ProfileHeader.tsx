@@ -2,6 +2,7 @@ import { type ReactElement, useState } from 'react';
 import { useNavigate } from 'react-router';
 import type { Person } from '../../api/types';
 import { Button, ButtonLink, ConfirmDialog, Icon, InlineError } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
 import { PEOPLE_PATH, editProfilePath, towerPath } from '../../routePaths';
 import { fullName } from '../people/personName';
 import { useSetHomePerson, useWorkspace } from '../workspace/workspaceQueries';
@@ -10,21 +11,22 @@ import { useDeletePerson } from './personQueries';
 import styles from './Profile.module.scss';
 
 export function ProfileHeader({ person }: { person: Person }): ReactElement {
-  const lifeSpan = lifeSpanOf(person);
+  const t = useT();
+  const lifeSpan = lifeSpanOf(t, person);
   return (
     <header className={styles.header}>
       <div className={styles.identity}>
-        <h1 className={styles.name}>{fullName(person)}</h1>
+        <h1 className={styles.name}>{fullName(t, person)}</h1>
         {lifeSpan !== '' && <p className={styles.lifeSpan}>{lifeSpan}</p>}
       </div>
       <div className={styles.actions}>
         <ButtonLink to={editProfilePath(person.id)} variant="primary">
           <Icon name="edit" />
-          Edit
+          {t('profile.edit')}
         </ButtonLink>
         <ButtonLink to={towerPath(person.id)}>
           <Icon name="tree" />
-          Show in tree
+          {t('profile.showInTree')}
         </ButtonLink>
         <HomePersonAction person={person} />
         <DeletePersonAction person={person} />
@@ -34,6 +36,7 @@ export function ProfileHeader({ person }: { person: Person }): ReactElement {
 }
 
 function HomePersonAction({ person }: { person: Person }): ReactElement {
+  const t = useT();
   const workspace = useWorkspace();
   const setHomePerson = useSetHomePerson();
   const isHomePerson = workspace.data?.home_person_id === person.id;
@@ -46,7 +49,7 @@ function HomePersonAction({ person }: { person: Person }): ReactElement {
     <>
       <Button onClick={handleClick} aria-disabled={isHomePerson || setHomePerson.isPending}>
         <Icon name={isHomePerson ? 'check' : 'home'} />
-        {isHomePerson ? 'Home person' : 'Set as home person'}
+        {isHomePerson ? t('profile.homePerson') : t('profile.setHomePerson')}
       </Button>
       <InlineError error={setHomePerson.error} />
     </>
@@ -54,10 +57,11 @@ function HomePersonAction({ person }: { person: Person }): ReactElement {
 }
 
 function DeletePersonAction({ person }: { person: Person }): ReactElement {
+  const t = useT();
   const navigate = useNavigate();
   const deletePerson = useDeletePerson();
   const [isConfirming, setIsConfirming] = useState(false);
-  const name = fullName(person);
+  const name = fullName(t, person);
   function handleConfirm(): void {
     deletePerson.mutate(person, { onSuccess: () => void navigate(PEOPLE_PATH) });
   }
@@ -69,10 +73,10 @@ function DeletePersonAction({ person }: { person: Person }): ReactElement {
     <>
       <Button variant="danger" onClick={() => { setIsConfirming(true); }}>
         <Icon name="trash" />
-        Delete
+        {t('profile.delete')}
       </Button>
-      <ConfirmDialog isOpen={isConfirming} title={`Delete ${name}?`} confirmLabel="Delete person" onConfirm={handleConfirm} onCancel={handleCancel} isPending={deletePerson.isPending} error={deletePerson.error}>
-        <p>{name} will be removed from your tree, together with their parent links and partnerships. This cannot be undone.</p>
+      <ConfirmDialog isOpen={isConfirming} title={t('profile.deleteTitle', { name })} confirmLabel={t('profile.deleteConfirm')} onConfirm={handleConfirm} onCancel={handleCancel} isPending={deletePerson.isPending} error={deletePerson.error}>
+        <p>{t('profile.deleteMessage', { name })}</p>
       </ConfirmDialog>
     </>
   );

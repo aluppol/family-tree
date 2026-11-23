@@ -1,8 +1,8 @@
 import { Group } from 'three';
 import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import type { PersonSummary } from '../../../api/types';
 import { classNames } from '../../../design/classNames';
 import type { TowerNode } from '../layout/towerTypes';
-import { shortName } from '../towerText';
 import styles from '../TowerScene.module.scss';
 import type { LabelKind, ScreenLabel } from './labelDeclutter';
 import { SPHERE_RADIUS } from './peopleMeshes';
@@ -23,14 +23,25 @@ interface ShownLabel {
   readonly kind: LabelKind;
 }
 
+export type PersonNameText = (person: PersonSummary) => string;
+
 export class NameLabels {
   readonly group = new Group();
   private readonly nodes: ReadonlyMap<number, TowerNode>;
   private shown = new Map<number, ShownLabel>();
   private hover: CSS2DObject | null = null;
+  private personName: PersonNameText;
 
-  constructor(nodes: ReadonlyMap<number, TowerNode>) {
+  constructor(nodes: ReadonlyMap<number, TowerNode>, personName: PersonNameText) {
     this.nodes = nodes;
+    this.personName = personName;
+  }
+
+  rename(personName: PersonNameText): void {
+    this.personName = personName;
+    for (const [personId, { label }] of this.shown) {
+      label.element.textContent = this.textFor(personId);
+    }
   }
 
   show(focus: SceneFocus): void {
@@ -84,12 +95,17 @@ export class NameLabels {
   private labelFor(personId: number): CSS2DObject {
     const element = document.createElement('div');
     const node = this.nodes.get(personId);
-    element.textContent = node === undefined ? '' : shortName(node.person);
+    element.textContent = this.textFor(personId);
     const label = new CSS2DObject(element);
     if (node !== undefined) {
       label.position.set(node.position.x, node.position.y + LABEL_LIFT, node.position.z);
     }
     return label;
+  }
+
+  private textFor(personId: number): string {
+    const node = this.nodes.get(personId);
+    return node === undefined ? '' : this.personName(node.person);
   }
 }
 

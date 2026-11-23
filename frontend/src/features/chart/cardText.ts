@@ -1,4 +1,5 @@
 import type { PersonSummary } from '../../api/types';
+import type { Translate } from '../../i18n/translate';
 import { formatLifeYears } from '../dates/format';
 import { fullName, type NamedPerson } from '../people/personName';
 import type { ChartNode } from './layout/types';
@@ -14,24 +15,24 @@ export const LINE_LENGTH = 15;
 
 const ELLIPSIS = '…';
 
-export function cardLines(person: PersonSummary): CardLine[] {
-  const lifeYears = formatLifeYears(person);
-  const names: CardLine[] = nameLines(person).map((text) => ({ text, tone: 'name' }));
+export function cardLines(t: Translate, person: PersonSummary): CardLine[] {
+  const lifeYears = formatLifeYears(t, person);
+  const names: CardLine[] = nameLines(t, person).map((text) => ({ text, tone: 'name' }));
   return lifeYears === '' ? names : [...names, { text: lifeYears, tone: 'years' }];
 }
 
-export function nameLines(person: NamedPerson): string[] {
+export function nameLines(t: Translate, person: NamedPerson): string[] {
   const givenNames = person.given_names.trim();
   const surname = person.surname.trim();
   if (givenNames !== '' && surname !== '') {
     return [truncated(givenNames), truncated(surname)];
   }
-  return wrappedOnTwoLines(fullName(person));
+  return wrappedOnTwoLines(fullName(t, person));
 }
 
-export function personLabel(node: ChartNode): string {
-  const repeatNote = node.isRepeat ? 'also shown elsewhere in this tree' : '';
-  return [fullName(node.person), formatLifeYears(node.person), repeatNote].filter((part) => part !== '').join(', ');
+export function personLabel(t: Translate, node: ChartNode): string {
+  const repeatNote = node.isRepeat ? t('chart.alsoElsewhere') : '';
+  return [fullName(t, node.person), formatLifeYears(t, node.person), repeatNote].filter((part) => part !== '').join(', ');
 }
 
 function wrappedOnTwoLines(text: string): string[] {

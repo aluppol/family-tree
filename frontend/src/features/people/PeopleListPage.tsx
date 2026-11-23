@@ -1,13 +1,15 @@
 import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
 import type { ReactElement } from 'react';
 import type { PeoplePage } from '../../api/types';
+import { useT } from '../../i18n/languageContext';
 import { useDocumentTitle } from '../shell/useDocumentTitle';
 import { type PeopleListing, PeopleListView } from './PeopleListView';
 import { usePeopleSearch } from './peopleQueries';
 import { useSearchText } from './useSearchText';
 
 export function PeopleListPage(): ReactElement {
-  useDocumentTitle('People');
+  const t = useT();
+  useDocumentTitle(t('people.title'));
   const searchText = useSearchText();
   const peopleQuery = usePeopleSearch(searchText.search);
   return (

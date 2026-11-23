@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react';
 import type { Person } from '../../api/types';
 import { LoadingState, PageContainer } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
 import { CHILDREN, PARENTS } from '../kinship/relations';
 import { ParentLinksPanel } from '../kinship/ParentLinksPanel';
 import { PartnershipsPanel } from '../kinship/PartnershipsPanel';
@@ -21,10 +22,11 @@ export function PersonProfilePage(): ReactElement {
 }
 
 function PersonProfile({ personId }: { personId: number }): ReactElement {
+  const t = useT();
   const person = usePerson(personId);
-  useDocumentTitle(person.data === undefined ? null : fullName(person.data));
+  useDocumentTitle(person.data === undefined ? null : fullName(t, person.data));
   if (person.isPending) {
-    return <LoadingState label="Loading person…" />;
+    return <LoadingState label={t('personForm.loading')} />;
   }
   if (person.isError) {
     return <PageError error={person.error} onRetry={person.refetch} />;

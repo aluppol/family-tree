@@ -1,5 +1,6 @@
 import { ApiError } from '../../api/client';
 import type { PersonProfile, Sex } from '../../api/types';
+import { type FieldMessage, messageOf } from '../../i18n/message';
 import { type DateDraft, type DateParse, EMPTY_DATE_DRAFT, draftFromDate, parseDateDraft } from '../dates/dateDraft';
 
 export interface PersonDraft {
@@ -16,7 +17,7 @@ export interface PersonDraft {
 
 export type PersonDraftField = keyof PersonDraft;
 
-export type PersonFormErrors = Partial<Record<PersonDraftField, string>>;
+export type PersonFormErrors = Partial<Record<PersonDraftField, FieldMessage>>;
 
 export type ProfileParse = { profile: PersonProfile; errors: null } | { profile: null; errors: PersonFormErrors };
 
@@ -63,7 +64,7 @@ export function profileFromDraft(draft: PersonDraft): ProfileParse {
   const birthDate = parseDateDraft(draft.birthDate);
   const deathDate = draft.hasDied ? parseDateDraft(draft.deathDate) : NO_DATE;
   const errors: PersonFormErrors = {
-    ...(isNameMissing(draft) ? { givenNames: 'Enter a given name or a surname.' } : {}),
+    ...(isNameMissing(draft) ? { givenNames: messageOf('personForm.nameMissing') } : {}),
     ...(birthDate.problem === null ? {} : { birthDate: birthDate.problem.message }),
     ...(deathDate.problem === null ? {} : { deathDate: deathDate.problem.message }),
   };
@@ -77,7 +78,7 @@ export function serverFieldErrors(error: unknown): PersonFormErrors {
   if (!(error instanceof ApiError)) {
     return {};
   }
-  let errors: PersonFormErrors = {};
+  let errors: Partial<Record<PersonDraftField, string>> = {};
   for (const [path, messages] of Object.entries(error.fields)) {
     const field = draftFieldForServerPath(path);
     if (field !== null) {

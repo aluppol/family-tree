@@ -1,4 +1,5 @@
 import type { CalendarDate, DateQualifier, GenealogicalDate } from '../../api/types';
+import { type Message, messageOf } from '../../i18n/message';
 
 export interface CalendarDraft {
   day: string;
@@ -18,7 +19,7 @@ export type DateInputName = `${CalendarPart}.${keyof CalendarDraft}`;
 
 export interface DateProblem {
   inputName: DateInputName;
-  message: string;
+  message: Message;
 }
 
 export type DateParse = { date: GenealogicalDate | null; problem: null } | { date: null; problem: DateProblem };
@@ -58,7 +59,7 @@ function parseRange(value: CalendarDate, untilDraft: CalendarDraft): DateParse {
     return until;
   }
   if (isEarlier(until.date, value)) {
-    return problemAt('until.year', 'The second date must not be before the first.');
+    return problemAt('until.year', messageOf('dates.problems.secondBeforeFirst'));
   }
   return { date: { qualifier: 'between', value, until: until.date }, problem: null };
 }
@@ -66,12 +67,12 @@ function parseRange(value: CalendarDate, untilDraft: CalendarDraft): DateParse {
 function parseCalendarDraft(draft: CalendarDraft, part: CalendarPart): CalendarParse {
   const year = parseWholeNumber(draft.year);
   if (year === null || year < 1 || year > 9999) {
-    return problemAt(`${part}.year`, draft.year.trim() === '' ? missingYearMessage(part) : 'Year must be a whole number from 1 to 9999.');
+    return problemAt(`${part}.year`, draft.year.trim() === '' ? missingYearMessage(part) : messageOf('dates.problems.yearRange'));
   }
   const month = draft.month === '' ? null : parseWholeNumber(draft.month);
   const day = draft.day.trim() === '' ? null : parseWholeNumber(draft.day);
   if (day === null && draft.day.trim() !== '') {
-    return problemAt(`${part}.day`, 'Day must be a whole number.');
+    return problemAt(`${part}.day`, messageOf('dates.problems.dayNumber'));
   }
   return checkDayFitsMonth({ year, month, day }, part);
 }
@@ -81,11 +82,11 @@ function checkDayFitsMonth(date: CalendarDate, part: CalendarPart): CalendarPars
     return { date, problem: null };
   }
   if (date.month === null) {
-    return problemAt(`${part}.month`, 'Choose a month for this day.');
+    return problemAt(`${part}.month`, messageOf('dates.problems.monthForDay'));
   }
   const monthLength = daysInMonth(date.year, date.month);
   if (date.day < 1 || date.day > monthLength) {
-    return problemAt(`${part}.day`, `Day must be from 1 to ${String(monthLength)} for this month.`);
+    return problemAt(`${part}.day`, messageOf('dates.problems.dayRange', { last: monthLength }));
   }
   return { date, problem: null };
 }
@@ -118,11 +119,11 @@ function parseWholeNumber(text: string): number | null {
   return /^\d+$/.test(trimmed) ? Number(trimmed) : null;
 }
 
-function missingYearMessage(part: CalendarPart): string {
-  return part === 'value' ? 'Enter a year.' : 'Enter a year for the second date.';
+function missingYearMessage(part: CalendarPart): Message {
+  return messageOf(part === 'value' ? 'dates.problems.yearMissing' : 'dates.problems.secondYearMissing');
 }
 
-function problemAt(inputName: DateInputName, message: string): { date: null; problem: DateProblem } {
+function problemAt(inputName: DateInputName, message: Message): { date: null; problem: DateProblem } {
   return { date: null, problem: { inputName, message } };
 }
 

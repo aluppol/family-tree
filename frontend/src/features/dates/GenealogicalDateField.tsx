@@ -1,25 +1,15 @@
 import { type ChangeEvent, type ReactElement, useId } from 'react';
 import type { DateQualifier } from '../../api/types';
 import { SelectField, type SelectOption, TextField } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
+import type { Translate } from '../../i18n/translate';
 import { type CalendarDraft, type CalendarPart, type DateDraft, type DateInputName, parseDateDraft } from './dateDraft';
+import { monthOptionLabels } from './format';
 import styles from './GenealogicalDateField.module.scss';
 
-const QUALIFIER_OPTIONS: readonly SelectOption<DateQualifier>[] = [
-  { value: 'exact', label: 'Exact' },
-  { value: 'about', label: 'About' },
-  { value: 'calculated', label: 'Calculated' },
-  { value: 'estimated', label: 'Estimated' },
-  { value: 'before', label: 'Before' },
-  { value: 'after', label: 'After' },
-  { value: 'between', label: 'Between' },
-];
+const QUALIFIERS: readonly DateQualifier[] = ['exact', 'about', 'calculated', 'estimated', 'before', 'after', 'between'];
 
-const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-const MONTH_OPTIONS: readonly SelectOption<string>[] = [
-  { value: '', label: '—' },
-  ...MONTH_NAMES.map((label, index) => ({ value: String(index + 1), label })),
-];
+const NO_MONTH = '—';
 
 export interface GenealogicalDateFieldProps {
   legend: string;
@@ -29,6 +19,7 @@ export interface GenealogicalDateFieldProps {
 }
 
 export function GenealogicalDateField({ legend, draft, onDraftChange, error }: GenealogicalDateFieldProps): ReactElement {
+  const t = useT();
   const errorId = useId();
   const invalidInput = error === undefined ? undefined : (parseDateDraft(draft).problem?.inputName ?? 'value.year');
   const marking: ErrorMarking = { errorId, invalidInput };
@@ -39,12 +30,12 @@ export function GenealogicalDateField({ legend, draft, onDraftChange, error }: G
     <fieldset className={styles.dateField}>
       <legend className={styles.legend}>{legend}</legend>
       <div className={styles.row}>
-        <SelectField className={styles.qualifier} label="Qualifier" options={QUALIFIER_OPTIONS} value={draft.qualifier} onValueChange={handleQualifierChange} />
+        <SelectField className={styles.qualifier} label={t('dates.field.qualifier')} options={qualifierOptions(t)} value={draft.qualifier} onValueChange={handleQualifierChange} />
         <CalendarInputs part="value" draft={draft} onDraftChange={onDraftChange} marking={marking} />
       </div>
       {draft.qualifier === 'between' && (
         <fieldset className={styles.secondDate}>
-          <legend className={styles.secondLegend}>and</legend>
+          <legend className={styles.secondLegend}>{t('dates.field.and')}</legend>
           <CalendarInputs part="until" draft={draft} onDraftChange={onDraftChange} marking={marking} />
         </fieldset>
       )}
@@ -75,15 +66,16 @@ interface CalendarInputsProps {
 }
 
 function CalendarInputs({ part, draft, onDraftChange, marking }: CalendarInputsProps): ReactElement {
+  const t = useT();
   const calendar = draft[part];
   function change(update: Partial<CalendarDraft>): void {
     onDraftChange({ ...draft, [part]: { ...calendar, ...update } });
   }
   return (
     <div className={styles.calendar}>
-      <NumberInput label="Day" className={styles.day} maxLength={2} value={calendar.day} onValueChange={(day) => { change({ day }); }} marking={markingFor(marking, `${part}.day`)} />
-      <SelectField className={styles.month} label="Month" options={MONTH_OPTIONS} value={calendar.month} onValueChange={(month) => { change({ month }); }} {...markingFor(marking, `${part}.month`)} />
-      <NumberInput label="Year" className={styles.year} maxLength={4} value={calendar.year} onValueChange={(year) => { change({ year }); }} marking={markingFor(marking, `${part}.year`)} />
+      <NumberInput label={t('dates.field.day')} className={styles.day} maxLength={2} value={calendar.day} onValueChange={(day) => { change({ day }); }} marking={markingFor(marking, `${part}.day`)} />
+      <SelectField className={styles.month} label={t('dates.field.month')} options={monthOptions(t)} value={calendar.month} onValueChange={(month) => { change({ month }); }} {...markingFor(marking, `${part}.month`)} />
+      <NumberInput label={t('dates.field.year')} className={styles.year} maxLength={4} value={calendar.year} onValueChange={(year) => { change({ year }); }} marking={markingFor(marking, `${part}.year`)} />
     </div>
   );
 }
@@ -106,4 +98,12 @@ function NumberInput({ label, className, maxLength, value, onValueChange, markin
 
 function markingFor(marking: ErrorMarking, inputName: DateInputName): InputMarking {
   return marking.invalidInput === inputName ? { 'aria-invalid': true, 'aria-describedby': marking.errorId } : {};
+}
+
+function qualifierOptions(t: Translate): SelectOption<DateQualifier>[] {
+  return QUALIFIERS.map((qualifier) => ({ value: qualifier, label: t(`dates.qualifiers.${qualifier}`) }));
+}
+
+function monthOptions(t: Translate): SelectOption<string>[] {
+  return [{ value: '', label: NO_MONTH }, ...monthOptionLabels(t).map((label, index) => ({ value: String(index + 1), label }))];
 }

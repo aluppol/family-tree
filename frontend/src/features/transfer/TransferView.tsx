@@ -2,21 +2,24 @@ import type { ReactElement } from 'react';
 import { gedcomExportUrl } from '../../api/gedcom';
 import type { ExportFormat } from '../../api/types';
 import { ButtonAnchor, CardSection, Icon, PageContainer, PageHeader } from '../../design/components';
+import type { TextKey } from '../../i18n/catalogue';
+import { useT } from '../../i18n/languageContext';
+import type { Translate } from '../../i18n/translate';
 import { type ImportStep, ImportStepView } from './ImportStepView';
 import styles from './Transfer.module.scss';
 
 interface ExportChoice {
   format: ExportFormat;
   label: string;
-  description: string;
+  descriptionKey: TextKey;
 }
 
 const MEGABYTE = 1024 * 1024;
 
 const EXPORT_CHOICES: readonly ExportChoice[] = [
-  { format: 'gedcom-7.0', label: 'GEDCOM 7.0', description: 'The current standard, for up-to-date genealogy programs.' },
-  { format: 'gedcom-5.5.1', label: 'GEDCOM 5.5.1', description: 'The classic format almost every program can read.' },
-  { format: 'gedzip', label: 'GEDZIP', description: 'GEDCOM 7.0 packed together with the photos.' },
+  { format: 'gedcom-7.0', label: 'GEDCOM 7.0', descriptionKey: 'transfer.gedcom7' },
+  { format: 'gedcom-5.5.1', label: 'GEDCOM 5.5.1', descriptionKey: 'transfer.gedcom551' },
+  { format: 'gedzip', label: 'GEDZIP', descriptionKey: 'transfer.gedzip' },
 ];
 
 export interface TransferViewProps {
@@ -28,15 +31,13 @@ export interface TransferViewProps {
 }
 
 export function TransferView({ step, largestUploadBytes, onFileSelect, onImport, onStartOver }: TransferViewProps): ReactElement {
+  const t = useT();
   return (
     <PageContainer>
-      <PageHeader title="Import & export" description="Bring in a family from another genealogy program, or take yours with you." />
+      <PageHeader title={t('transfer.title')} description={t('transfer.description')} />
       <div className={styles.columns}>
-        <CardSection title="Import a GEDCOM file">
-          <p className={styles.explanation}>
-            GEDCOM 5.5.1 or 7.0 (.ged) or GEDZIP (.gdz or .zip){uploadLimitOf(largestUploadBytes)}. The people in the file are added to your tree;
-            nothing already in it is changed.
-          </p>
+        <CardSection title={t('transfer.importSection')}>
+          <p className={styles.explanation}>{importExplanation(t, largestUploadBytes)}</p>
           <ImportStepView step={step} onFileSelect={onFileSelect} onImport={onImport} onStartOver={onStartOver} />
         </CardSection>
         <ExportSection />
@@ -45,14 +46,15 @@ export function TransferView({ step, largestUploadBytes, onFileSelect, onImport,
   );
 }
 
-function uploadLimitOf(largestUploadBytes: number | undefined): string {
-  return largestUploadBytes === undefined ? '' : `, up to ${String(largestUploadBytes / MEGABYTE)} MB`;
+function importExplanation(t: Translate, largestUploadBytes: number | undefined): string {
+  return largestUploadBytes === undefined ? t('transfer.importExplanation') : t('transfer.importExplanationWithLimit', { megabytes: largestUploadBytes / MEGABYTE });
 }
 
 function ExportSection(): ReactElement {
+  const t = useT();
   return (
-    <CardSection title="Export your tree">
-      <p className={styles.explanation}>Download everyone in your tree in a format other genealogy programs understand.</p>
+    <CardSection title={t('transfer.exportSection')}>
+      <p className={styles.explanation}>{t('transfer.exportExplanation')}</p>
       <ul className={styles.exportChoices}>
         {EXPORT_CHOICES.map((choice) => (
           <li key={choice.format} className={styles.exportChoice}>
@@ -60,7 +62,7 @@ function ExportSection(): ReactElement {
               <Icon name="download" />
               {choice.label}
             </ButtonAnchor>
-            <span className={styles.exportDescription}>{choice.description}</span>
+            <span className={styles.exportDescription}>{t(choice.descriptionKey)}</span>
           </li>
         ))}
       </ul>

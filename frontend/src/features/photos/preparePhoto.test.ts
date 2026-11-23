@@ -52,18 +52,18 @@ test('the quality is lowered until the photo fits in 2 MB', async () => {
 test('a photo that never fits is rejected with an explanation', async () => {
   stubDecodedImage(800, 800);
   stubEncoder({ 0.9: 3e6, 0.8: 3e6, 0.7: 3e6, 0.6: 3e6, 0.5: 3e6, 0.4: 3e6 });
-  await expect(preparePhoto(new File(['raw'], 'noise.png'))).rejects.toThrow('This photo is too large even after resizing. Choose a smaller photo.');
+  await expect(preparePhoto(new File(['raw'], 'noise.png'))).rejects.toMatchObject({ messageKey: 'photos.tooLarge' });
 });
 
 test('a file that is not an image is rejected with an explanation', async () => {
   vi.stubGlobal('createImageBitmap', vi.fn(() => Promise.reject(new DOMException('The source image could not be decoded.'))));
-  await expect(preparePhoto(new File(['text'], 'notes.txt'))).rejects.toEqual(new ClientRejection('This file is not a photo we can read. Choose a JPEG, PNG or WebP image.'));
+  await expect(preparePhoto(new File(['text'], 'notes.txt'))).rejects.toEqual(new ClientRejection('photos.unreadable'));
 });
 
 test('a browser without a drawing context cannot resize', async () => {
   stubDecodedImage(800, 800);
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null);
-  await expect(preparePhoto(new File(['raw'], 'emma.png'))).rejects.toThrow('Your browser cannot resize photos.');
+  await expect(preparePhoto(new File(['raw'], 'emma.png'))).rejects.toMatchObject({ messageKey: 'photos.cannotResize' });
 });
 
 test('a failed encoding is reported', async () => {
@@ -71,5 +71,5 @@ test('a failed encoding is reported', async () => {
   vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation((callback) => {
     callback(null);
   });
-  await expect(preparePhoto(new File(['raw'], 'emma.png'))).rejects.toThrow('Your browser could not encode this photo.');
+  await expect(preparePhoto(new File(['raw'], 'emma.png'))).rejects.toMatchObject({ messageKey: 'photos.cannotEncode' });
 });

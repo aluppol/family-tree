@@ -11,10 +11,8 @@ import { PathTubes } from './pathTubes';
 import { PeopleMeshes } from './peopleMeshes';
 import { RingGuides } from './ringGuides';
 import { type ScenePalette, readPalette } from './sceneColors';
-import type { CameraPreset, RendererFactory, SceneFocus, SceneRenderer, TowerScene, TowerSceneOptions, ViewInsets } from './sceneTypes';
+import type { CameraPreset, RendererFactory, SceneFocus, SceneRenderer, SceneTexts, TowerScene, TowerSceneOptions, ViewInsets } from './sceneTypes';
 import { type Pointer, type ScreenPoint, TAP_RADIUS, isTap, nearestPerson } from './screenPicking';
-
-export const SCENE_LABEL = 'Time tower: every person in the family as a ball, placed higher for later generations. Use the search or the relatives list to move between people.';
 
 const FIELD_OF_VIEW = 45;
 const MAX_PIXEL_RATIO = 2;
@@ -87,7 +85,7 @@ class TowerSceneController implements TowerScene {
     this.renderer = createRenderer();
     this.palette = readPalette(host);
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    this.world = buildWorld(options.layout);
+    this.world = buildWorld(options);
     this.extent = extentOf(options.layout);
     this.resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(this.resize);
     this.mount();
@@ -117,6 +115,13 @@ class TowerSceneController implements TowerScene {
   setInsets(insets: ViewInsets): void {
     this.insets = insets;
     this.resize();
+  }
+
+  setTexts(texts: SceneTexts): void {
+    this.renderer.domElement.setAttribute('aria-label', texts.description);
+    this.world.rings.relabel(texts.ringLabel);
+    this.world.labels.rename(texts.personName);
+    this.requestFrame();
   }
 
   showPreset(preset: CameraPreset): void {
@@ -155,7 +160,7 @@ class TowerSceneController implements TowerScene {
   private mount(): void {
     const canvas = this.renderer.domElement;
     canvas.setAttribute('role', 'img');
-    canvas.setAttribute('aria-label', SCENE_LABEL);
+    canvas.setAttribute('aria-label', this.options.texts.description);
     Object.assign(canvas.style, { display: 'block', width: '100%', height: '100%' });
     this.labelRenderer.domElement.className = styles.labels ?? '';
     this.host.append(canvas, this.labelRenderer.domElement);
@@ -348,12 +353,12 @@ function partsOf(world: World): WorldPart[] {
   return [world.people, world.edges, world.rings, world.labels, world.path];
 }
 
-function buildWorld(layout: TowerLayout): World {
+function buildWorld({ layout, texts }: TowerSceneOptions): World {
   return {
     people: new PeopleMeshes([...layout.nodes.values()]),
     edges: new EdgeLines(layout),
-    rings: new RingGuides(layout.rings),
-    labels: new NameLabels(layout.nodes),
+    rings: new RingGuides(layout.rings, texts.ringLabel),
+    labels: new NameLabels(layout.nodes, texts.personName),
     path: new PathTubes(),
   };
 }

@@ -81,9 +81,9 @@ test('InlineError announces the server message', () => {
   expect(screen.getByRole('alert')).toHaveTextContent('Robert Darwin is already a parent of Charles Darwin.');
 });
 
-test('InlineError shows client rejections as they are', () => {
-  render(<InlineError error={new ClientRejection('This file is not a photo we can read.')} />);
-  expect(screen.getByRole('alert')).toHaveTextContent('This file is not a photo we can read.');
+test('InlineError shows client rejections from the catalogue', () => {
+  render(<InlineError error={new ClientRejection('photos.unreadable')} />);
+  expect(screen.getByRole('alert')).toHaveTextContent('This file is not a photo we can read. Choose a JPEG, PNG or WebP image.');
 });
 
 test('InlineError offers to sign in again when the session ended', () => {

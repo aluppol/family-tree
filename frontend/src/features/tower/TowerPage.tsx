@@ -1,6 +1,7 @@
 import { type ReactElement, useCallback, useMemo, useRef, useState } from 'react';
 import { LoadingState } from '../../design/components';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { useT } from '../../i18n/languageContext';
 import { fullName } from '../people/personName';
 import { usePersonIdParam } from '../people/usePersonIdParam';
 import { NotFoundView } from '../shell/NotFoundPage';
@@ -26,16 +27,17 @@ export function TowerPage(): ReactElement {
 }
 
 function TowerScreen({ personId }: { personId: number }): ReactElement {
+  const t = useT();
   const treeGraph = useTreeGraph();
   const graph = useMemo(() => (treeGraph.data === undefined ? undefined : indexTreeGraph(treeGraph.data)), [treeGraph.data]);
   const layout = useMemo(() => (graph === undefined ? undefined : layoutTower(graph)), [graph]);
   const node = layout?.nodes.get(personId);
-  useDocumentTitle(node === undefined ? null : `Time tower of ${fullName(node.person)}`);
+  useDocumentTitle(node === undefined ? null : t('tower.titleOf', { name: fullName(t, node.person) }));
   if (treeGraph.isLoadingError) {
     return <PageError error={treeGraph.error} onRetry={treeGraph.refetch} />;
   }
   if (graph === undefined || layout === undefined) {
-    return <LoadingState label="Building the time tower…" />;
+    return <LoadingState label={t('tower.building')} />;
   }
   return node === undefined ? <NotFoundView /> : <TowerExplorerScreen graph={graph} layout={layout} node={node} />;
 }

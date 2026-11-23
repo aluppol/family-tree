@@ -1,9 +1,11 @@
-import { type ReactElement, type RefObject, useEffect, useEffectEvent, useRef, useState } from 'react';
+import { type ReactElement, type RefObject, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 import { ButtonLink } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
 import type { TowerLayout } from './layout/towerTypes';
-import type { SceneFocus, TowerScene, ViewInsets } from './scene/sceneTypes';
+import type { SceneFocus, SceneTexts, TowerScene, ViewInsets } from './scene/sceneTypes';
 import { createTowerScene, isWebGLAvailable } from './scene/towerScene';
 import styles from './TowerPage.module.scss';
+import { sceneTextsOf } from './towerText';
 
 export interface TowerCanvasProps {
   layout: TowerLayout;
@@ -17,24 +19,31 @@ export interface TowerCanvasProps {
   onInteract: () => void;
 }
 
-export function TowerCanvas(props: TowerCanvasProps): ReactElement {
-  const [canDraw] = useState(isWebGLAvailable);
-  return canDraw ? <SceneHost {...props} /> : <NoWebGL cardsPath={props.cardsPath} />;
+interface SceneHostProps extends TowerCanvasProps {
+  texts: SceneTexts;
 }
 
-function SceneHost(props: TowerCanvasProps): ReactElement {
+export function TowerCanvas(props: TowerCanvasProps): ReactElement {
+  const t = useT();
+  const [canDraw] = useState(isWebGLAvailable);
+  const texts = useMemo(() => sceneTextsOf(t), [t]);
+  return canDraw ? <SceneHost {...props} texts={texts} /> : <NoWebGL cardsPath={props.cardsPath} />;
+}
+
+function SceneHost(props: SceneHostProps): ReactElement {
   const { layout, isReducedMotion, sceneRef, onPick, onInteract } = props;
   const hostRef = useRef<HTMLDivElement>(null);
   const handlePick = useEffectEvent(onPick);
   const handleInteract = useEffectEvent(onInteract);
   const initialInsets = useEffectEvent(() => props.insets);
+  const initialTexts = useEffectEvent(() => props.texts);
   useEffect(() => {
     const host = hostRef.current;
     if (host === null) {
       return undefined;
     }
     const callbacks = { onPick: (personId: number) => { handlePick(personId); }, onInteract: () => { handleInteract(); } };
-    const scene = createTowerScene(host, { layout, isReducedMotion, callbacks, insets: initialInsets() });
+    const scene = createTowerScene(host, { layout, isReducedMotion, callbacks, insets: initialInsets(), texts: initialTexts() });
     sceneRef.current = scene;
     return () => {
       scene.dispose();
@@ -45,11 +54,14 @@ function SceneHost(props: TowerCanvasProps): ReactElement {
   return <div ref={hostRef} className={styles.canvasHost} />;
 }
 
-function useSceneState({ layout, focus, sceneRef, isRotating, isReducedMotion, insets }: TowerCanvasProps): void {
+function useSceneState({ layout, focus, sceneRef, isRotating, isReducedMotion, insets, texts }: SceneHostProps): void {
   const shownFocusRef = useRef<number | null>(null);
   useEffect(() => {
     sceneRef.current?.setInsets(insets);
   }, [insets, layout, isReducedMotion, sceneRef]);
+  useEffect(() => {
+    sceneRef.current?.setTexts(texts);
+  }, [texts, layout, isReducedMotion, sceneRef]);
   useEffect(() => {
     sceneRef.current?.showFocus(focus);
   }, [focus, layout, isReducedMotion, sceneRef]);
@@ -65,10 +77,11 @@ function useSceneState({ layout, focus, sceneRef, isRotating, isReducedMotion, i
 }
 
 function NoWebGL({ cardsPath }: { cardsPath: string }): ReactElement {
+  const t = useT();
   return (
     <div className={styles.noWebGL}>
-      <p>This browser cannot draw the 3D tower.</p>
-      <ButtonLink to={cardsPath}>Open the cards view</ButtonLink>
+      <p>{t('tower.noWebGL')}</p>
+      <ButtonLink to={cardsPath}>{t('tower.openCardsView')}</ButtonLink>
     </div>
   );
 }

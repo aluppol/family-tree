@@ -45,10 +45,10 @@ describe('ChartPage loading', () => {
 
 describe('ChartPage errors', () => {
   it('says the person was not found when the server answers 404', async () => {
-    serveError(404, { code: 'person.not_found', message: 'This person does not exist.' });
+    serveError(404, { code: 'person.not_found', message: 'This person is not in your family tree.' });
     renderPageAt('/tree/404');
     expect(await screen.findByRole('heading', { level: 1, name: 'Not found' })).toBeInTheDocument();
-    expect(screen.getByText('This person does not exist.')).toBeInTheDocument();
+    expect(screen.getByText('This person is not in your family tree.')).toBeInTheDocument();
   });
 
   it('tells the viewer when their session has ended', async () => {

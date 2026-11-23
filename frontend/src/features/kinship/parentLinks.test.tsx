@@ -44,14 +44,14 @@ test('adding a parent with an empty search box asks for a name or a choice', asy
 });
 
 test('a kinship rule violation from the server is shown inside the dialog', async () => {
-  mockServer.use(http.post('/api/parent-links/', () => apiErrorResponse(400, { code: 'kinship.cycle', message: 'William Erasmus Darwin is a descendant of Charles Robert Darwin.' })));
+  mockServer.use(http.post('/api/parent-links/', () => apiErrorResponse(400, { code: 'kinship.cycle', message: 'The child is already an ancestor of this parent.' })));
   const { user } = renderApp(`/people/${String(DARWIN_IDS.charles)}`);
   await user.click(within(await findSection('Parents')).getByRole('button', { name: 'Add parent' }));
   const dialog = screen.getByRole('dialog');
   await user.click(within(dialog).getByRole('combobox', { name: 'Person' }));
   await user.click(await within(dialog).findByRole('option', { name: /Emma Wedgwood/ }));
   await user.click(within(dialog).getByRole('button', { name: 'Add parent' }));
-  expect(await within(dialog).findByRole('alert')).toHaveTextContent('William Erasmus Darwin is a descendant of Charles Robert Darwin.');
+  expect(await within(dialog).findByRole('alert')).toHaveTextContent('The child is already an ancestor of this parent.');
   expect(screen.getByRole('dialog')).toBeInTheDocument();
 });
 

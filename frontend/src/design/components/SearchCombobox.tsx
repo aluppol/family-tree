@@ -1,4 +1,6 @@
 import type { MouseEvent, ReactElement } from 'react';
+import { useT } from '../../i18n/languageContext';
+import type { Translate } from '../../i18n/translate';
 import { type FieldDescription, FieldError, FieldHint, FieldLabel, type FieldTexts, useFieldDescription } from './fieldParts';
 import { Icon } from './Icon';
 import styles from './SearchCombobox.module.scss';
@@ -18,11 +20,12 @@ export interface SearchComboboxProps<Option extends ComboboxOption> extends Fiel
 }
 
 export function SearchCombobox<Option extends ComboboxOption>(props: SearchComboboxProps<Option>): ReactElement {
-  const { label, options, isLoading = false, emptyMessage = 'No matches', hint, error } = props;
+  const { label, options, isLoading = false, emptyMessage, hint, error } = props;
+  const t = useT();
   const description = useFieldDescription(props);
   const listboxId = `${description.controlId}-listbox`;
   const behaviour = useComboboxBehaviour({ ...props, listboxId });
-  const emptyText = isLoading ? 'Searching…' : emptyMessage;
+  const emptyText = isLoading ? t('common.searching') : (emptyMessage ?? t('common.noMatches'));
   return (
     <div className={styles.combobox}>
       <FieldLabel htmlFor={description.controlId} label={label} />
@@ -31,7 +34,7 @@ export function SearchCombobox<Option extends ComboboxOption>(props: SearchCombo
       <ComboboxPopup listboxId={listboxId} label={label} options={options} behaviour={behaviour} emptyText={emptyText} />
       <FieldError description={description} error={error} />
       <span role="status" className="visually-hidden">
-        {behaviour.isOpen ? announcement(options.length, emptyText) : ''}
+        {behaviour.isOpen ? announcement(t, options.length, emptyText) : ''}
       </span>
     </div>
   );
@@ -123,9 +126,6 @@ function ComboboxOptionRow<Option extends ComboboxOption>({ option, behaviour }:
   );
 }
 
-function announcement(optionCount: number, emptyText: string): string {
-  if (optionCount === 0) {
-    return emptyText;
-  }
-  return optionCount === 1 ? '1 suggestion available.' : `${String(optionCount)} suggestions available.`;
+function announcement(t: Translate, optionCount: number, emptyText: string): string {
+  return optionCount === 0 ? emptyText : t('combobox.suggestions', { count: optionCount });
 }

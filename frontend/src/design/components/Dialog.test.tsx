@@ -71,7 +71,7 @@ test('ConfirmDialog confirms and cancels', async () => {
 
 test('ConfirmDialog ignores a second confirmation while pending and shows the failure', async () => {
   const handleConfirm = vi.fn();
-  const failure = new ApiError(400, { code: 'kinship.cycle', message: 'That would make a person their own ancestor.', fields: {} });
+  const failure = new ApiError(400, { code: 'kinship.cycle', message: 'The child is already an ancestor of this parent.', fields: {} });
   render(
     <ConfirmDialog isOpen isPending title="Remove link?" confirmLabel="Remove link" onConfirm={handleConfirm} onCancel={vi.fn()} error={failure}>
       <p>Both people stay.</p>
@@ -81,7 +81,7 @@ test('ConfirmDialog ignores a second confirmation while pending and shows the fa
   expect(confirmButton).toHaveAttribute('aria-disabled', 'true');
   await userEvent.click(confirmButton);
   expect(handleConfirm).not.toHaveBeenCalled();
-  expect(screen.getByRole('alert')).toHaveTextContent('That would make a person their own ancestor.');
+  expect(screen.getByRole('alert')).toHaveTextContent('The child is already an ancestor of this parent.');
 });
 
 test('DialogFormActions submits the surrounding form and cancels', async () => {

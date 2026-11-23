@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 import { useNavigate } from 'react-router';
 import type { Person, PersonProfile } from '../../api/types';
 import { LoadingState } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
 import { profilePath } from '../../routePaths';
 import { fullName } from '../people/personName';
 import { usePersonIdParam } from '../people/usePersonIdParam';
@@ -19,10 +20,11 @@ export function EditPersonPage(): ReactElement {
 }
 
 function PersonEditor({ personId }: { personId: number }): ReactElement {
+  const t = useT();
   const person = usePerson(personId);
-  useDocumentTitle(person.data === undefined ? 'Edit person' : `Edit ${fullName(person.data)}`);
+  useDocumentTitle(person.data === undefined ? t('personForm.editTitle') : t('personForm.editHeading', { name: fullName(t, person.data) }));
   if (person.isPending) {
-    return <LoadingState label="Loading person…" />;
+    return <LoadingState label={t('personForm.loading')} />;
   }
   if (person.isError) {
     return <PageError error={person.error} onRetry={person.refetch} />;
@@ -31,6 +33,7 @@ function PersonEditor({ personId }: { personId: number }): ReactElement {
 }
 
 function EditPersonForm({ person }: { person: Person }): ReactElement {
+  const t = useT();
   const navigate = useNavigate();
   const updatePerson = useUpdatePerson();
   function handleValidSubmit(profile: PersonProfile): void {
@@ -46,8 +49,8 @@ function EditPersonForm({ person }: { person: Person }): ReactElement {
   const form = usePersonForm({ initialDraft: draftFromProfile(person), serverError: updatePerson.error, onValidSubmit: handleValidSubmit });
   return (
     <PersonFormView
-      heading={`Edit ${fullName(person)}`}
-      submitLabel="Save changes"
+      heading={t('personForm.editHeading', { name: fullName(t, person) })}
+      submitLabel={t('personForm.saveChanges')}
       cancelPath={profilePath(person.id)}
       isSubmitting={updatePerson.isPending}
       serverError={updatePerson.error}

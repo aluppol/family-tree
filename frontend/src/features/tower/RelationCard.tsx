@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react';
 import type { PersonSummary } from '../../api/types';
 import { Button } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
 import { fullName } from '../people/personName';
 import { relationWord } from './relationPath';
 import styles from './TowerPage.module.scss';
@@ -14,33 +15,34 @@ export interface RelationCardProps {
 }
 
 export function RelationCard({ person, relation, onSelect, onClear }: RelationCardProps): ReactElement {
+  const t = useT();
+  const names = { from: fullName(t, person), to: fullName(t, relation.target) };
   return (
-    <section className={styles.relationCard} aria-label={`How ${fullName(person)} is related to ${fullName(relation.target)}`}>
-      <p className={styles.relationTitle}>
-        From {fullName(person)} to {fullName(relation.target)}
-      </p>
+    <section className={styles.relationCard} aria-label={t('tower.relationLabel', names)}>
+      <p className={styles.relationTitle}>{t('tower.relationTitle', names)}</p>
       <RelationLinks links={relation.links} onSelect={onSelect} />
       <Button size="small" variant="ghost" onClick={onClear}>
-        Clear the path
+        {t('tower.clearPath')}
       </Button>
     </section>
   );
 }
 
 function RelationLinks({ links, onSelect }: { links: readonly RelationLink[] | null; onSelect: (personId: number) => void }): ReactElement {
+  const t = useT();
   if (links === null) {
-    return <p className={styles.relationNote}>They are not connected in this tree.</p>;
+    return <p className={styles.relationNote}>{t('tower.notConnected')}</p>;
   }
   if (links.length === 0) {
-    return <p className={styles.relationNote}>This is the same person.</p>;
+    return <p className={styles.relationNote}>{t('tower.samePerson')}</p>;
   }
   return (
     <ol className={styles.relationSteps}>
       {links.map((link) => (
         <li key={link.person.id}>
           <button type="button" className={styles.relativeButton} onClick={() => { onSelect(link.person.id); }}>
-            <span className={styles.relativeYears}>{relationWord(link.relation, link.person.sex)}</span>
-            <span className={styles.relativeName}>{fullName(link.person)}</span>
+            <span className={styles.relativeYears}>{relationWord(t, link.relation, link.person.sex)}</span>
+            <span className={styles.relativeName}>{fullName(t, link.person)}</span>
           </button>
         </li>
       ))}

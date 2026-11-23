@@ -34,10 +34,12 @@ export interface TowerMarriage {
   readonly secondId: number;
 }
 
+export type RingLabel = { readonly kind: 'decade'; readonly year: number } | { readonly kind: 'generation'; readonly number: number };
+
 export interface TowerRing {
   readonly y: number;
   readonly radius: number;
-  readonly label: string | null;
+  readonly label: RingLabel | null;
   readonly isMajor: boolean;
 }
 

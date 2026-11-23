@@ -40,14 +40,14 @@ async function encodeWithinLimit(canvas: HTMLCanvasElement): Promise<EncodedJpeg
       return { blob, quality };
     }
   }
-  throw new ClientRejection('This photo is too large even after resizing. Choose a smaller photo.');
+  throw new ClientRejection('photos.tooLarge');
 }
 
 async function decodeImage(file: File): Promise<ImageBitmap> {
   try {
     return await createImageBitmap(file);
   } catch {
-    throw new ClientRejection('This file is not a photo we can read. Choose a JPEG, PNG or WebP image.');
+    throw new ClientRejection('photos.unreadable');
   }
 }
 
@@ -57,7 +57,7 @@ function drawScaled(image: ImageBitmap, size: PixelSize): HTMLCanvasElement {
   canvas.height = size.height;
   const context = canvas.getContext('2d');
   if (context === null) {
-    throw new ClientRejection('Your browser cannot resize photos.');
+    throw new ClientRejection('photos.cannotResize');
   }
   context.fillStyle = JPEG_BACKGROUND;
   context.fillRect(0, 0, size.width, size.height);
@@ -70,7 +70,7 @@ function encodeJpeg(canvas: HTMLCanvasElement, quality: number): Promise<Blob> {
     canvas.toBlob(
       (encoded) => {
         if (encoded === null) {
-          reject(new ClientRejection('Your browser could not encode this photo.'));
+          reject(new ClientRejection('photos.cannotEncode'));
         } else {
           resolve(encoded);
         }

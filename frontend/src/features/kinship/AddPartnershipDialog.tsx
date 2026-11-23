@@ -2,6 +2,7 @@ import { type ReactElement, type SubmitEvent, useState } from 'react';
 import { createNewSpouse } from '../../api/kinship';
 import type { PartnershipTerms, Person } from '../../api/types';
 import { Dialog, DialogFormActions, InlineError } from '../../design/components';
+import { useT } from '../../i18n/languageContext';
 import { fullName } from '../people/personName';
 import styles from './Kinship.module.scss';
 import { useCreateNewRelative, useCreatePartnership } from './kinshipQueries';
@@ -26,6 +27,7 @@ interface SpouseRequests {
 const IGNORED_CHOICE: RelativeChoiceHandlers = { onExistingPerson: () => undefined, onNewPerson: () => undefined };
 
 export function AddPartnershipDialog({ person, onClose }: AddPartnershipDialogProps): ReactElement {
+  const t = useT();
   const choice = useRelativeChoice(PARTNERS, person.id, '');
   const [draft, setDraft] = useState(EMPTY_TERMS_DRAFT);
   const [errors, setErrors] = useState<TermsErrors>({});
@@ -39,12 +41,12 @@ export function AddPartnershipDialog({ person, onClose }: AddPartnershipDialogPr
     }
   }
   return (
-    <Dialog isOpen title={`Add a spouse of ${fullName(person)}`} onClose={onClose}>
+    <Dialog isOpen title={t('kinship.spouses.dialogTitle', { name: fullName(t, person) })} onClose={onClose}>
       <form className={styles.dialogForm} noValidate onSubmit={handleSubmit}>
-        <RelativeChoiceFields choice={choice} label="Spouse" relativeNoun="spouse" />
+        <RelativeChoiceFields choice={choice} label={t('kinship.spouses.fieldLabel')} choiceMissingText={t('kinship.spouses.choiceMissing')} />
         <PartnershipTermsFields draft={draft} errors={errors} onDraftChange={setDraft} />
         <InlineError error={choice.newRelative === null ? spouse.partnershipError : spouse.newSpouseError} />
-        <DialogFormActions submitLabel="Add spouse" pendingLabel="Adding…" isPending={spouse.isPending} onCancel={onClose} />
+        <DialogFormActions submitLabel={t('kinship.spouses.add')} pendingLabel={t('common.adding')} isPending={spouse.isPending} onCancel={onClose} />
       </form>
     </Dialog>
   );

@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
-
-const APP_NAME = 'Family Tree';
+import { useT } from '../../i18n/languageContext';
 
 export function useDocumentTitle(pageTitle: string | null): void {
+  const t = useT();
+  const appName = t('app.name');
+  const title = pageTitle === null ? appName : t('app.pageTitle', { page: pageTitle, app: appName });
   useEffect(() => {
-    document.title = pageTitle === null ? APP_NAME : `${pageTitle} · ${APP_NAME}`;
-  }, [pageTitle]);
+    document.title = title;
+  }, [title]);
 }
